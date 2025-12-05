@@ -10,9 +10,9 @@ Whats Up Addis is a modern web application that enables users to discover, creat
 
 - **Monorepo**: pnpm workspaces
 - **Frontend**: Next.js 15, React 19, Tailwind CSS
-- **Backend**: Node.js 24, Express, TypeScript
+- **Backend**: Node.js 22, Express, TypeScript
 - **Database**: PostgreSQL with Prisma ORM
-- **Crawler**: Node.js with Cheerio and Axios
+- **Crawler**: Node.js with Puppeteer for dynamic content scraping
 - **Authentication**: JWT with bcrypt
 
 ## Project Structure
@@ -31,7 +31,7 @@ whats-up-addis/
 
 ## Prerequisites
 
-- Node.js 24 or higher
+- Node.js 22 or higher
 - pnpm 9.0.0 or higher
 - PostgreSQL 15 or higher
 
