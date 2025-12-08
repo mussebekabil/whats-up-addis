@@ -29,7 +29,11 @@ export class CategoryController {
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
 
-      const result = await categoryService.getEventsByCategory(slug, page, limit);
+      const result = await categoryService.getEventsByCategory(
+        slug,
+        page,
+        limit
+      );
       res.json(result);
     } catch (error) {
       next(error);

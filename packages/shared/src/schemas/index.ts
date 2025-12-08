@@ -21,7 +21,11 @@ const eventBaseSchema = z.object({
   startDate: z.string().datetime('Invalid start date'),
   endDate: z.string().datetime('Invalid end date'),
   imageUrl: z.string().url('Invalid image URL').optional().nullable(),
-  price: z.number().nonnegative('Price must be non-negative').optional().nullable(),
+  price: z
+    .number()
+    .nonnegative('Price must be non-negative')
+    .optional()
+    .nullable(),
   categoryId: z.string().uuid('Invalid category ID'),
   tags: z.array(z.string()).optional(),
 });
@@ -51,7 +55,11 @@ export const eventFiltersSchema = z.object({
 // Category schemas
 export const createCategorySchema = z.object({
   name: z.string().min(2).max(100),
-  slug: z.string().min(2).max(100).regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+  slug: z
+    .string()
+    .min(2)
+    .max(100)
+    .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
   description: z.string().optional(),
 });
 
@@ -75,5 +83,9 @@ export type UpdateEventInput = z.infer<typeof updateEventSchema>;
 export type EventFiltersInput = z.infer<typeof eventFiltersSchema>;
 export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
-export type CreateCrawlerSourceInput = z.infer<typeof createCrawlerSourceSchema>;
-export type UpdateCrawlerSourceInput = z.infer<typeof updateCrawlerSourceSchema>;
+export type CreateCrawlerSourceInput = z.infer<
+  typeof createCrawlerSourceSchema
+>;
+export type UpdateCrawlerSourceInput = z.infer<
+  typeof updateCrawlerSourceSchema
+>;

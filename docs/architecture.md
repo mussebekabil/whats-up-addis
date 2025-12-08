@@ -30,6 +30,7 @@
 ### 2.2 Component Overview
 
 #### Frontend (Next.js + React)
+
 - Server-side rendering for optimal SEO
 - User interface for browsing and managing events
 - Authentication and user management
@@ -37,6 +38,7 @@
 - Responsive design for mobile and desktop
 
 #### Backend API (Node.js + TypeScript)
+
 - RESTful API for event CRUD operations
 - User authentication and authorization
 - Event validation and business logic
@@ -44,6 +46,7 @@
 - API documentation with OpenAPI/Swagger
 
 #### Crawler Service (Node.js + TypeScript)
+
 - Automated web scraping from multiple sources
 - Event data extraction and normalization
 - Duplicate detection and deduplication
@@ -51,6 +54,7 @@
 - Error handling and retry mechanisms
 
 #### Database (PostgreSQL)
+
 - Event storage with full-text search capabilities
 - User management
 - Event categories and tags
@@ -60,10 +64,12 @@
 ## 3. Technology Stack
 
 ### 3.1 Monorepo Management
+
 - **pnpm**: Workspace management and dependency handling
 - **Turborepo** (optional): Build orchestration and caching
 
 ### 3.2 Frontend
+
 - **Framework**: Next.js 14+ (App Router)
 - **UI Library**: React 18+
 - **Styling**: Tailwind CSS
@@ -73,6 +79,7 @@
 - **Date Handling**: date-fns
 
 ### 3.3 Backend API
+
 - **Runtime**: Node.js 20+
 - **Framework**: Express.js / Fastify
 - **Language**: TypeScript
@@ -82,6 +89,7 @@
 - **API Documentation**: Swagger/OpenAPI
 
 ### 3.4 Crawler Service
+
 - **Scraping**: Puppeteer / Playwright / Cheerio
 - **Scheduling**: node-cron / Bull Queue
 - **HTTP Client**: Axios
@@ -89,11 +97,13 @@
 - **Data Validation**: Zod
 
 ### 3.5 Database
+
 - **Database**: PostgreSQL 15+
 - **Full-Text Search**: PostgreSQL native FTS
 - **Migrations**: Prisma Migrate / TypeORM migrations
 
 ### 3.6 DevOps & Tools
+
 - **Package Manager**: pnpm
 - **Code Quality**: ESLint, Prettier
 - **Testing**: Jest, React Testing Library
@@ -106,6 +116,7 @@
 ### 4.1 Core Tables
 
 #### Events
+
 ```sql
 - id: UUID (PK)
 - title: VARCHAR(255)
@@ -126,6 +137,7 @@
 ```
 
 #### Users
+
 ```sql
 - id: UUID (PK)
 - email: VARCHAR(255) UNIQUE
@@ -137,6 +149,7 @@
 ```
 
 #### Categories
+
 ```sql
 - id: UUID (PK)
 - name: VARCHAR(100)
@@ -146,6 +159,7 @@
 ```
 
 #### Crawler_Sources
+
 ```sql
 - id: UUID (PK)
 - name: VARCHAR(255)
@@ -157,6 +171,7 @@
 ```
 
 #### Event_Tags
+
 ```sql
 - id: UUID (PK)
 - event_id: UUID (FK)
@@ -166,6 +181,7 @@
 ## 5. API Endpoints
 
 ### 5.1 Events
+
 - `GET /api/events` - List events (with pagination, filters)
 - `GET /api/events/:id` - Get event details
 - `POST /api/events` - Create new event (authenticated)
@@ -174,16 +190,19 @@
 - `GET /api/events/search` - Search events
 
 ### 5.2 Categories
+
 - `GET /api/categories` - List all categories
 - `GET /api/categories/:slug/events` - Get events by category
 
 ### 5.3 Authentication
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/me` - Get current user
 
 ### 5.4 Admin
+
 - `GET /api/admin/crawler/sources` - List crawler sources
 - `POST /api/admin/crawler/sources` - Add crawler source
 - `POST /api/admin/crawler/run` - Trigger manual crawl
@@ -259,24 +278,28 @@ whats-up-addis/
 ## 7. Key Features
 
 ### 7.1 Event Discovery
+
 - Browse upcoming events in Addis Ababa
 - Filter by date, category, location
 - Full-text search
 - Event details with images and descriptions
 
 ### 7.2 Event Management
+
 - User registration and authentication
 - Create and publish events
 - Edit and delete own events
 - Admin moderation capabilities
 
 ### 7.3 Automated Crawling
+
 - Scheduled scraping from multiple sources
 - Automatic event extraction and normalization
 - Duplicate detection
 - Source attribution
 
 ### 7.4 User Experience
+
 - Responsive design
 - Fast page loads with SSR
 - SEO optimized

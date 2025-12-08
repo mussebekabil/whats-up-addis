@@ -44,6 +44,7 @@ POST /api/auth/register
 ```
 
 **Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -53,6 +54,7 @@ POST /api/auth/register
 ```
 
 **Response:**
+
 ```json
 {
   "user": {
@@ -75,6 +77,7 @@ POST /api/auth/login
 ```
 
 **Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -83,6 +86,7 @@ POST /api/auth/login
 ```
 
 **Response:**
+
 ```json
 {
   "user": {
@@ -106,6 +110,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "id": "uuid",
@@ -132,6 +137,7 @@ GET /api/events?page=1&limit=20&categoryId=uuid&search=music&isFree=true
 ```
 
 **Query Parameters:**
+
 - `page` (number, default: 1)
 - `limit` (number, default: 20, max: 100)
 - `categoryId` (string, optional)
@@ -143,6 +149,7 @@ GET /api/events?page=1&limit=20&categoryId=uuid&search=music&isFree=true
 - `isFree` (boolean, optional)
 
 **Response:**
+
 ```json
 {
   "data": [
@@ -155,7 +162,7 @@ GET /api/events?page=1&limit=20&categoryId=uuid&search=music&isFree=true
       "startDate": "2025-02-01T18:00:00.000Z",
       "endDate": "2025-02-01T22:00:00.000Z",
       "imageUrl": "https://...",
-      "price": 500.00,
+      "price": 500.0,
       "source": "manual",
       "categoryId": "uuid",
       "category": {
@@ -197,6 +204,7 @@ Authorization: Bearer <token>
 ```
 
 **Body:**
+
 ```json
 {
   "title": "Music Concert",
@@ -206,7 +214,7 @@ Authorization: Bearer <token>
   "startDate": "2025-02-01T18:00:00.000Z",
   "endDate": "2025-02-01T22:00:00.000Z",
   "imageUrl": "https://...",
-  "price": 500.00,
+  "price": 500.0,
   "categoryId": "uuid",
   "tags": ["live-music", "concert"]
 }
@@ -235,6 +243,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Event deleted successfully"
@@ -250,6 +259,7 @@ GET /api/events/search?q=music&page=1&limit=20
 ```
 
 **Query Parameters:**
+
 - `q` (string, required) - Search query
 - `page` (number, default: 1)
 - `limit` (number, default: 20)
@@ -263,6 +273,7 @@ GET /api/categories
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -303,6 +314,7 @@ Authorization: Bearer <admin-token>
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -325,6 +337,7 @@ Authorization: Bearer <admin-token>
 ```
 
 **Body:**
+
 ```json
 {
   "name": "New Event Site",
@@ -358,6 +371,7 @@ Authorization: Bearer <admin-token>
 ```
 
 **Response:**
+
 ```json
 {
   "message": "Crawler triggered successfully"

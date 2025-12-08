@@ -18,7 +18,11 @@ export class AdminController {
     }
   }
 
-  async getCrawlerSourceById(req: AuthRequest, res: Response, next: NextFunction) {
+  async getCrawlerSourceById(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { id } = req.params;
       const source = await adminService.getCrawlerSourceById(id);
@@ -28,7 +32,11 @@ export class AdminController {
     }
   }
 
-  async createCrawlerSource(req: AuthRequest, res: Response, next: NextFunction) {
+  async createCrawlerSource(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const data = createCrawlerSourceSchema.parse(req.body);
       const source = await adminService.createCrawlerSource(data);
@@ -38,7 +46,11 @@ export class AdminController {
     }
   }
 
-  async updateCrawlerSource(req: AuthRequest, res: Response, next: NextFunction) {
+  async updateCrawlerSource(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { id } = req.params;
       const data = updateCrawlerSourceSchema.parse(req.body);
@@ -49,7 +61,11 @@ export class AdminController {
     }
   }
 
-  async deleteCrawlerSource(req: AuthRequest, res: Response, next: NextFunction) {
+  async deleteCrawlerSource(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const { id } = req.params;
       const result = await adminService.deleteCrawlerSource(id);

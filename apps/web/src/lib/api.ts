@@ -17,9 +17,9 @@ class ApiClient {
   ): Promise<T> {
     const { token, ...fetchOptions } = options;
 
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...fetchOptions.headers,
+      ...(fetchOptions.headers as Record<string, string>),
     };
 
     if (token) {
@@ -45,11 +45,7 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'GET', token });
   }
 
-  async post<T>(
-    endpoint: string,
-    data: any,
-    token?: string
-  ): Promise<T> {
+  async post<T>(endpoint: string, data: unknown, token?: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -57,11 +53,7 @@ class ApiClient {
     });
   }
 
-  async put<T>(
-    endpoint: string,
-    data: any,
-    token?: string
-  ): Promise<T> {
+  async put<T>(endpoint: string, data: unknown, token?: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),

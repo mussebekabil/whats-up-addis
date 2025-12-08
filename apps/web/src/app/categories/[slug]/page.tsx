@@ -10,14 +10,17 @@ interface CategoryPageProps {
   searchParams: Promise<{ page?: string }>;
 }
 
-export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: CategoryPageProps) {
   const { slug } = await params;
   const { page: pageParam } = await searchParams;
   const page = pageParam ? parseInt(pageParam) : 1;
 
-  let category;
-  let events = [];
-  let pagination = null;
+  let category: any;
+  let events: any[] = [];
+  let pagination: any = null;
 
   try {
     const [categoryData, eventsData] = await Promise.all([
@@ -25,8 +28,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       categoryService.getEventsByCategory(slug, page, 12),
     ]);
     category = categoryData;
-    events = eventsData.data;
-    pagination = eventsData.pagination;
+    events = (eventsData as any).data;
+    pagination = (eventsData as any).pagination;
   } catch (error) {
     console.error('Error fetching category data:', error);
     notFound();
@@ -89,21 +92,22 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   </Link>
                 )}
 
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(
-                  (pageNum) => (
-                    <Link
-                      key={pageNum}
-                      href={`/categories/${slug}?page=${pageNum}`}
-                      className={`px-4 py-2 rounded ${
-                        pageNum === pagination.page
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      {pageNum}
-                    </Link>
-                  )
-                )}
+                {Array.from(
+                  { length: pagination.totalPages },
+                  (_, i) => i + 1
+                ).map((pageNum) => (
+                  <Link
+                    key={pageNum}
+                    href={`/categories/${slug}?page=${pageNum}`}
+                    className={`px-4 py-2 rounded ${
+                      pageNum === pagination.page
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {pageNum}
+                  </Link>
+                ))}
 
                 {pagination.hasNextPage && (
                   <Link

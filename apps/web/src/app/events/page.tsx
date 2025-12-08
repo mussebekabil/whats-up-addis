@@ -5,15 +5,16 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export default async function EventsPage() {
-  let events = [];
-  let pagination = null;
+  let events: any[] = [];
+  let pagination: any = null;
   let error = null;
   try {
-    const response = await eventService.getEvents({ limit: 12 });
+    const response = await eventService.getEvents({ page: 1, limit: 12 });
     events = response.data;
     pagination = response.pagination;
   } catch (err) {
-    error = 'Failed to load events. Please make sure the API server is running.';
+    error =
+      'Failed to load events. Please make sure the API server is running.';
     console.error('Error fetching events:', err);
   }
 
@@ -25,7 +26,7 @@ export default async function EventsPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">All Events</h1>
           <p className="text-gray-600">
-            Discover what's happening in Addis Ababa
+            Discover what&apos;s happening in Addis Ababa
           </p>
         </div>
 
@@ -38,28 +39,29 @@ export default async function EventsPage() {
         {events.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event: any) => (
+              {events.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
 
             {pagination && pagination.totalPages > 1 && (
               <div className="mt-8 flex justify-center gap-2">
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <Link
-                      key={page}
-                      href={`/events?page=${page}`}
-                      className={`px-4 py-2 rounded ${
-                        page === pagination.page
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      {page}
-                    </Link>
-                  )
-                )}
+                {Array.from(
+                  { length: pagination.totalPages },
+                  (_, i) => i + 1
+                ).map((page) => (
+                  <Link
+                    key={page}
+                    href={`/events?page=${page}`}
+                    className={`px-4 py-2 rounded ${
+                      page === pagination.page
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {page}
+                  </Link>
+                ))}
               </div>
             )}
           </>

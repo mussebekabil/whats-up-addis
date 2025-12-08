@@ -32,7 +32,7 @@ export class AdminService {
 
   async updateCrawlerSource(id: string, data: UpdateCrawlerSourceInput) {
     const source = await this.getCrawlerSourceById(id);
-
+    console.log('Existing source:', source);
     return prisma.crawlerSource.update({
       where: { id },
       data,

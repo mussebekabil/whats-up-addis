@@ -13,9 +13,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
     >
       <h3 className="font-semibold text-lg">{category.name}</h3>
       {category.description && (
-        <p className="text-sm text-gray-600 mt-2">
-          {category.description}
-        </p>
+        <p className="text-sm text-gray-600 mt-2">{category.description}</p>
       )}
     </Link>
   );

@@ -21,7 +21,7 @@ export class EventService {
       limit = 20,
     } = filters;
 
-    const where: any = {
+    const where: Record<string, unknown> = {
       isActive: true,
     };
 
@@ -30,9 +30,11 @@ export class EventService {
     }
 
     if (startDate || endDate) {
-      where.startDate = {};
-      if (startDate) where.startDate.gte = new Date(startDate);
-      if (endDate) where.startDate.lte = new Date(endDate);
+      where.startDate = {} as Record<string, unknown>;
+      if (startDate)
+        (where.startDate as Record<string, unknown>).gte = new Date(startDate);
+      if (endDate)
+        (where.startDate as Record<string, unknown>).lte = new Date(endDate);
     }
 
     if (search) {
@@ -48,9 +50,11 @@ export class EventService {
       where.price = isFree ? null : { not: null };
     } else {
       if (minPrice !== undefined || maxPrice !== undefined) {
-        where.price = {};
-        if (minPrice !== undefined) where.price.gte = minPrice;
-        if (maxPrice !== undefined) where.price.lte = maxPrice;
+        where.price = {} as Record<string, unknown>;
+        if (minPrice !== undefined)
+          (where.price as Record<string, unknown>).gte = minPrice;
+        if (maxPrice !== undefined)
+          (where.price as Record<string, unknown>).lte = maxPrice;
       }
     }
 
@@ -138,7 +142,12 @@ export class EventService {
     return event;
   }
 
-  async updateEvent(id: string, data: UpdateEventInput, userId: string, userRole: string) {
+  async updateEvent(
+    id: string,
+    data: UpdateEventInput,
+    userId: string,
+    userRole: string
+  ) {
     const event = await prisma.event.findUnique({
       where: { id },
     });
@@ -155,7 +164,7 @@ export class EventService {
     const { tags, ...eventData } = data;
 
     // Convert dates if provided
-    const updateData: any = { ...eventData };
+    const updateData: Record<string, unknown> = { ...eventData };
     if (eventData.startDate) {
       updateData.startDate = new Date(eventData.startDate);
     }

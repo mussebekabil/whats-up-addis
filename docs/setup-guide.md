@@ -112,6 +112,7 @@ When prompted, give your migration a name (e.g., "initial").
 ### 7. Seed the Database (Optional)
 
 The seed script will create:
+
 - Default categories
 - An admin user (email: admin@whatsupaddis.com)
 - Sample crawler sources
@@ -165,6 +166,7 @@ lsof -ti:3001 | xargs kill -9
 ### Database Connection Issues
 
 1. Verify PostgreSQL is running:
+
    ```bash
    psql -U postgres -c "SELECT version();"
    ```

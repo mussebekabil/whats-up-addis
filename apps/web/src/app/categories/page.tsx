@@ -4,13 +4,14 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export default async function CategoriesPage() {
-  let categories = [];
+  let categories: any[] = [];
   let error = null;
 
   try {
     categories = await categoryService.getCategories();
   } catch (err) {
-    error = 'Failed to load categories. Please make sure the API server is running.';
+    error =
+      'Failed to load categories. Please make sure the API server is running.';
     console.error('Error fetching categories:', err);
   }
 
@@ -21,9 +22,7 @@ export default async function CategoriesPage() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Event Categories</h1>
-          <p className="text-gray-600">
-            Browse events by category
-          </p>
+          <p className="text-gray-600">Browse events by category</p>
         </div>
 
         {error && (
@@ -34,7 +33,7 @@ export default async function CategoriesPage() {
 
         {categories.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category: any) => (
+            {categories.map((category) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}

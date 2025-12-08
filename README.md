@@ -98,6 +98,7 @@ pnpm crawler:dev
 ```
 
 The services will be available at:
+
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:3001
 - Database Studio: http://localhost:5555 (run `pnpm db:studio`)
@@ -123,12 +124,14 @@ The services will be available at:
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/logout` - User logout
 - `GET /api/auth/me` - Get current user
 
 ### Events
+
 - `GET /api/events` - List events (with pagination and filters)
 - `GET /api/events/:id` - Get event details
 - `POST /api/events` - Create new event (authenticated)
@@ -137,11 +140,13 @@ The services will be available at:
 - `GET /api/events/search` - Search events
 
 ### Categories
+
 - `GET /api/categories` - List all categories
 - `GET /api/categories/:slug` - Get category by slug
 - `GET /api/categories/:slug/events` - Get events by category
 
 ### Admin (requires admin role)
+
 - `GET /api/admin/crawler/sources` - List crawler sources
 - `POST /api/admin/crawler/sources` - Add crawler source
 - `PUT /api/admin/crawler/sources/:id` - Update crawler source

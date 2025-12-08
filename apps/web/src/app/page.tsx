@@ -7,13 +7,13 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export default async function Home() {
-  let events = [];
-  let categories = [];
+  let events: any[] = [];
+  let categories: any[] = [];
   let error = null;
 
   try {
     const [eventsResponse, categoriesResponse] = await Promise.all([
-      eventService.getEvents({ limit: 6 }),
+      eventService.getEvents({ page: 1, limit: 6 }),
       categoryService.getCategories(),
     ]);
     events = eventsResponse.data;
@@ -33,7 +33,8 @@ export default async function Home() {
             Discover Events in Addis Ababa
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Find concerts, conferences, workshops, and more happening in your city
+            Find concerts, conferences, workshops, and more happening in your
+            city
           </p>
           <div className="flex justify-center gap-4">
             <Link
@@ -71,7 +72,7 @@ export default async function Home() {
               </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event: any) => (
+              {events.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
             </div>
@@ -85,7 +86,7 @@ export default async function Home() {
                 Browse by Category
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {categories.map((category: any) => (
+                {categories.map((category) => (
                   <CategoryCard key={category.id} category={category} />
                 ))}
               </div>

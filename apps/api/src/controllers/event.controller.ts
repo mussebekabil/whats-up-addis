@@ -22,9 +22,7 @@ export class EventController {
         maxPrice: req.query.maxPrice
           ? parseFloat(req.query.maxPrice as string)
           : undefined,
-        isFree: req.query.isFree
-          ? req.query.isFree === 'true'
-          : undefined,
+        isFree: req.query.isFree ? req.query.isFree === 'true' : undefined,
       });
 
       const result = await eventService.getEvents(filters);
@@ -66,7 +64,12 @@ export class EventController {
 
       const { id } = req.params;
       const data = updateEventSchema.parse(req.body);
-      const event = await eventService.updateEvent(id, data, req.user.id, req.user.role);
+      const event = await eventService.updateEvent(
+        id,
+        data,
+        req.user.id,
+        req.user.role
+      );
       res.json(event);
     } catch (error) {
       next(error);
@@ -80,7 +83,11 @@ export class EventController {
       }
 
       const { id } = req.params;
-      const result = await eventService.deleteEvent(id, req.user.id, req.user.role);
+      const result = await eventService.deleteEvent(
+        id,
+        req.user.id,
+        req.user.role
+      );
       res.json(result);
     } catch (error) {
       next(error);

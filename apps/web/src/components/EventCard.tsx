@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import type { Event } from '@whats-up-addis/shared';
 
@@ -10,41 +11,43 @@ export default function EventCard({ event }: EventCardProps) {
   return (
     <Link
       href={`/events/${event.id}`}
-      className="block bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden"
+      className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden"
     >
       {event.imageUrl && (
-        <div className="relative h-48 bg-gray-200">
-          <img
+        <div className="relative h-64 bg-gray-200 dark:bg-gray-700">
+          <Image
             src={event.imageUrl}
             alt={event.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
       )}
       <div className="p-4">
         <div className="flex items-center gap-2 mb-2">
           {event.category && (
-            <span className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded">
+            <span className="text-xs bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-2 py-1 rounded">
               {event.category.name}
             </span>
           )}
           {event.price !== null && event.price !== undefined ? (
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+            <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-1 rounded">
               ${Number(event.price).toFixed(2)}
             </span>
           ) : (
-            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
+            <span className="text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-2 py-1 rounded">
               Free
             </span>
           )}
         </div>
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+        <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2 line-clamp-2">
           {event.title}
         </h3>
-        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
           {event.description}
         </p>
-        <div className="text-sm text-gray-500 space-y-1">
+        <div className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
           <div className="flex items-center gap-1">
             <svg
               className="w-4 h-4"
@@ -59,7 +62,9 @@ export default function EventCard({ event }: EventCardProps) {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span>{format(new Date(event.startDate), 'MMM dd, yyyy · h:mm a')}</span>
+            <span>
+              {format(new Date(event.startDate), 'MMM dd, yyyy · h:mm a')}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <svg

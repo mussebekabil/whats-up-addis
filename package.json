@@ -5,7 +5,7 @@
   "description": "Event discovery and management platform for Addis Ababa, Ethiopia",
   "engines": {
     "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=10.0.0"
   },
   "scripts": {
     "dev": "pnpm -r --parallel dev",
@@ -26,5 +26,5 @@
     "prettier": "^3.4.2",
     "typescript": "^5.7.2"
   },
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@10.0.0"
 }
