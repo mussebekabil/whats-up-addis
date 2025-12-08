@@ -1,26 +1,70 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import { eventService } from '@/lib/events';
+import { authService } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import type { Event, User } from '@whats-up-addis/shared';
 
 interface EventDetailsPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function EventDetailsPage({
+export default function EventDetailsPage({
   params,
 }: EventDetailsPageProps) {
-  const { id } = await params;
+  const [eventId, setEventId] = useState<string>('');
+  const [event, setEvent] = useState<Event | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  let event;
-  try {
-    event = await eventService.getEventById(id);
-  } catch (error) {
-    console.error('Error fetching event:', error);
-    notFound();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const resolvedParams = await params;
+        setEventId(resolvedParams.id);
+
+        const eventData = await eventService.getEventById(resolvedParams.id);
+        setEvent(eventData);
+
+        // Check if user is logged in and is an admin
+        if (authService.isAuthenticated()) {
+          try {
+            const userData = await authService.getMe();
+            setUser(userData);
+          } catch (err) {
+            console.error('Error fetching user:', err);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching event:', error);
+        notFound();
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 container mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading event...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   if (!event) {
@@ -32,7 +76,7 @@ export default async function EventDetailsPage({
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Link
             href="/events"
             className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
@@ -52,24 +96,67 @@ export default async function EventDetailsPage({
             </svg>
             Back to Events
           </Link>
+
+          {user?.role === 'ADMIN' && (
+            <div className="flex gap-3">
+              <Link
+                href={`/events/${eventId}/edit`}
+                className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+                Edit Event
+              </Link>
+              <Link
+                href={`/events/create?duplicate=${eventId}`}
+                className="inline-flex items-center px-4 py-2 border border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors font-medium"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                Duplicate
+              </Link>
+            </div>
+          )}
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          {/* Image Section */}
+        <div className="grid lg:grid-cols-2 gap-8 lg:items-center">
+          {/* Left Section - Event Image */}
           {event.imageUrl && (
-            <div className="relative bg-black dark:bg-black w-full h-[600px]">
+            <div className="relative bg-black dark:bg-black rounded-lg shadow-lg overflow-hidden lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]">
               <Image
                 src={event.imageUrl}
                 alt={event.title}
                 fill
                 className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
           )}
 
-          {/* Content Section */}
-          <div className="p-8">
+          {/* Right Section - Event Details */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {event.category && (
                 <span className="text-sm bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full font-medium">

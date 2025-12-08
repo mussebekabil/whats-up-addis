@@ -5,7 +5,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Whats Up Addis - Events in Addis Ababa',
+  title: 'What\'s Up Addis - Events in Addis Ababa',
   description: 'Discover and manage events happening in Addis Ababa, Ethiopia',
 };
 

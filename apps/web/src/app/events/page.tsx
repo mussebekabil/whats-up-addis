@@ -4,12 +4,19 @@ import EventCard from '@/components/EventCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-export default async function EventsPage() {
+interface EventsPageProps {
+  searchParams: Promise<{ page?: string }>;
+}
+
+export default async function EventsPage({ searchParams }: EventsPageProps) {
+  const params = await searchParams;
+  const currentPage = parseInt(params.page || '1', 10);
+
   let events: any[] = [];
   let pagination: any = null;
   let error = null;
   try {
-    const response = await eventService.getEvents({ page: 1, limit: 12 });
+    const response = await eventService.getEvents({ page: currentPage, limit: 12 });
     events = response.data;
     pagination = response.pagination;
   } catch (err) {
@@ -24,14 +31,14 @@ export default async function EventsPage() {
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">All Events</h1>
-          <p className="text-gray-600">
+          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">All Events</h1>
+          <p className="text-gray-600 dark:text-gray-300">
             Discover what&apos;s happening in Addis Ababa
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-8">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-8">
             {error}
           </div>
         )}
@@ -53,10 +60,10 @@ export default async function EventsPage() {
                   <Link
                     key={page}
                     href={`/events?page=${page}`}
-                    className={`px-4 py-2 rounded ${
-                      page === pagination.page
+                    className={`px-4 py-2 rounded transition-colors ${
+                      page === currentPage
                         ? 'bg-primary-600 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                     }`}
                   >
                     {page}
@@ -68,12 +75,12 @@ export default async function EventsPage() {
         ) : (
           !error && (
             <div className="text-center py-16">
-              <p className="text-gray-600 mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-4">
                 No events found. Be the first to create one!
               </p>
               <Link
                 href="/events/create"
-                className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
                 Create Event
               </Link>
