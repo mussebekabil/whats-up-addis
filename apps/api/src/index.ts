@@ -23,6 +23,8 @@ import authRoutes from './routes/auth.routes.js';
 import eventRoutes from './routes/event.routes.js';
 import categoryRoutes from './routes/category.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import commentRoutes from './routes/comment.routes.js';
+import ratingRoutes from './routes/rating.routes.js';
 
 // Load environment variables from the monorepo root
 config({ path: join(__dirname, '../../../.env') });
@@ -46,6 +48,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', commentRoutes);
+app.use('/api', ratingRoutes);
 
 // Error handlers
 app.use(notFoundHandler);

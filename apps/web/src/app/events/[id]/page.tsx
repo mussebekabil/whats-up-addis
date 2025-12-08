@@ -9,6 +9,7 @@ import { eventService } from '@/lib/events';
 import { authService } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import EventEngagement from '@/components/EventEngagement';
 import type { Event, User } from '@whats-up-addis/shared';
 
 interface EventDetailsPageProps {
@@ -327,6 +328,9 @@ export default function EventDetailsPage({
             )}
           </div>
         </div>
+
+        {/* Ratings and Comments Section */}
+        <EventEngagement eventId={eventId} />
       </main>
 
       <Footer />

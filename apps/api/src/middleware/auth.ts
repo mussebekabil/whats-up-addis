@@ -59,3 +59,32 @@ export const authorize = (...roles: string[]) => {
     next();
   };
 };
+
+export const optionalAuth = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const secret = process.env.JWT_SECRET;
+
+      if (secret) {
+        const decoded = jwt.verify(token, secret) as {
+          id: string;
+          email: string;
+          role: string;
+        };
+        req.user = decoded;
+      }
+    }
+
+    next();
+  } catch (error) {
+    // If token is invalid, just continue without user
+    next();
+  }
+};

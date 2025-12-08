@@ -75,6 +75,23 @@ export const createCrawlerSourceSchema = z.object({
 
 export const updateCrawlerSourceSchema = createCrawlerSourceSchema.partial();
 
+// Comment schemas
+export const createCommentSchema = z.object({
+  content: z.string().min(1, 'Comment cannot be empty').max(1000, 'Comment is too long'),
+  parentCommentId: z.string().uuid().optional(),
+});
+
+export const updateCommentSchema = z.object({
+  content: z.string().min(1, 'Comment cannot be empty').max(1000, 'Comment is too long'),
+});
+
+// Rating schemas
+export const createRatingSchema = z.object({
+  rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
+});
+
+export const updateRatingSchema = createRatingSchema;
+
 // Type exports
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -89,3 +106,7 @@ export type CreateCrawlerSourceInput = z.infer<
 export type UpdateCrawlerSourceInput = z.infer<
   typeof updateCrawlerSourceSchema
 >;
+export type CreateCommentInput = z.infer<typeof createCommentSchema>;
+export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
+export type CreateRatingInput = z.infer<typeof createRatingSchema>;
+export type UpdateRatingInput = z.infer<typeof updateRatingSchema>;

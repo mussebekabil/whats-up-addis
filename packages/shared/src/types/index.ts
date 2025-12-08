@@ -89,3 +89,41 @@ export interface AuthResponse {
   user: Omit<User, 'passwordHash'>;
   tokens: AuthTokens;
 }
+
+export interface Comment {
+  id: string;
+  content: string;
+  eventId: string;
+  userId: string;
+  parentCommentId?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  user: Pick<User, 'id' | 'name'>;
+  replies?: Comment[];
+  likes?: CommentLike[];
+  likesCount?: number;
+  isLikedByUser?: boolean;
+}
+
+export interface CommentLike {
+  id: string;
+  commentId: string;
+  userId: string;
+  createdAt: Date;
+}
+
+export interface Rating {
+  id: string;
+  rating: number;
+  eventId: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user?: Pick<User, 'id' | 'name'>;
+}
+
+export interface EventRatingStats {
+  averageRating: number;
+  totalRatings: number;
+  userRating?: number;
+}

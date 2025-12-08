@@ -145,6 +145,20 @@ The services will be available at:
 - `GET /api/categories/:slug` - Get category by slug
 - `GET /api/categories/:slug/events` - Get events by category
 
+### Ratings (requires authentication)
+
+- `GET /api/events/:eventId/ratings` - Get rating statistics for an event
+- `POST /api/events/:eventId/ratings` - Create or update a rating (1-5 stars)
+- `DELETE /api/events/:eventId/ratings` - Delete your rating
+
+### Comments (requires authentication for write operations)
+
+- `GET /api/events/:eventId/comments` - Get all comments for an event
+- `POST /api/events/:eventId/comments` - Create a new comment
+- `PUT /api/comments/:commentId` - Update your comment
+- `DELETE /api/comments/:commentId` - Delete your comment (or any comment if admin)
+- `POST /api/comments/:commentId/like` - Toggle like on a comment
+
 ### Admin (requires admin role)
 
 - `GET /api/admin/crawler/sources` - List crawler sources
@@ -162,8 +176,25 @@ The application uses PostgreSQL with the following main tables:
 - **categories** - Event categories
 - **event_tags** - Tags for events
 - **crawler_sources** - Website sources for the crawler
+- **comments** - User comments on events (supports threading/replies)
+- **comment_likes** - Likes on comments
+- **ratings** - User ratings for events (1-5 stars)
 
 See `packages/database/prisma/schema.prisma` for the complete schema.
+
+## Features
+
+### User Engagement
+
+The platform includes comprehensive user engagement features:
+
+- **Event Ratings**: Users can rate events on a scale of 1-5 stars. Each user can rate an event once, and can update their rating anytime.
+- **Comments System**: Users can comment on events and reply to other comments, creating threaded discussions.
+- **Comment Likes**: Users can like comments to show appreciation.
+- **Real-time Stats**: Event pages display average ratings, total number of ratings, and like counts.
+- **User Context**: The UI shows which comments you've liked and your rating for each event.
+
+All engagement features require user authentication and are fully integrated into the event details page.
 
 ## Crawler Service
 

@@ -19,7 +19,10 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  events Event[]
+  events       Event[]
+  comments     Comment[]
+  commentLikes CommentLike[]
+  ratings      Rating[]
 
   @@map("users")
 }
@@ -45,6 +48,8 @@ model Event {
   category Category   @relation(fields: [categoryId], references: [id])
   creator  User?      @relation(fields: [createdBy], references: [id])
   tags     EventTag[]
+  comments Comment[]
+  ratings  Rating[]
 
   @@index([startDate])
   @@index([categoryId])
@@ -87,6 +92,59 @@ model CrawlerSource {
   createdAt      DateTime  @default(now()) @map("created_at")
 
   @@map("crawler_sources")
+}
+
+model Comment {
+  id              String   @id @default(uuid())
+  content         String   @db.Text
+  eventId         String   @map("event_id")
+  userId          String   @map("user_id")
+  parentCommentId String?  @map("parent_comment_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentComment Comment?      @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies       Comment[]     @relation("CommentReplies")
+  likes         CommentLike[]
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([parentCommentId])
+  @@map("comments")
+}
+
+model CommentLike {
+  id        String   @id @default(uuid())
+  commentId String   @map("comment_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("comment_likes")
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  rating    Int      @db.SmallInt // 1-5
+  eventId   String   @map("event_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@map("ratings")
 }
 
 enum Role {
