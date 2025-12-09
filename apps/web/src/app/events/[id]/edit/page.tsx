@@ -7,6 +7,7 @@ import { eventService } from '@/lib/events';
 import { categoryService } from '@/lib/categories';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ImageUpload from '@/components/ImageUpload';
 import { User, Category, Event, Roles } from '@whats-up-addis/shared';
 
 interface EditEventPageProps {
@@ -31,6 +32,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
     startDate: '',
     endDate: '',
     imageUrl: '',
+    sourceUrl: '',
     price: '',
     categoryId: '',
     tags: '',
@@ -69,18 +71,19 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         const startDateLocal = new Date(eventData.startDate)
           .toISOString()
           .slice(0, 16);
-        const endDateLocal = new Date(eventData.endDate)
-          .toISOString()
-          .slice(0, 16);
+        const endDateLocal = eventData.endDate
+          ? new Date(eventData.endDate).toISOString().slice(0, 16)
+          : '';
 
         setFormData({
           title: eventData.title,
           description: eventData.description,
-          location: eventData.location,
-          venue: eventData.venue,
+          location: eventData.location || '',
+          venue: eventData.venue || '',
           startDate: startDateLocal,
           endDate: endDateLocal,
           imageUrl: eventData.imageUrl || '',
+          sourceUrl: eventData.sourceUrl || '',
           price:
             eventData.price !== null && eventData.price !== undefined
               ? String(eventData.price)
@@ -129,11 +132,14 @@ export default function EditEventPage({ params }: EditEventPageProps) {
       const eventData = {
         title: formData.title,
         description: formData.description,
-        location: formData.location,
-        venue: formData.venue,
+        location: formData.location || null,
+        venue: formData.venue || null,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
+        endDate: formData.endDate
+          ? new Date(formData.endDate).toISOString()
+          : null,
         imageUrl: formData.imageUrl || null,
+        sourceUrl: formData.sourceUrl || null,
         price: formData.price ? parseFloat(formData.price) : null,
         categoryId: formData.categoryId,
         tags: tagsArray.length > 0 ? tagsArray : undefined,
@@ -256,7 +262,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                   htmlFor="location"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Location *
+                  Location
                 </label>
                 <input
                   type="text"
@@ -264,7 +270,6 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  required
                   minLength={2}
                   maxLength={255}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -277,7 +282,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                   htmlFor="venue"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Venue *
+                  Venue
                 </label>
                 <input
                   type="text"
@@ -285,7 +290,6 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                   name="venue"
                   value={formData.venue}
                   onChange={handleChange}
-                  required
                   minLength={2}
                   maxLength={255}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -318,7 +322,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                   htmlFor="endDate"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  End Date & Time *
+                  End Date & Time
                 </label>
                 <input
                   type="datetime-local"
@@ -326,7 +330,6 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleChange}
-                  required
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
@@ -378,22 +381,37 @@ export default function EditEventPage({ params }: EditEventPageProps) {
               </div>
 
               <div>
-                <label
-                  htmlFor="imageUrl"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  id="imageUrl"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://example.com/image.jpg"
+                <ImageUpload
+                  currentImageUrl={formData.imageUrl}
+                  onImageUploaded={(url) =>
+                    setFormData((prev) => ({ ...prev, imageUrl: url }))
+                  }
+                  onImageRemoved={() =>
+                    setFormData((prev) => ({ ...prev, imageUrl: '' }))
+                  }
                 />
               </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="sourceUrl"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Source URL
+              </label>
+              <input
+                type="url"
+                id="sourceUrl"
+                name="sourceUrl"
+                value={formData.sourceUrl}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="https://example.com/event-page"
+              />
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Original event page URL (if applicable)
+              </p>
             </div>
 
             <div>

@@ -16,11 +16,22 @@ export const loginSchema = z.object({
 const eventBaseSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(255),
   description: z.string().min(10, 'Description must be at least 10 characters'),
-  location: z.string().min(2, 'Location is required').max(255),
-  venue: z.string().min(2, 'Venue is required').max(255),
+  location: z
+    .string()
+    .min(2, 'Location must be at least 2 characters')
+    .max(255)
+    .optional()
+    .nullable(),
+  venue: z
+    .string()
+    .min(2, 'Venue must be at least 2 characters')
+    .max(255)
+    .optional()
+    .nullable(),
   startDate: z.string().datetime('Invalid start date'),
-  endDate: z.string().datetime('Invalid end date'),
+  endDate: z.string().datetime('Invalid end date').optional().nullable(),
   imageUrl: z.string().url('Invalid image URL').optional().nullable(),
+  sourceUrl: z.string().url('Invalid source URL').optional().nullable(),
   price: z
     .number()
     .nonnegative('Price must be non-negative')
@@ -31,7 +42,13 @@ const eventBaseSchema = z.object({
 });
 
 export const createEventSchema = eventBaseSchema.refine(
-  (data) => new Date(data.endDate) > new Date(data.startDate),
+  (data) => {
+    // Only validate if both dates are provided
+    if (data.endDate && data.startDate) {
+      return new Date(data.endDate) > new Date(data.startDate);
+    }
+    return true;
+  },
   {
     message: 'End date must be after start date',
     path: ['endDate'],

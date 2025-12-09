@@ -31,10 +31,10 @@ model Event {
   id          String    @id @default(uuid())
   title       String    @db.VarChar(255)
   description String    @db.Text
-  location    String    @db.VarChar(255)
-  venue       String    @db.VarChar(255)
+  location    String?   @db.VarChar(255)
+  venue       String?   @db.VarChar(255)
   startDate   DateTime  @map("start_date")
-  endDate     DateTime  @map("end_date")
+  endDate     DateTime? @map("end_date")
   imageUrl    String?   @map("image_url") @db.VarChar(500)
   price       Decimal?  @db.Decimal(10, 2)
   source      String    @db.VarChar(100) // manual or crawler

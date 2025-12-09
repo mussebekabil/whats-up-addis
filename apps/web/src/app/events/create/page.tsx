@@ -7,6 +7,7 @@ import { eventService } from '@/lib/events';
 import { categoryService } from '@/lib/categories';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ImageUpload from '@/components/ImageUpload';
 import { User, Category, Roles } from '@whats-up-addis/shared';
 
 function CreateEventForm() {
@@ -26,6 +27,7 @@ function CreateEventForm() {
     startDate: '',
     endDate: '',
     imageUrl: '',
+    sourceUrl: '',
     price: '',
     categoryId: '',
     tags: '',
@@ -63,11 +65,12 @@ function CreateEventForm() {
           setFormData({
             title: `${eventToDuplicate.title} (Copy)`,
             description: eventToDuplicate.description,
-            location: eventToDuplicate.location,
-            venue: eventToDuplicate.venue,
+            location: eventToDuplicate.location || '',
+            venue: eventToDuplicate.venue || '',
             startDate: '',
             endDate: '',
             imageUrl: eventToDuplicate.imageUrl || '',
+            sourceUrl: eventToDuplicate.sourceUrl || '',
             price:
               eventToDuplicate.price !== null &&
               eventToDuplicate.price !== undefined
@@ -118,11 +121,14 @@ function CreateEventForm() {
       const eventData = {
         title: formData.title,
         description: formData.description,
-        location: formData.location,
-        venue: formData.venue,
+        location: formData.location || null,
+        venue: formData.venue || null,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: new Date(formData.endDate).toISOString(),
+        endDate: formData.endDate
+          ? new Date(formData.endDate).toISOString()
+          : null,
         imageUrl: formData.imageUrl || null,
+        sourceUrl: formData.sourceUrl || null,
         price: formData.price ? parseFloat(formData.price) : null,
         categoryId: formData.categoryId,
         tags: tagsArray.length > 0 ? tagsArray : undefined,
@@ -245,7 +251,7 @@ function CreateEventForm() {
                   htmlFor="location"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Location *
+                  Location
                 </label>
                 <input
                   type="text"
@@ -253,7 +259,6 @@ function CreateEventForm() {
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  required
                   minLength={2}
                   maxLength={255}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -266,7 +271,7 @@ function CreateEventForm() {
                   htmlFor="venue"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  Venue *
+                  Venue
                 </label>
                 <input
                   type="text"
@@ -274,7 +279,6 @@ function CreateEventForm() {
                   name="venue"
                   value={formData.venue}
                   onChange={handleChange}
-                  required
                   minLength={2}
                   maxLength={255}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -307,7 +311,7 @@ function CreateEventForm() {
                   htmlFor="endDate"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
-                  End Date & Time *
+                  End Date & Time
                 </label>
                 <input
                   type="datetime-local"
@@ -315,7 +319,6 @@ function CreateEventForm() {
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleChange}
-                  required
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
@@ -367,22 +370,37 @@ function CreateEventForm() {
               </div>
 
               <div>
-                <label
-                  htmlFor="imageUrl"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Image URL
-                </label>
-                <input
-                  type="url"
-                  id="imageUrl"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://example.com/image.jpg"
+                <ImageUpload
+                  currentImageUrl={formData.imageUrl}
+                  onImageUploaded={(url) =>
+                    setFormData((prev) => ({ ...prev, imageUrl: url }))
+                  }
+                  onImageRemoved={() =>
+                    setFormData((prev) => ({ ...prev, imageUrl: '' }))
+                  }
                 />
               </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="sourceUrl"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Source URL
+              </label>
+              <input
+                type="url"
+                id="sourceUrl"
+                name="sourceUrl"
+                value={formData.sourceUrl}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="https://example.com/event-page"
+              />
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Original event page URL (if applicable)
+              </p>
             </div>
 
             <div>

@@ -84,6 +84,7 @@ export const optionalAuth = async (
 
     next();
   } catch (error) {
+    console.log('Optional auth failed:', error);
     // If token is invalid, just continue without user
     next();
   }

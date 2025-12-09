@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { createRatingSchema } from '@whats-up-addis/shared';
 import { RatingService } from '../services/rating.service.js';
 import { AuthRequest } from '../middleware/auth.js';

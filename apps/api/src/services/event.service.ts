@@ -132,7 +132,7 @@ export class EventService {
       data: {
         ...eventData,
         startDate: new Date(eventData.startDate),
-        endDate: new Date(eventData.endDate),
+        endDate: eventData.endDate ? new Date(eventData.endDate) : undefined,
         source: 'manual',
         createdBy: userId,
         tags: tags
