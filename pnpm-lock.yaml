@@ -87,9 +87,6 @@ importers:
 
   apps/crawler:
     dependencies:
-      '@whats-up-addis/common':
-        specifier: workspace:*
-        version: link:../../packages/common
       '@whats-up-addis/database':
         specifier: workspace:*
         version: link:../../packages/database
@@ -182,12 +179,6 @@ importers:
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.18(tsx@4.20.6)
-      typescript:
-        specifier: ^5.7.2
-        version: 5.9.3
-
-  packages/common:
-    devDependencies:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3

@@ -21,8 +21,12 @@ export default async function CategoriesPage() {
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">Event Categories</h1>
-          <p className="text-gray-600 dark:text-gray-300">Browse events by category</p>
+          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
+            Event Categories
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Browse events by category
+          </p>
         </div>
 
         {error && (
@@ -39,9 +43,13 @@ export default async function CategoriesPage() {
                 href={`/categories/${category.slug}`}
                 className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700"
               >
-                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">{category.name}</h3>
+                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">
+                  {category.name}
+                </h3>
                 {category.description && (
-                  <p className="text-gray-600 dark:text-gray-300">{category.description}</p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {category.description}
+                  </p>
                 )}
                 <div className="mt-4 text-primary-600 dark:text-primary-400 font-medium">
                   View events →
@@ -52,7 +60,9 @@ export default async function CategoriesPage() {
         ) : (
           !error && (
             <div className="text-center py-16">
-              <p className="text-gray-600 dark:text-gray-400">No categories available yet.</p>
+              <p className="text-gray-600 dark:text-gray-400">
+                No categories available yet.
+              </p>
             </div>
           )
         )}

@@ -18,7 +18,11 @@ export class RatingController {
     }
   }
 
-  async createOrUpdateRating(req: AuthRequest, res: Response, next: NextFunction) {
+  async createOrUpdateRating(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -27,7 +31,11 @@ export class RatingController {
       const { eventId } = req.params;
       const data = createRatingSchema.parse(req.body);
 
-      const rating = await ratingService.createOrUpdateRating(eventId, req.user.id, data);
+      const rating = await ratingService.createOrUpdateRating(
+        eventId,
+        req.user.id,
+        data
+      );
       res.json(rating);
     } catch (error) {
       next(error);

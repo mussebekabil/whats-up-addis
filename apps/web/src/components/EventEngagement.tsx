@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { authService } from '@/lib/auth';
 import { commentService } from '@/lib/comments';
 import { ratingService } from '@/lib/ratings';
-import type { Comment, EventRatingStats, User } from '@whats-up-addis/shared';
+import { Comment, EventRatingStats, User, Roles } from '@whats-up-addis/shared';
 import { formatDistanceToNow } from 'date-fns';
 
 interface EventEngagementProps {
@@ -42,6 +42,7 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
     };
 
     initialize();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventId]);
 
   const fetchComments = async () => {
@@ -134,7 +135,15 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
     setDeleteConfirmation({ isOpen: false, commentId: null });
   };
 
-  const StarRating = ({ rating, onRate, readonly = false }: { rating: number; onRate?: (r: number) => void; readonly?: boolean }) => {
+  const StarRating = ({
+    rating,
+    onRate,
+    readonly = false,
+  }: {
+    rating: number;
+    onRate?: (r: number) => void;
+    readonly?: boolean;
+  }) => {
     const renderStar = (position: number) => {
       const isFullStar = position <= rating;
       const isHalfStar = position === Math.ceil(rating) && rating % 1 !== 0;
@@ -177,23 +186,39 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
     );
   };
 
-  const CommentItem = ({ comment, isReply = false }: { comment: Comment; isReply?: boolean }) => (
-    <div className={`${isReply ? 'ml-12 mt-4' : 'mb-6'} border-l-2 border-gray-200 dark:border-gray-700 pl-4`}>
+  const CommentItem = ({
+    comment,
+    isReply = false,
+  }: {
+    comment: Comment;
+    isReply?: boolean;
+  }) => (
+    <div
+      className={`${isReply ? 'ml-12 mt-4' : 'mb-6'} border-l-2 border-gray-200 dark:border-gray-700 pl-4`}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <span className="font-semibold text-gray-900 dark:text-white">{comment.user.name}</span>
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {comment.user.name}
+            </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+              {formatDistanceToNow(new Date(comment.createdAt), {
+                addSuffix: true,
+              })}
             </span>
           </div>
-          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{comment.content}</p>
+          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+            {comment.content}
+          </p>
           <div className="flex items-center gap-4 mt-2">
             <button
               onClick={() => handleToggleLike(comment.id)}
               disabled={!user}
               className={`flex items-center gap-1 text-sm ${
-                comment.isLikedByUser ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
+                comment.isLikedByUser
+                  ? 'text-primary-600 dark:text-primary-400'
+                  : 'text-gray-500 dark:text-gray-400'
               } hover:text-primary-600 dark:hover:text-primary-400 disabled:opacity-50`}
             >
               ❤️ {comment.likesCount}
@@ -206,14 +231,15 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
                 Reply
               </button>
             )}
-            {user && (user.id === comment.userId || user.role === 'ADMIN') && (
-              <button
-                onClick={() => handleDeleteComment(comment.id)}
-                className="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-600"
-              >
-                Delete
-              </button>
-            )}
+            {user &&
+              (user.id === comment.userId || user.role === Roles.Admin) && (
+                <button
+                  onClick={() => handleDeleteComment(comment.id)}
+                  className="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-600"
+                >
+                  Delete
+                </button>
+              )}
           </div>
         </div>
       </div>
@@ -237,7 +263,8 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
             Delete Comment
           </h3>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
-            Are you sure you want to delete this comment? This action cannot be undone.
+            Are you sure you want to delete this comment? This action cannot be
+            undone.
           </p>
           <div className="flex gap-3 justify-end">
             <button
@@ -283,8 +310,18 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
             onClick={() => setError(null)}
             className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -292,9 +329,13 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
 
       {/* Ratings Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Rate This Event</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Rate This Event
+        </h2>
         {isLoadingRatings ? (
-          <div className="text-gray-600 dark:text-gray-400">Loading ratings...</div>
+          <div className="text-gray-600 dark:text-gray-400">
+            Loading ratings...
+          </div>
         ) : (
           <>
             <div className="flex items-center gap-4 mb-4">
@@ -310,7 +351,9 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
             </div>
             {user && (
               <div className="border-t dark:border-gray-700 pt-4">
-                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">Your rating:</p>
+                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                  Your rating:
+                </p>
                 <StarRating rating={selectedRating} onRate={handleRating} />
               </div>
             )}
@@ -325,7 +368,9 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
 
       {/* Comments Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Comments</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          Comments
+        </h2>
 
         {user && (
           <form onSubmit={handleSubmitComment} className="mb-8">
@@ -365,9 +410,13 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
         )}
 
         {isLoadingComments ? (
-          <div className="text-gray-600 dark:text-gray-400">Loading comments...</div>
+          <div className="text-gray-600 dark:text-gray-400">
+            Loading comments...
+          </div>
         ) : comments.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">No comments yet. Be the first to comment!</p>
+          <p className="text-gray-500 dark:text-gray-400">
+            No comments yet. Be the first to comment!
+          </p>
         ) : (
           <div>
             {comments.map((comment) => (

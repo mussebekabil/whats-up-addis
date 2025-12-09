@@ -8,9 +8,10 @@ export class RatingService {
     });
 
     const totalRatings = ratings.length;
-    const averageRating = totalRatings > 0
-      ? ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings
-      : 0;
+    const averageRating =
+      totalRatings > 0
+        ? ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings
+        : 0;
 
     const userRating = userId
       ? await prisma.rating.findUnique({
@@ -30,7 +31,11 @@ export class RatingService {
     };
   }
 
-  async createOrUpdateRating(eventId: string, userId: string, data: CreateRatingInput) {
+  async createOrUpdateRating(
+    eventId: string,
+    userId: string,
+    data: CreateRatingInput
+  ) {
     // Verify event exists
     const event = await prisma.event.findUnique({
       where: { id: eventId },

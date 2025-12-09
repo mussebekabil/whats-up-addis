@@ -1,5 +1,5 @@
 import { BaseScraper, ScrapedEvent } from './base.scraper.js';
-import { CategoryConstants } from '@whats-up-addis/common';
+import { CategoryConstants } from '@whats-up-addis/shared';
 
 export class GenericScraper extends BaseScraper {
   async scrape(): Promise<ScrapedEvent[]> {

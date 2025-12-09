@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config) => {
+    // Handle .js imports that point to .ts files (for NodeNext module resolution compatibility)
+    config.resolve.extensionAlias = {
+      '.js': ['.js', '.ts', '.tsx'],
+      '.jsx': ['.jsx', '.tsx'],
+    };
+    return config;
+  },
 };
 
 export default nextConfig;

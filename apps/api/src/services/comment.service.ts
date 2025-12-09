@@ -1,5 +1,9 @@
 import { prisma } from '@whats-up-addis/database';
-import type { CreateCommentInput, UpdateCommentInput } from '@whats-up-addis/shared';
+import type {
+  CreateCommentInput,
+  UpdateCommentInput,
+} from '@whats-up-addis/shared';
+import { Roles } from '@whats-up-addis/shared';
 
 export class CommentService {
   async getCommentsByEventId(eventId: string, userId?: string) {
@@ -40,16 +44,24 @@ export class CommentService {
     return comments.map((comment) => ({
       ...comment,
       likesCount: comment.likes.length,
-      isLikedByUser: userId ? comment.likes.some((like) => like.userId === userId) : false,
+      isLikedByUser: userId
+        ? comment.likes.some((like) => like.userId === userId)
+        : false,
       replies: comment.replies?.map((reply) => ({
         ...reply,
         likesCount: reply.likes.length,
-        isLikedByUser: userId ? reply.likes.some((like) => like.userId === userId) : false,
+        isLikedByUser: userId
+          ? reply.likes.some((like) => like.userId === userId)
+          : false,
       })),
     }));
   }
 
-  async createComment(eventId: string, userId: string, data: CreateCommentInput) {
+  async createComment(
+    eventId: string,
+    userId: string,
+    data: CreateCommentInput
+  ) {
     // Verify event exists
     const event = await prisma.event.findUnique({
       where: { id: eventId },
@@ -99,7 +111,11 @@ export class CommentService {
     };
   }
 
-  async updateComment(commentId: string, userId: string, data: UpdateCommentInput) {
+  async updateComment(
+    commentId: string,
+    userId: string,
+    data: UpdateCommentInput
+  ) {
     const comment = await prisma.comment.findUnique({
       where: { id: commentId },
     });
@@ -139,7 +155,7 @@ export class CommentService {
     }
 
     // Only comment owner or admin can delete
-    if (comment.userId !== userId && userRole !== 'ADMIN') {
+    if (comment.userId !== userId && userRole !== Roles.Admin) {
       throw new Error('You can only delete your own comments');
     }
 

@@ -23,6 +23,10 @@ export class EventController {
           ? parseFloat(req.query.maxPrice as string)
           : undefined,
         isFree: req.query.isFree ? req.query.isFree === 'true' : undefined,
+        startDate: req.query.startDate as string | undefined,
+        endDate: req.query.endDate as string | undefined,
+        endDateGte: req.query.endDateGte as string | undefined,
+        endDateLt: req.query.endDateLt as string | undefined,
       });
 
       const result = await eventService.getEvents(filters);

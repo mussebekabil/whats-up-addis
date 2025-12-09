@@ -37,7 +37,11 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await authService.register(formData.email, formData.password, formData.name);
+      await authService.register(
+        formData.email,
+        formData.password,
+        formData.name
+      );
       router.push('/events');
     } catch (err: any) {
       setError(err.message || 'Failed to create account. Please try again.');
@@ -63,7 +67,7 @@ export default function RegisterPage() {
             Create Account
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-center mb-8">
-            Join What's Up Addis today
+            Join What&apos;s Up Addis today
           </p>
 
           {error && (

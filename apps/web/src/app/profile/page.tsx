@@ -25,7 +25,10 @@ export default function ProfilePage() {
         setUser(userData);
       } catch (err: any) {
         setError(err.message || 'Failed to load user data');
-        if (err.message?.includes('Unauthorized') || err.message?.includes('token')) {
+        if (
+          err.message?.includes('Unauthorized') ||
+          err.message?.includes('token')
+        ) {
           authService.logout();
           router.push('/auth/login');
         }
@@ -49,7 +52,9 @@ export default function ProfilePage() {
         <main className="flex-1 container mx-auto px-4 py-16">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading profile...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">
+              Loading profile...
+            </p>
           </div>
         </main>
         <Footer />
@@ -103,13 +108,17 @@ export default function ProfilePage() {
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Full Name
                   </label>
-                  <p className="mt-1 text-gray-900 dark:text-white">{user.name}</p>
+                  <p className="mt-1 text-gray-900 dark:text-white">
+                    {user.name}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email Address
                   </label>
-                  <p className="mt-1 text-gray-900 dark:text-white">{user.email}</p>
+                  <p className="mt-1 text-gray-900 dark:text-white">
+                    {user.email}
+                  </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">

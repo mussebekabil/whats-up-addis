@@ -6,18 +6,38 @@ const router = Router();
 const commentController = new CommentController();
 
 // Get comments for an event (public, but shows like status if authenticated)
-router.get('/events/:eventId/comments', optionalAuth, commentController.getComments);
+router.get(
+  '/events/:eventId/comments',
+  optionalAuth,
+  commentController.getComments
+);
 
 // Create a comment (requires auth)
-router.post('/events/:eventId/comments', authenticate, commentController.createComment);
+router.post(
+  '/events/:eventId/comments',
+  authenticate,
+  commentController.createComment
+);
 
 // Update a comment (requires auth)
-router.put('/comments/:commentId', authenticate, commentController.updateComment);
+router.put(
+  '/comments/:commentId',
+  authenticate,
+  commentController.updateComment
+);
 
 // Delete a comment (requires auth)
-router.delete('/comments/:commentId', authenticate, commentController.deleteComment);
+router.delete(
+  '/comments/:commentId',
+  authenticate,
+  commentController.deleteComment
+);
 
 // Toggle like on a comment (requires auth)
-router.post('/comments/:commentId/like', authenticate, commentController.toggleLike);
+router.post(
+  '/comments/:commentId/like',
+  authenticate,
+  commentController.toggleLike
+);
 
 export default router;

@@ -44,6 +44,8 @@ export const eventFiltersSchema = z.object({
   categoryId: z.string().uuid().optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
+  endDateGte: z.string().datetime().optional(),
+  endDateLt: z.string().datetime().optional(),
   search: z.string().optional(),
   minPrice: z.number().nonnegative().optional(),
   maxPrice: z.number().nonnegative().optional(),
@@ -77,17 +79,27 @@ export const updateCrawlerSourceSchema = createCrawlerSourceSchema.partial();
 
 // Comment schemas
 export const createCommentSchema = z.object({
-  content: z.string().min(1, 'Comment cannot be empty').max(1000, 'Comment is too long'),
+  content: z
+    .string()
+    .min(1, 'Comment cannot be empty')
+    .max(1000, 'Comment is too long'),
   parentCommentId: z.string().uuid().optional(),
 });
 
 export const updateCommentSchema = z.object({
-  content: z.string().min(1, 'Comment cannot be empty').max(1000, 'Comment is too long'),
+  content: z
+    .string()
+    .min(1, 'Comment cannot be empty')
+    .max(1000, 'Comment is too long'),
 });
 
 // Rating schemas
 export const createRatingSchema = z.object({
-  rating: z.number().int().min(1, 'Rating must be at least 1').max(5, 'Rating must be at most 5'),
+  rating: z
+    .number()
+    .int()
+    .min(1, 'Rating must be at least 1')
+    .max(5, 'Rating must be at most 5'),
 });
 
 export const updateRatingSchema = createRatingSchema;

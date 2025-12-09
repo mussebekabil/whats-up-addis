@@ -1,5 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import { createCommentSchema, updateCommentSchema } from '@whats-up-addis/shared';
+import { Response, NextFunction } from 'express';
+import {
+  createCommentSchema,
+  updateCommentSchema,
+} from '@whats-up-addis/shared';
 import { CommentService } from '../services/comment.service.js';
 import { AuthRequest } from '../middleware/auth.js';
 
@@ -11,7 +14,10 @@ export class CommentController {
       const { eventId } = req.params;
       const userId = req.user?.id;
 
-      const comments = await commentService.getCommentsByEventId(eventId, userId);
+      const comments = await commentService.getCommentsByEventId(
+        eventId,
+        userId
+      );
       res.json(comments);
     } catch (error) {
       next(error);
@@ -27,7 +33,11 @@ export class CommentController {
       const { eventId } = req.params;
       const data = createCommentSchema.parse(req.body);
 
-      const comment = await commentService.createComment(eventId, req.user.id, data);
+      const comment = await commentService.createComment(
+        eventId,
+        req.user.id,
+        data
+      );
       res.status(201).json(comment);
     } catch (error) {
       next(error);
@@ -43,7 +53,11 @@ export class CommentController {
       const { commentId } = req.params;
       const data = updateCommentSchema.parse(req.body);
 
-      const comment = await commentService.updateComment(commentId, req.user.id, data);
+      const comment = await commentService.updateComment(
+        commentId,
+        req.user.id,
+        data
+      );
       res.json(comment);
     } catch (error) {
       next(error);
@@ -58,7 +72,11 @@ export class CommentController {
 
       const { commentId } = req.params;
 
-      const result = await commentService.deleteComment(commentId, req.user.id, req.user.role);
+      const result = await commentService.deleteComment(
+        commentId,
+        req.user.id,
+        req.user.role
+      );
       res.json(result);
     } catch (error) {
       next(error);

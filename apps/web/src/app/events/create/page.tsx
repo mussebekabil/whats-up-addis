@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/lib/auth';
 import { eventService } from '@/lib/events';
 import { categoryService } from '@/lib/categories';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import type { User, Category } from '@whats-up-addis/shared';
+import { User, Category, Roles } from '@whats-up-addis/shared';
 
-export default function CreateEventPage() {
+function CreateEventForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const duplicateId = searchParams.get('duplicate');
@@ -44,8 +44,10 @@ export default function CreateEventPage() {
           categoryService.getCategories(),
         ]);
 
-        if (userData.role !== 'ADMIN') {
-          setError('You do not have permission to create events. Admin access required.');
+        if (userData.role !== Roles.Admin) {
+          setError(
+            'You do not have permission to create events. Admin access required.'
+          );
           setIsLoading(false);
           return;
         }
@@ -66,14 +68,21 @@ export default function CreateEventPage() {
             startDate: '',
             endDate: '',
             imageUrl: eventToDuplicate.imageUrl || '',
-            price: eventToDuplicate.price !== null && eventToDuplicate.price !== undefined ? String(eventToDuplicate.price) : '',
+            price:
+              eventToDuplicate.price !== null &&
+              eventToDuplicate.price !== undefined
+                ? String(eventToDuplicate.price)
+                : '',
             categoryId: eventToDuplicate.categoryId,
             tags: eventToDuplicate.tags?.map((t) => t.tag).join(', ') || '',
           });
         }
       } catch (err: any) {
         setError(err.message || 'Failed to load data');
-        if (err.message?.includes('Unauthorized') || err.message?.includes('token')) {
+        if (
+          err.message?.includes('Unauthorized') ||
+          err.message?.includes('token')
+        ) {
           authService.logout();
           router.push('/auth/login');
         }
@@ -86,7 +95,9 @@ export default function CreateEventPage() {
   }, [router, duplicateId]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -120,7 +131,9 @@ export default function CreateEventPage() {
       const createdEvent = await eventService.createEvent(eventData);
       router.push(`/events/${createdEvent.id}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to create event. Please check all fields.');
+      setError(
+        err.message || 'Failed to create event. Please check all fields.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -181,9 +194,15 @@ export default function CreateEventPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6"
+          >
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Event Title *
               </label>
               <input
@@ -201,7 +220,10 @@ export default function CreateEventPage() {
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Description *
               </label>
               <textarea
@@ -219,7 +241,10 @@ export default function CreateEventPage() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Location *
                 </label>
                 <input
@@ -237,7 +262,10 @@ export default function CreateEventPage() {
               </div>
 
               <div>
-                <label htmlFor="venue" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="venue"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Venue *
                 </label>
                 <input
@@ -257,7 +285,10 @@ export default function CreateEventPage() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="startDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Start Date & Time *
                 </label>
                 <input
@@ -272,7 +303,10 @@ export default function CreateEventPage() {
               </div>
 
               <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="endDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   End Date & Time *
                 </label>
                 <input
@@ -288,7 +322,10 @@ export default function CreateEventPage() {
             </div>
 
             <div>
-              <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="categoryId"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Category *
               </label>
               <select
@@ -310,7 +347,10 @@ export default function CreateEventPage() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Price (USD)
                 </label>
                 <input
@@ -327,7 +367,10 @@ export default function CreateEventPage() {
               </div>
 
               <div>
-                <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="imageUrl"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Image URL
                 </label>
                 <input
@@ -343,7 +386,10 @@ export default function CreateEventPage() {
             </div>
 
             <div>
-              <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="tags"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Tags
               </label>
               <input
@@ -382,5 +428,28 @@ export default function CreateEventPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function CreateEventPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          <main className="flex-1 container mx-auto px-4 py-16">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+              <p className="mt-4 text-gray-600 dark:text-gray-300">
+                Loading...
+              </p>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      }
+    >
+      <CreateEventForm />
+    </Suspense>
   );
 }

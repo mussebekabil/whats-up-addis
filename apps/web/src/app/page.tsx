@@ -7,16 +7,26 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export default async function Home() {
-  let events: any[] = [];
+  let upcomingEvents: any[] = [];
+  let pastEvents: any[] = [];
   let categories: any[] = [];
   let error = null;
 
   try {
-    const [eventsResponse, categoriesResponse] = await Promise.all([
-      eventService.getEvents({ page: 1, limit: 6 }),
-      categoryService.getCategories(),
-    ]);
-    events = eventsResponse.data;
+    const now = new Date().toISOString();
+
+    const [upcomingResponse, pastResponse, categoriesResponse] =
+      await Promise.all([
+        eventService.getEvents({ page: 1, limit: 6, endDateGte: now }),
+        eventService.getEvents({ page: 1, limit: 20, endDateLt: now }),
+        categoryService.getCategories(),
+      ]);
+
+    upcomingEvents = upcomingResponse.data;
+    // Filter past events to only show those with images, limit to 3
+    pastEvents = pastResponse.data
+      .filter((event) => event.imageUrl)
+      .slice(0, 3);
     categories = categoriesResponse;
   } catch (err) {
     error = 'Failed to load data. Please make sure the API server is running.';
@@ -54,33 +64,60 @@ export default async function Home() {
 
         {error && (
           <div className="container mx-auto px-4 mb-8">
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded">
               {error}
             </div>
           </div>
         )}
 
-        {events.length > 0 && (
-          <section className="container mx-auto px-4 py-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold">Upcoming Events</h2>
-              <Link
-                href="/events"
-                className="text-primary-600 hover:text-primary-700 font-medium"
-              >
-                View all →
-              </Link>
+        {upcomingEvents.length > 0 && (
+          <section className="bg-white dark:bg-gray-950 py-12">
+            <div className="container mx-auto px-4">
+              <div className="relative mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-left">
+                  Upcoming Events
+                </h2>
+                <Link
+                  href="/events?filter=upcoming"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                >
+                  View all →
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+          </section>
+        )}
+
+        {pastEvents.length > 0 && (
+          <section className="bg-gradient-to-b from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 py-12">
+            <div className="container mx-auto px-4">
+              <div className="relative mb-12">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-left">
+                  Past Events
+                </h2>
+                <Link
+                  href="/events?filter=past"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                >
+                  View all →
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {pastEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
             </div>
           </section>
         )}
 
         {categories.length > 0 ? (
-          <section className="bg-gray-50 dark:bg-gray-900 py-16">
+          <section className="bg-primary-50 dark:bg-gray-900/50 py-16">
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
                 Browse by Category
@@ -94,9 +131,9 @@ export default async function Home() {
           </section>
         ) : (
           !error && (
-            <section className="bg-gray-50 py-16">
+            <section className="bg-primary-50 dark:bg-gray-900/50 py-16">
               <div className="container mx-auto px-4 text-center">
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   No categories available yet. Check back soon!
                 </p>
               </div>

@@ -5,18 +5,30 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 interface EventsPageProps {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; filter?: string }>;
 }
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = await searchParams;
   const currentPage = parseInt(params.page || '1', 10);
+  const filter = params.filter; // 'upcoming', 'past', or undefined
 
   let events: any[] = [];
   let pagination: any = null;
   let error = null;
+
   try {
-    const response = await eventService.getEvents({ page: currentPage, limit: 12 });
+    const now = new Date().toISOString();
+    const queryParams: any = { page: currentPage, limit: 12 };
+
+    // Apply date filter based on the filter parameter
+    if (filter === 'upcoming') {
+      queryParams.endDateGte = now;
+    } else if (filter === 'past') {
+      queryParams.endDateLt = now;
+    }
+
+    const response = await eventService.getEvents(queryParams);
     events = response.data;
     pagination = response.pagination;
   } catch (err) {
@@ -25,16 +37,65 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     console.error('Error fetching events:', err);
   }
 
+  // Determine page title based on filter
+  const pageTitle =
+    filter === 'upcoming'
+      ? 'Upcoming Events'
+      : filter === 'past'
+        ? 'Past Events'
+        : 'All Events';
+
+  const pageDescription =
+    filter === 'upcoming'
+      ? 'Events happening soon in Addis Ababa'
+      : filter === 'past'
+        ? 'Past events in Addis Ababa'
+        : "Discover what's happening in Addis Ababa";
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">All Events</h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Discover what&apos;s happening in Addis Ababa
-          </p>
+          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
+            {pageTitle}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">{pageDescription}</p>
+        </div>
+
+        {/* Filter tabs */}
+        <div className="mb-6 flex gap-2">
+          <Link
+            href="/events"
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              !filter
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            All Events
+          </Link>
+          <Link
+            href="/events?filter=upcoming"
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              filter === 'upcoming'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            Upcoming
+          </Link>
+          <Link
+            href="/events?filter=past"
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              filter === 'past'
+                ? 'bg-primary-600 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+          >
+            Past
+          </Link>
         </div>
 
         {error && (
@@ -56,19 +117,24 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 {Array.from(
                   { length: pagination.totalPages },
                   (_, i) => i + 1
-                ).map((page) => (
-                  <Link
-                    key={page}
-                    href={`/events?page=${page}`}
-                    className={`px-4 py-2 rounded transition-colors ${
-                      page === currentPage
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    {page}
-                  </Link>
-                ))}
+                ).map((page) => {
+                  const pageUrl = filter
+                    ? `/events?page=${page}&filter=${filter}`
+                    : `/events?page=${page}`;
+                  return (
+                    <Link
+                      key={page}
+                      href={pageUrl}
+                      className={`px-4 py-2 rounded transition-colors ${
+                        page === currentPage
+                          ? 'bg-primary-600 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {page}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </>

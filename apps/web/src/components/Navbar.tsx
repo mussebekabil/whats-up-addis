@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authService } from '@/lib/auth';
-import type { User } from '@whats-up-addis/shared';
+import { User, Roles } from '@whats-up-addis/shared';
 
 export default function Navbar() {
   const router = useRouter();
@@ -30,7 +30,10 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     };
@@ -59,8 +62,11 @@ export default function Navbar() {
     <header className="border-b bg-white dark:bg-gray-800 dark:border-gray-700 sticky top-0 z-50">
       <nav className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            What's Up Addis
+          <Link
+            href="/"
+            className="text-2xl font-bold text-primary-600 dark:text-primary-400"
+          >
+            Whats Up Addis
           </Link>
           <div className="flex items-center gap-6">
             <Link
@@ -76,7 +82,7 @@ export default function Navbar() {
               Categories
             </Link>
 
-            {user?.role === 'ADMIN' && (
+            {user?.role === Roles.Admin && (
               <Link
                 href="/events/create"
                 className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
@@ -97,8 +103,12 @@ export default function Navbar() {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2">
                     <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {user.email}
+                      </p>
                     </div>
                     <Link
                       href="/profile"

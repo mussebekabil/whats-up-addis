@@ -7,7 +7,7 @@ import { eventService } from '@/lib/events';
 import { categoryService } from '@/lib/categories';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import type { User, Category, Event } from '@whats-up-addis/shared';
+import { User, Category, Event, Roles } from '@whats-up-addis/shared';
 
 interface EditEventPageProps {
   params: Promise<{ id: string }>;
@@ -17,6 +17,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
   const router = useRouter();
   const [eventId, setEventId] = useState<string>('');
   const [user, setUser] = useState<User | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [event, setEvent] = useState<Event | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,8 +53,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
           categoryService.getCategories(),
         ]);
 
-        if (userData.role !== 'ADMIN') {
-          setError('You do not have permission to edit events. Admin access required.');
+        if (userData.role !== Roles.Admin) {
+          setError(
+            'You do not have permission to edit events. Admin access required.'
+          );
           setIsLoading(false);
           return;
         }
@@ -63,8 +66,12 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         setCategories(categoriesData);
 
         // Populate form with existing event data
-        const startDateLocal = new Date(eventData.startDate).toISOString().slice(0, 16);
-        const endDateLocal = new Date(eventData.endDate).toISOString().slice(0, 16);
+        const startDateLocal = new Date(eventData.startDate)
+          .toISOString()
+          .slice(0, 16);
+        const endDateLocal = new Date(eventData.endDate)
+          .toISOString()
+          .slice(0, 16);
 
         setFormData({
           title: eventData.title,
@@ -74,13 +81,19 @@ export default function EditEventPage({ params }: EditEventPageProps) {
           startDate: startDateLocal,
           endDate: endDateLocal,
           imageUrl: eventData.imageUrl || '',
-          price: eventData.price !== null && eventData.price !== undefined ? String(eventData.price) : '',
+          price:
+            eventData.price !== null && eventData.price !== undefined
+              ? String(eventData.price)
+              : '',
           categoryId: eventData.categoryId,
           tags: eventData.tags?.map((t) => t.tag).join(', ') || '',
         });
       } catch (err: any) {
         setError(err.message || 'Failed to load event data');
-        if (err.message?.includes('Unauthorized') || err.message?.includes('token')) {
+        if (
+          err.message?.includes('Unauthorized') ||
+          err.message?.includes('token')
+        ) {
           authService.logout();
           router.push('/auth/login');
         }
@@ -93,7 +106,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
   }, [params, router]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -127,7 +142,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
       await eventService.updateEvent(eventId, eventData);
       router.push(`/events/${eventId}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to update event. Please check all fields.');
+      setError(
+        err.message || 'Failed to update event. Please check all fields.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -140,7 +157,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         <main className="flex-1 container mx-auto px-4 py-16">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading event...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">
+              Loading event...
+            </p>
           </div>
         </main>
         <Footer />
@@ -172,7 +191,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Event</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Edit Event
+            </h1>
             <p className="text-gray-600 dark:text-gray-300 mt-2">
               Update the event details below
             </p>
@@ -184,9 +205,15 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6"
+          >
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Event Title *
               </label>
               <input
@@ -204,7 +231,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Description *
               </label>
               <textarea
@@ -222,7 +252,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Location *
                 </label>
                 <input
@@ -240,7 +273,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
               </div>
 
               <div>
-                <label htmlFor="venue" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="venue"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Venue *
                 </label>
                 <input
@@ -260,7 +296,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="startDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Start Date & Time *
                 </label>
                 <input
@@ -275,7 +314,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
               </div>
 
               <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="endDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   End Date & Time *
                 </label>
                 <input
@@ -291,7 +333,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
 
             <div>
-              <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="categoryId"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Category *
               </label>
               <select
@@ -313,7 +358,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Price (USD)
                 </label>
                 <input
@@ -330,7 +378,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
               </div>
 
               <div>
-                <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="imageUrl"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Image URL
                 </label>
                 <input
@@ -346,7 +397,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
 
             <div>
-              <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                htmlFor="tags"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
                 Tags
               </label>
               <input

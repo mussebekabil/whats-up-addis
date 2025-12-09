@@ -10,15 +10,13 @@ import { authService } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventEngagement from '@/components/EventEngagement';
-import type { Event, User } from '@whats-up-addis/shared';
+import { Event, User, Roles } from '@whats-up-addis/shared';
 
 interface EventDetailsPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function EventDetailsPage({
-  params,
-}: EventDetailsPageProps) {
+export default function EventDetailsPage({ params }: EventDetailsPageProps) {
   const [eventId, setEventId] = useState<string>('');
   const [event, setEvent] = useState<Event | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -60,7 +58,9 @@ export default function EventDetailsPage({
         <main className="flex-1 container mx-auto px-4 py-16">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading event...</p>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">
+              Loading event...
+            </p>
           </div>
         </main>
         <Footer />
@@ -98,7 +98,7 @@ export default function EventDetailsPage({
             Back to Events
           </Link>
 
-          {user?.role === 'ADMIN' && (
+          {user?.role === Roles.Admin && (
             <div className="flex gap-3">
               <Link
                 href={`/events/${eventId}/edit`}

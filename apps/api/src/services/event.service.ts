@@ -4,6 +4,7 @@ import {
   UpdateEventInput,
   EventFiltersInput,
   calculatePagination,
+  Roles,
 } from '@whats-up-addis/shared';
 import { AppError } from '../middleware/error-handler.js';
 
@@ -13,6 +14,8 @@ export class EventService {
       categoryId,
       startDate,
       endDate,
+      endDateGte,
+      endDateLt,
       search,
       minPrice,
       maxPrice,
@@ -29,12 +32,24 @@ export class EventService {
       where.categoryId = categoryId;
     }
 
-    if (startDate || endDate) {
-      where.startDate = {} as Record<string, unknown>;
-      if (startDate)
-        (where.startDate as Record<string, unknown>).gte = new Date(startDate);
-      if (endDate)
-        (where.startDate as Record<string, unknown>).lte = new Date(endDate);
+    if (startDate) {
+      where.startDate = {
+        gte: new Date(startDate),
+      } as Record<string, unknown>;
+    }
+
+    // Handle endDate filtering with more granular control
+    if (endDate || endDateGte || endDateLt) {
+      where.endDate = {} as Record<string, unknown>;
+      if (endDate) {
+        (where.endDate as Record<string, unknown>).gte = new Date(endDate);
+      }
+      if (endDateGte) {
+        (where.endDate as Record<string, unknown>).gte = new Date(endDateGte);
+      }
+      if (endDateLt) {
+        (where.endDate as Record<string, unknown>).lt = new Date(endDateLt);
+      }
     }
 
     if (search) {
@@ -157,7 +172,7 @@ export class EventService {
     }
 
     // Only allow owner or admin to update
-    if (event.createdBy !== userId && userRole !== 'ADMIN') {
+    if (event.createdBy !== userId && userRole !== Roles.Admin) {
       throw new AppError(403, 'Not authorized to update this event');
     }
 
@@ -213,7 +228,7 @@ export class EventService {
     }
 
     // Only allow owner or admin to delete
-    if (event.createdBy !== userId && userRole !== 'ADMIN') {
+    if (event.createdBy !== userId && userRole !== Roles.Admin) {
       throw new AppError(403, 'Not authorized to delete this event');
     }
 
