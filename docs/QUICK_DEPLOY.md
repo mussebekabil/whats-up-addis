@@ -71,11 +71,13 @@ Check: GitHub → Actions tab (should see workflow running)
 ## Environment Variables Needed
 
 ### Now (for Vercel):
+
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ### Later (after Railway deployment):
+
 ```
 NEXT_PUBLIC_API_URL=https://your-api.railway.app
 ```
@@ -85,13 +87,16 @@ NEXT_PUBLIC_API_URL=https://your-api.railway.app
 ## Troubleshooting
 
 ### Build fails?
+
 - Check `apps/web/next.config.ts` exists
 - Ensure `"packageManager": "pnpm@10.0.0"` in root `package.json`
 
 ### Can't access API?
+
 - Normal! Deploy backend first, then update `NEXT_PUBLIC_API_URL`
 
 ### Images not loading?
+
 - Check Cloudinary credentials in Railway (after backend deployment)
 
 ---
@@ -101,7 +106,7 @@ NEXT_PUBLIC_API_URL=https://your-api.railway.app
 ✅ Frontend deployed to Vercel
 
 🔄 Next: Deploy backend to Railway
-   → See `RAILWAY_SETUP.md` (coming next)
+→ See `RAILWAY_SETUP.md` (coming next)
 
 ---
 

@@ -34,6 +34,7 @@ git push -u origin main
 
 4. **Environment Variables**:
    Add the following environment variable:
+
    ```
    Key: NEXT_PUBLIC_API_URL
    Value: http://localhost:3001 (temporary, will update after Railway deployment)
@@ -77,6 +78,7 @@ vercel project ls
 ```
 
 Or get them from Vercel dashboard:
+
 - **Project ID**: Project Settings → General → Project ID
 - **Org ID**: Account Settings → General → Your ID
 
@@ -110,6 +112,7 @@ git push origin main
 ## Vercel Configuration Files
 
 ### `vercel.json` (Root Directory)
+
 ```json
 {
   "buildCommand": "cd apps/web && pnpm build",
@@ -127,7 +130,9 @@ git push origin main
 ```
 
 ### `next.config.ts` (apps/web/)
+
 Already configured with:
+
 - Cloudinary image optimization
 - Webpack configuration for monorepo
 - Environment variables
@@ -164,6 +169,7 @@ After deploying your backend to Railway:
 Add these DNS records at your domain registrar:
 
 **For Root Domain** (whatsupaddis.com):
+
 ```
 Type: A
 Name: @
@@ -171,6 +177,7 @@ Value: 76.76.21.21
 ```
 
 **For www Subdomain**:
+
 ```
 Type: CNAME
 Name: www
@@ -184,11 +191,13 @@ Value: cname.vercel-dns.com
 ## Environment Variables
 
 ### Development (.env.local)
+
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
 ### Production (Vercel)
+
 ```bash
 NEXT_PUBLIC_API_URL=https://your-api.railway.app
 ```
@@ -202,6 +211,7 @@ NEXT_PUBLIC_API_URL=https://your-api.railway.app
 **Error**: `Module not found: Can't resolve '@whats-up-addis/shared'`
 
 **Solution**:
+
 1. Ensure root directory is set correctly in Vercel
 2. Check `transpilePackages` in `next.config.ts`
 3. Clear cache and redeploy
@@ -209,6 +219,7 @@ NEXT_PUBLIC_API_URL=https://your-api.railway.app
 **Error**: `Command "pnpm" not found`
 
 **Solution**:
+
 - Vercel auto-detects pnpm from `packageManager` field in `package.json`
 - Verify it exists: `"packageManager": "pnpm@10.0.0"`
 
@@ -217,6 +228,7 @@ NEXT_PUBLIC_API_URL=https://your-api.railway.app
 **Error**: CORS errors or "Failed to fetch"
 
 **Solution**:
+
 1. Ensure `NEXT_PUBLIC_API_URL` is set correctly
 2. Check Railway API has CORS enabled for Vercel domain
 3. Verify API is running on Railway
@@ -224,6 +236,7 @@ NEXT_PUBLIC_API_URL=https://your-api.railway.app
 ### Slow Builds
 
 **Solution**:
+
 1. Enable pnpm caching (already configured in workflow)
 2. Use Vercel's build cache (automatic)
 3. Consider upgrading Vercel plan for faster builds
@@ -247,6 +260,7 @@ NEXT_PUBLIC_API_URL=https://your-api.railway.app
 ## Next Steps
 
 After frontend is deployed:
+
 1. Deploy backend to Railway (see `RAILWAY_SETUP.md`)
 2. Update `NEXT_PUBLIC_API_URL` in Vercel
 3. Run database migrations on Railway

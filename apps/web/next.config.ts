@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Webpack configuration
   webpack: (config) => {
     // Handle .js imports that point to .ts files (for NodeNext module resolution compatibility)
     config.resolve.extensionAlias = {
@@ -21,7 +22,6 @@ const nextConfig: NextConfig = {
     return config;
   },
   // Optimize for production
-  swcMinify: true,
   compress: true,
   poweredByHeader: false,
   // Environment variables that should be available on the client

@@ -13,6 +13,7 @@ This guide covers deploying the What's Up Addis application to Vercel (frontend)
 ## Part 1: Deploy Frontend to Vercel
 
 ### Prerequisites
+
 1. GitHub account
 2. Vercel account (sign up at https://vercel.com)
 3. Push your code to GitHub
@@ -62,6 +63,7 @@ NEXT_PUBLIC_API_URL=https://your-railway-api-url.up.railway.app
 ## Part 2: Deploy Backend to Railway (Next Steps)
 
 The backend deployment will be covered in the next phase. You'll deploy:
+
 - Express API
 - PostgreSQL database
 - Crawler cron job
@@ -71,11 +73,13 @@ The backend deployment will be covered in the next phase. You'll deploy:
 ## Environment Variables Reference
 
 ### Frontend (.env for Vercel)
+
 ```bash
 NEXT_PUBLIC_API_URL=https://your-api-url.up.railway.app
 ```
 
 ### Backend (.env for Railway)
+
 ```bash
 # Database
 DATABASE_URL=postgresql://user:password@host:5432/database
@@ -105,14 +109,17 @@ CRAWLER_USER_AGENT="WhatsUpAddis/1.0"
 ### Build Fails on Vercel
 
 **Error**: "Cannot find module '@whats-up-addis/shared'"
+
 - **Solution**: Ensure `transpilePackages: ['@whats-up-addis/shared']` is in `next.config.ts`
 
 **Error**: "Module not found: Can't resolve './types/index.js'"
+
 - **Solution**: Verify webpack `extensionAlias` configuration in `next.config.ts`
 
 ### API Connection Issues
 
 **Error**: "Failed to fetch" or CORS errors
+
 - **Solution**:
   1. Verify `NEXT_PUBLIC_API_URL` is set correctly in Vercel
   2. Ensure Railway API has CORS enabled
@@ -138,6 +145,7 @@ CRAWLER_USER_AGENT="WhatsUpAddis/1.0"
 ## Next Steps
 
 After deploying the frontend:
+
 1. Deploy backend to Railway
 2. Set up PostgreSQL on Railway
 3. Run database migrations

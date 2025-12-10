@@ -21,12 +21,12 @@ Complete deployment guide for the What's Up Addis event discovery platform.
 
 ### Cost Breakdown (Monthly)
 
-| Service | Free Tier | Paid (Starter) |
-|---------|-----------|----------------|
-| Vercel (Frontend) | ✅ FREE | FREE |
-| Railway (Backend + DB) | $5 credit | $5-15 |
-| Cloudinary (Images) | ✅ FREE (25GB) | $0 |
-| **Total** | **$0-5** | **$5-15** |
+| Service                | Free Tier      | Paid (Starter) |
+| ---------------------- | -------------- | -------------- |
+| Vercel (Frontend)      | ✅ FREE        | FREE           |
+| Railway (Backend + DB) | $5 credit      | $5-15          |
+| Cloudinary (Images)    | ✅ FREE (25GB) | $0             |
+| **Total**              | **$0-5**       | **$5-15**      |
 
 ---
 
@@ -48,6 +48,7 @@ Complete deployment guide for the What's Up Addis event discovery platform.
 **Time: 5-10 minutes**
 
 1. **Push code to GitHub**
+
    ```bash
    git push origin main
    ```
@@ -71,6 +72,7 @@ Complete deployment guide for the What's Up Addis event discovery platform.
 **Time: 15-20 minutes**
 
 Coming next! Will deploy:
+
 - Express API
 - PostgreSQL database
 - Crawler with cron jobs
@@ -155,6 +157,7 @@ Workflow Steps:
 ```
 
 **Setup**:
+
 1. Add GitHub secrets (see `VERCEL_SETUP.md`)
 2. Push to main branch
 3. Check Actions tab for status
@@ -164,11 +167,13 @@ Workflow Steps:
 ## 📊 Monitoring & Logs
 
 ### Vercel
+
 - **Dashboard**: https://vercel.com/dashboard
 - **Analytics**: Built-in (Real-time visitor stats)
 - **Logs**: Deployment logs in dashboard
 
 ### Railway (after deployment)
+
 - **Dashboard**: https://railway.app/dashboard
 - **Logs**: Real-time application logs
 - **Metrics**: CPU, Memory, Network usage
@@ -203,16 +208,19 @@ Workflow Steps:
 ### Common Issues
 
 **Build fails on Vercel**
+
 - Check Node.js version in `package.json` engines
 - Verify `transpilePackages` in `next.config.ts`
 - Clear Vercel build cache
 
 **API connection fails**
+
 - Verify `NEXT_PUBLIC_API_URL` is set in Vercel
 - Check CORS settings in backend
 - Ensure Railway API is running
 
 **Images don't load**
+
 - Check Cloudinary credentials in Railway
 - Verify image URLs in database
 
@@ -222,19 +230,20 @@ Workflow Steps:
 
 ## 📚 Documentation Index
 
-| Document | Purpose | When to Use |
-|----------|---------|-------------|
-| `QUICK_DEPLOY.md` | Quick reference | First-time deployment |
-| `VERCEL_SETUP.md` | Detailed Vercel guide | Setup + troubleshooting |
-| `RAILWAY_SETUP.md` | Railway deployment | Backend setup (next phase) |
-| `DEPLOYMENT.md` | Complete overview | Reference for all services |
-| `.env.example` | Environment template | Setting up environments |
+| Document           | Purpose               | When to Use                |
+| ------------------ | --------------------- | -------------------------- |
+| `QUICK_DEPLOY.md`  | Quick reference       | First-time deployment      |
+| `VERCEL_SETUP.md`  | Detailed Vercel guide | Setup + troubleshooting    |
+| `RAILWAY_SETUP.md` | Railway deployment    | Backend setup (next phase) |
+| `DEPLOYMENT.md`    | Complete overview     | Reference for all services |
+| `.env.example`     | Environment template  | Setting up environments    |
 
 ---
 
 ## 🎯 Current Status
 
 ### ✅ Completed
+
 - [x] Vercel configuration files created
 - [x] GitHub Actions workflow configured
 - [x] Next.js optimized for production
@@ -242,6 +251,7 @@ Workflow Steps:
 - [x] Quick reference guides created
 
 ### 🔄 Next Steps
+
 1. Deploy frontend to Vercel (you can do this now!)
 2. Create Railway setup guide
 3. Deploy backend and database to Railway

@@ -1,6 +1,7 @@
 # Fix Vercel Deployment Error
 
 ## The Error
+
 ```
 Error: No Output Directory named "public" found after the Build completed.
 ```
@@ -20,6 +21,7 @@ Go to your project → **Settings** → **General** and set:
 **Root Directory**: `apps/web` ← **IMPORTANT**
 
 **Build Command**: Leave as default (Vercel auto-detects)
+
 - Or explicitly set: `pnpm build`
 
 **Output Directory**: Leave as default (`.next`)
@@ -131,6 +133,7 @@ Should have:
 ### Clear Vercel Cache
 
 In deployment settings:
+
 1. Click three dots menu on failed deployment
 2. Select "Redeploy"
 3. Check "Clear build cache"
