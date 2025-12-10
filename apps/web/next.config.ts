@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
       },
     ],
   },
@@ -18,6 +19,14 @@ const nextConfig: NextConfig = {
       '.jsx': ['.jsx', '.tsx'],
     };
     return config;
+  },
+  // Optimize for production
+  swcMinify: true,
+  compress: true,
+  poweredByHeader: false,
+  // Environment variables that should be available on the client
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 };
 
