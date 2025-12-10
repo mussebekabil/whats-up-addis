@@ -68,9 +68,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate Prisma Client
-        run: pnpm db:generate
-
       - name: Deploy to Vercel Preview
         uses: amondnet/vercel-action@v25
         with:
