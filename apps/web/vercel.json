@@ -1,5 +1,6 @@
 {
   "buildCommand": "cd ../.. && pnpm install && pnpm db:generate && pnpm --filter @whats-up-addis/web build",
+  "outputDirectory": ".next",
   "installCommand": "echo 'Skipping default install'",
   "framework": null
 }
