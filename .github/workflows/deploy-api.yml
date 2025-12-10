@@ -38,24 +38,27 @@ jobs:
       - name: Build API
         run: pnpm --filter @whats-up-addis/api build
 
-      # TODO: Add Railway deployment when Railway is configured
-      # - name: Deploy to Railway
-      #   uses: railway/railway-deploy@v3
-      #   with:
-      #     railway-token: ${{ secrets.RAILWAY_TOKEN }}
-      #     service: api
-      #   env:
-      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      #     JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      #     CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-      #     CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-      #     CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
 
-      - name: Placeholder - Railway not yet configured
+      - name: Deploy API to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          echo "API deployment workflow created but Railway deployment not yet configured"
-          echo "To enable Railway deployment:"
-          echo "1. Set up Railway project for API"
-          echo "2. Add RAILWAY_TOKEN to GitHub secrets"
-          echo "3. Add necessary environment variables to GitHub secrets"
-          echo "4. Uncomment the Railway deployment step above"
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --service api --detach
+          railway status --service api
+
+      - name: Run Database Migrations
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway run --service api pnpm --filter @whats-up-addis/database db:migrate:prod
+
+      - name: Verify Deployment
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "Deployment complete! Checking service status..."
+          railway status --service api
+          echo "View logs with: railway logs --service api"

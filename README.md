@@ -238,20 +238,95 @@ All packages use TypeScript with strict mode enabled. Shared types are available
 
 ## Deployment
 
-### Backend API
+### Railway (Recommended for Backend)
+
+Deploy your API, Crawler, and Database to Railway with automated CI/CD:
+
+**Architecture:**
+```
+┌─────────────────┐
+│   PostgreSQL    │ ← Railway Managed Database
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    │         │
+┌───▼──┐  ┌──▼────┐
+│ API  │  │Crawler│ ← Railway Services
+└───┬──┘  └───────┘
+    │
+    │ HTTPS
+    ▼
+┌────────┐
+│  Web   │ ← Vercel (Next.js)
+└────────┘
+```
+
+#### Option 1: Automated CI/CD with GitHub Actions (Recommended)
+
+**Setup once, deploy automatically:**
+
+1. Set up Railway and get credentials:
+   ```bash
+   railway login
+   railway link
+   railway status  # Get project ID
+   ```
+
+2. Add GitHub Secrets (Settings → Secrets and variables → Actions):
+   - `RAILWAY_TOKEN` - From https://railway.app/account/tokens
+   - `RAILWAY_PROJECT_ID` - From `railway status`
+
+3. Push to main branch:
+   ```bash
+   git push origin main  # Auto-deploys to Railway
+   ```
+
+**Features:**
+- ✅ Automatic deployment on push to main
+- ✅ Quality checks (lint + type-check) before deploy
+- ✅ Automatic database migrations
+- ✅ Separate workflows for API and Crawler
+- ✅ Only deploys when relevant files change
+
+**For detailed setup:** [GITHUB_ACTIONS_SETUP.md](./GITHUB_ACTIONS_SETUP.md)
+
+#### Option 2: Manual Deployment
+
+**Quick Start:**
+```bash
+# Run the automated setup script
+./scripts/railway-setup.sh
+```
+
+**Manual Setup:**
+1. See [RAILWAY_QUICKSTART.md](./RAILWAY_QUICKSTART.md) for step-by-step guide
+2. See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for detailed documentation
+
+### Vercel (Frontend Only)
+
+Deploy the Next.js frontend to Vercel:
+
+1. Connect your GitHub repository to Vercel
+2. Set root directory to `apps/web`
+3. Set environment variable: `NEXT_PUBLIC_API_URL=https://your-railway-api-url.railway.app`
+4. Deploy
+
+### Manual Deployment
+
+#### Backend API
 
 1. Build the application: `pnpm --filter @whats-up-addis/api build`
 2. Set environment variables
 3. Run migrations: `pnpm db:migrate:prod`
 4. Start the server: `pnpm --filter @whats-up-addis/api start`
 
-### Frontend
+#### Frontend
 
 1. Build the application: `pnpm --filter @whats-up-addis/web build`
 2. Set environment variables
 3. Start the server: `pnpm --filter @whats-up-addis/web start`
 
-### Crawler
+#### Crawler
 
 1. Build the application: `pnpm --filter @whats-up-addis/crawler build`
 2. Set environment variables

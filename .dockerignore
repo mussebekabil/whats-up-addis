@@ -1,0 +1,14 @@
+node_modules
+.git
+.github
+dist
+build
+.next
+.env.local
+.env*.local
+*.log
+.DS_Store
+coverage
+.turbo
+apps/web
+.vercel
