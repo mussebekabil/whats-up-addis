@@ -44,8 +44,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./apps/web
+          vercel-args: '--prod --yes'
 
   deploy-preview:
     name: Deploy to Vercel Preview
@@ -74,6 +73,6 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./apps/web
+          vercel-args: '--yes'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
