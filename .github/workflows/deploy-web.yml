@@ -1,78 +1,78 @@
-name: Deploy Web (Vercel)
+# name: Deploy Web (Vercel)
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/web/**'
-      - 'packages/shared/**'
-      - '.github/workflows/deploy-web.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'apps/web/**'
-      - 'packages/shared/**'
+# on:
+#   push:
+#     branches: [main]
+#     paths:
+#       - 'apps/web/**'
+#       - 'packages/shared/**'
+#       - '.github/workflows/deploy-web.yml'
+#   pull_request:
+#     branches: [main]
+#     paths:
+#       - 'apps/web/**'
+#       - 'packages/shared/**'
 
-env:
-  NODE_VERSION: '22'
+# env:
+#   NODE_VERSION: '22'
 
-jobs:
-  deploy-production:
-    name: Deploy to Vercel Production
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+# jobs:
+#   deploy-production:
+#     name: Deploy to Vercel Production
+#     runs-on: ubuntu-latest
+#     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+#       - name: Setup pnpm
+#         uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: ${{ env.NODE_VERSION }}
+#           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+#       - name: Install dependencies
+#         run: pnpm install --frozen-lockfile
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod --yes'
+#       - name: Deploy to Vercel
+#         uses: amondnet/vercel-action@v25
+#         with:
+#           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+#           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+#           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+#           vercel-args: '--prod --yes'
 
-  deploy-preview:
-    name: Deploy to Vercel Preview
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+#   deploy-preview:
+#     name: Deploy to Vercel Preview
+#     runs-on: ubuntu-latest
+#     if: github.event_name == 'pull_request'
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+#       - name: Setup pnpm
+#         uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: ${{ env.NODE_VERSION }}
+#           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+#       - name: Install dependencies
+#         run: pnpm install --frozen-lockfile
 
-      - name: Deploy to Vercel Preview
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--yes'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Deploy to Vercel Preview
+#         uses: amondnet/vercel-action@v25
+#         with:
+#           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+#           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+#           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+#           vercel-args: '--yes'
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
