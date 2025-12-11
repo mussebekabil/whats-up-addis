@@ -32,12 +32,12 @@ RUN echo "DATABASE_URL=postgresql://user:pass@localhost:5432/temp" > /app/.env
 WORKDIR /app/packages/database
 RUN pnpm db:generate
 
-# Build API
-WORKDIR /app/apps/api
-RUN pnpm build
+# We don't need to build since we'll use tsx to run TypeScript directly
+# This avoids issues with monorepo package imports
 
 # Expose port (Railway will set PORT env var)
 EXPOSE 3001
 
-# Start the API
-CMD ["node", "dist/index.js"]
+# Start the API with tsx (TypeScript executor)
+WORKDIR /app/apps/api
+CMD ["npx", "tsx", "src/index.ts"]

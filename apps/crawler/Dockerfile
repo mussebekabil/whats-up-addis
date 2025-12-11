@@ -48,9 +48,9 @@ RUN echo "DATABASE_URL=postgresql://user:pass@localhost:5432/temp" > /app/.env
 WORKDIR /app/packages/database
 RUN pnpm db:generate
 
-# Build crawler
-WORKDIR /app/apps/crawler
-RUN pnpm build
+# We don't need to build since we'll use tsx to run TypeScript directly
+# This avoids issues with monorepo package imports
 
-# Start the crawler
-CMD ["node", "dist/index.js"]
+# Start the crawler with tsx (TypeScript executor)
+WORKDIR /app/apps/crawler
+CMD ["npx", "tsx", "src/index.ts"]
