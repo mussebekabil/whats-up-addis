@@ -35,6 +35,9 @@ import uploadRoutes from './routes/upload.routes.js';
 const app = express();
 const PORT = process.env.API_PORT || 3001;
 
+// Trust proxy - required for Railway and other cloud platforms
+app.set('trust proxy', true);
+
 // Middleware
 app.use(helmet());
 app.use(cors());
