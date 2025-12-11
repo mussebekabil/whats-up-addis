@@ -49,7 +49,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-16">
+        <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
@@ -66,7 +66,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-16">
+        <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
             {error || 'User data not available'}
           </div>
@@ -80,7 +80,7 @@ export default function ProfilePage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-16">
+      <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <div className="flex items-center mb-8">

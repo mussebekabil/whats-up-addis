@@ -37,7 +37,7 @@ export default async function Home() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         <section className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-5xl font-bold mb-4">
             Discover Events in Addis Ababa

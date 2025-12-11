@@ -76,7 +76,7 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
         <div className="mb-6 flex items-center justify-between">
           <Link
             href="/events"

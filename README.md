@@ -243,6 +243,7 @@ All packages use TypeScript with strict mode enabled. Shared types are available
 Deploy your API, Crawler, and Database to Railway with automated CI/CD:
 
 **Architecture:**
+
 ```
 ┌─────────────────┐
 │   PostgreSQL    │ ← Railway Managed Database
@@ -266,6 +267,7 @@ Deploy your API, Crawler, and Database to Railway with automated CI/CD:
 **Setup once, deploy automatically:**
 
 1. Set up Railway and get credentials:
+
    ```bash
    railway login
    railway link
@@ -282,6 +284,7 @@ Deploy your API, Crawler, and Database to Railway with automated CI/CD:
    ```
 
 **Features:**
+
 - ✅ Automatic deployment on push to main
 - ✅ Quality checks (lint + type-check) before deploy
 - ✅ Automatic database migrations
@@ -293,12 +296,14 @@ Deploy your API, Crawler, and Database to Railway with automated CI/CD:
 #### Option 2: Manual Deployment
 
 **Quick Start:**
+
 ```bash
 # Run the automated setup script
 ./scripts/railway-setup.sh
 ```
 
 **Manual Setup:**
+
 1. See [RAILWAY_QUICKSTART.md](./RAILWAY_QUICKSTART.md) for step-by-step guide
 2. See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for detailed documentation
 

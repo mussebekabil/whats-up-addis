@@ -42,7 +42,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-16">
+      <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
         <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white text-center">
             Welcome Back

@@ -19,7 +19,7 @@ export default async function CategoriesPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
             Event Categories

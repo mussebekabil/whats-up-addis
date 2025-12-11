@@ -160,7 +160,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-16">
+        <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
@@ -177,7 +177,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-16">
+        <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
           <div className="max-w-2xl mx-auto">
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-6 py-4 rounded-lg">
               <h2 className="text-lg font-semibold mb-2">Access Denied</h2>
@@ -194,7 +194,7 @@ export default function EditEventPage({ params }: EditEventPageProps) {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
         <div className="max-w-3xl mx-auto">
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
