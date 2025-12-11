@@ -95,7 +95,7 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <Link
             href="/events"
             className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
@@ -117,13 +117,13 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
           </Link>
 
           {user?.role === Roles.Admin && (
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               <Link
                 href={`/events/${eventId}/edit`}
-                className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+                className="inline-flex items-center px-3 py-2 md:px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium text-sm md:text-base"
               >
                 <svg
-                  className="w-5 h-5 mr-2"
+                  className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -135,14 +135,14 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                   />
                 </svg>
-                Edit Event
+                Edit
               </Link>
               <Link
                 href={`/events/create?duplicate=${eventId}`}
-                className="inline-flex items-center px-4 py-2 border border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors font-medium"
+                className="inline-flex items-center px-3 py-2 md:px-4 border border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors font-medium text-sm md:text-base"
               >
                 <svg
-                  className="w-5 h-5 mr-2"
+                  className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -158,10 +158,10 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
               </Link>
               <button
                 onClick={() => setShowDeleteModal(true)}
-                className="inline-flex items-center px-4 py-2 border border-red-600 text-red-600 dark:text-red-400 dark:border-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium"
+                className="inline-flex items-center px-3 py-2 md:px-4 border border-red-600 text-red-600 dark:text-red-400 dark:border-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium text-sm md:text-base"
               >
                 <svg
-                  className="w-5 h-5 mr-2"
+                  className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -179,22 +179,25 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
           )}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:items-center">
-          {/* Left Section - Event Image */}
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:items-start">
+          {/* Event Image - Shows on top for mobile */}
           {event.imageUrl && (
-            <div className="relative bg-black dark:bg-black rounded-lg shadow-lg overflow-hidden lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]">
-              <Image
-                src={event.imageUrl}
-                alt={event.title}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
+            <div className="relative w-full bg-black dark:bg-black rounded-lg shadow-lg overflow-hidden lg:sticky lg:top-24">
+              <div className="relative w-full aspect-[4/3] lg:aspect-auto lg:h-[calc(100vh-8rem)]">
+                <Image
+                  src={event.imageUrl}
+                  alt={event.title}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+              </div>
             </div>
           )}
 
-          {/* Right Section - Event Details */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+          {/* Event Details - Shows below image on mobile */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {event.category && (
                 <span className="text-sm bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full font-medium">
@@ -212,11 +215,11 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
               )}
             </div>
 
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               {event.title}
             </h1>
 
-            <div className="grid md:grid-cols-2 gap-4 mb-6 text-gray-700 dark:text-gray-300">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-gray-700 dark:text-gray-300">
               <div className="flex items-start gap-3">
                 <svg
                   className="w-6 h-6 text-primary-600 dark:text-primary-400 mt-1 flex-shrink-0"
