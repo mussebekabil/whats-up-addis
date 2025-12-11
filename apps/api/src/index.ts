@@ -23,6 +23,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { errorHandler } from './middleware/error-handler.js';
 import { notFoundHandler } from './middleware/not-found.js';
+import healthRoutes from './routes/health.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import eventRoutes from './routes/event.routes.js';
 import categoryRoutes from './routes/category.routes.js';
@@ -40,12 +41,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+// Health check routes (no /api prefix for standard health endpoints)
+app.use('/', healthRoutes);
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/categories', categoryRoutes);
