@@ -39,5 +39,5 @@ RUN pnpm db:generate
 EXPOSE 3001
 
 # Start the API with tsx (TypeScript executor)
-WORKDIR /app/apps/api
-CMD ["npx", "tsx", "src/index.ts"]
+#WORKDIR /app/apps/api
+#CMD ["npx", "tsx", "src/index.ts"]
