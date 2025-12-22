@@ -17,4 +17,8 @@ router.put('/crawler/sources/:id', adminController.updateCrawlerSource);
 router.delete('/crawler/sources/:id', adminController.deleteCrawlerSource);
 router.post('/crawler/run', adminController.triggerCrawl);
 
+// Event management routes
+router.get('/events', adminController.getEvents);
+router.patch('/events/:id/status', adminController.updateEventStatus);
+
 export default router;
