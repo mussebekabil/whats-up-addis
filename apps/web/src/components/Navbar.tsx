@@ -88,12 +88,20 @@ export default function Navbar() {
               </Link>
 
               {user?.role === Roles.Admin && (
-                <Link
-                  href="/events/create"
-                  className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                >
-                  Create Event
-                </Link>
+                <>
+                  <Link
+                    href="/admin/events"
+                    className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  >
+                    Manage Events
+                  </Link>
+                  <Link
+                    href="/events/create"
+                    className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  >
+                    Create Event
+                  </Link>
+                </>
               )}
 
               {user ? (
@@ -115,6 +123,15 @@ export default function Navbar() {
                           {user.email}
                         </p>
                       </div>
+                      {user.role === Roles.Admin && (
+                        <Link
+                          href="/admin/events"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          Admin Panel
+                        </Link>
+                      )}
                       <Link
                         href="/profile"
                         onClick={() => setIsDropdownOpen(false)}
@@ -317,6 +334,15 @@ export default function Navbar() {
                 {user.email}
               </p>
             </div>
+            {user.role === Roles.Admin && (
+              <Link
+                href="/admin/events"
+                onClick={() => setIsDropdownOpen(false)}
+                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Admin Panel
+              </Link>
+            )}
             <Link
               href="/profile"
               onClick={() => setIsDropdownOpen(false)}

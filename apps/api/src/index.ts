@@ -36,7 +36,10 @@ const app = express();
 const PORT = process.env.API_PORT || 3001;
 
 // Trust proxy - required for Railway and other cloud platforms
-app.set('trust proxy', true);
+// In production, trust the first proxy (the load balancer/reverse proxy)
+// In development, don't trust any proxies
+const isProduction = process.env.NODE_ENV === 'production';
+app.set('trust proxy', isProduction ? 1 : false);
 
 // Middleware
 app.use(helmet());

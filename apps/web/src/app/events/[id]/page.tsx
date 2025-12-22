@@ -406,9 +406,9 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
             </div>
 
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Are you sure you want to delete <strong>{event?.title}</strong>? This will
-              permanently remove the event and all associated data including ratings
-              and comments.
+              Are you sure you want to delete <strong>{event?.title}</strong>?
+              This will permanently remove the event and all associated data
+              including ratings and comments.
             </p>
 
             <div className="flex gap-3 justify-end">

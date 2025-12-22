@@ -1,11 +1,13 @@
 # Telegram Events Crawler Implementation Plan
 
 ## Overview
+
 This document outlines the implementation plan for a new microservice that fetches event posts from Telegram groups, processes them using an LLM to extract structured data, uploads images to Cloudinary, and stores the events in the PostgreSQL database.
 
 ## Architecture
 
 ### System Components
+
 1. **Telegram Bot/Client** - Connects to Telegram groups and fetches messages
 2. **LLM Parser Service** - Processes text messages to extract event information
 3. **Image Processing Service** - Downloads and uploads images to Cloudinary
@@ -13,6 +15,7 @@ This document outlines the implementation plan for a new microservice that fetch
 5. **Scheduler** - Runs the crawler periodically (similar to existing crawler)
 
 ### Technology Stack
+
 - **Runtime**: Node.js with TypeScript
 - **Telegram Client**: `telegraf` or `telegram` (node-telegram-bot-api)
 - **LLM Integration**: OpenAI API or Anthropic Claude API
@@ -24,6 +27,7 @@ This document outlines the implementation plan for a new microservice that fetch
 ## Database Schema Updates
 
 ### New Model: TelegramSource
+
 ```prisma
 model TelegramSource {
   id                String    @id @default(uuid())
@@ -44,7 +48,9 @@ model TelegramSource {
 ```
 
 ### Updates to Event Model
+
 The existing `Event` model already supports:
+
 - `source` field - will use "telegram" as value
 - `sourceUrl` field - will store the Telegram message link
 - `imageUrl` field - will store Cloudinary URL
@@ -55,6 +61,7 @@ The existing `Event` model already supports:
 ### Phase 1: Setup and Configuration
 
 #### 1.1 Install Dependencies
+
 ```bash
 pnpm --filter @whats-up-addis/crawler add telegraf
 pnpm --filter @whats-up-addis/crawler add openai
@@ -63,7 +70,9 @@ pnpm --filter @whats-up-addis/crawler add @anthropic-ai/sdk
 ```
 
 #### 1.2 Environment Variables
+
 Add to `.env` file:
+
 ```env
 # Telegram Configuration
 TELEGRAM_BOT_TOKEN=your_bot_token_here
@@ -86,7 +95,9 @@ TELEGRAM_CRAWLER_SCHEDULE="0 */2 * * *"  # Every 2 hours
 ```
 
 #### 1.3 Database Migration
+
 Create a new migration for the `TelegramSource` model:
+
 ```bash
 pnpm db:generate
 pnpm db:migrate
@@ -95,9 +106,11 @@ pnpm db:migrate
 ### Phase 2: Core Services Implementation
 
 #### 2.1 Telegram Client Service
+
 **File**: `apps/crawler/src/services/telegram-client.service.ts`
 
 **Responsibilities**:
+
 - Initialize Telegram bot/client connection
 - Fetch messages from specified channels/groups
 - Handle message pagination
@@ -105,19 +118,25 @@ pnpm db:migrate
 - Track last processed message ID
 
 **Key Methods**:
+
 ```typescript
 class TelegramClientService {
-  async connect(): Promise<void>
-  async fetchMessages(chatId: string, lastMessageId?: number): Promise<TelegramMessage[]>
-  async downloadPhoto(photoId: string): Promise<Buffer>
-  async getMessageLink(chatId: string, messageId: number): Promise<string>
+  async connect(): Promise<void>;
+  async fetchMessages(
+    chatId: string,
+    lastMessageId?: number
+  ): Promise<TelegramMessage[]>;
+  async downloadPhoto(photoId: string): Promise<Buffer>;
+  async getMessageLink(chatId: string, messageId: number): Promise<string>;
 }
 ```
 
 #### 2.2 LLM Parser Service
+
 **File**: `apps/crawler/src/services/llm-parser.service.ts`
 
 **Responsibilities**:
+
 - Send event text to LLM API
 - Parse LLM response into structured event data
 - Handle parsing errors and retries
@@ -125,6 +144,7 @@ class TelegramClientService {
 
 **Prompt Engineering**:
 The LLM will receive a system prompt like:
+
 ```
 You are an event information extractor. Parse the following event post and extract:
 - title: The event name (required)
@@ -142,6 +162,7 @@ Respond ONLY with valid JSON.
 ```
 
 **Key Methods**:
+
 ```typescript
 interface ParsedEventData {
   title: string;
@@ -155,33 +176,38 @@ interface ParsedEventData {
 }
 
 class LLMParserService {
-  async parseEventText(text: string): Promise<ParsedEventData>
-  private validateParsedData(data: any): ParsedEventData
+  async parseEventText(text: string): Promise<ParsedEventData>;
+  private validateParsedData(data: any): ParsedEventData;
 }
 ```
 
 #### 2.3 Image Upload Service
+
 **File**: `apps/crawler/src/services/image-upload.service.ts`
 
 **Responsibilities**:
+
 - Upload images to Cloudinary
 - Handle image optimization
 - Generate appropriate folder structure
 - Return public URL
 
 **Key Methods**:
+
 ```typescript
 class ImageUploadService {
-  async uploadFromBuffer(buffer: Buffer, filename: string): Promise<string>
-  async uploadFromUrl(url: string): Promise<string>
-  private generateFolder(source: string): string
+  async uploadFromBuffer(buffer: Buffer, filename: string): Promise<string>;
+  async uploadFromUrl(url: string): Promise<string>;
+  private generateFolder(source: string): string;
 }
 ```
 
 #### 2.4 Telegram Crawler Service
+
 **File**: `apps/crawler/src/services/telegram-crawler.service.ts`
 
 **Responsibilities**:
+
 - Orchestrate the entire crawling process
 - Fetch active Telegram sources from database
 - Process each message through the pipeline
@@ -190,6 +216,7 @@ class ImageUploadService {
 - Update last crawled timestamp
 
 **Processing Pipeline**:
+
 ```
 1. Fetch active TelegramSources from database
 2. For each source:
@@ -203,18 +230,26 @@ class ImageUploadService {
 ```
 
 **Key Methods**:
+
 ```typescript
 class TelegramCrawlerService {
-  async crawlAll(): Promise<void>
-  async crawlSource(source: TelegramSource): Promise<number>
-  private async processMessage(message: TelegramMessage, source: TelegramSource): Promise<void>
-  private async checkDuplicate(title: string, startDate: Date): Promise<boolean>
+  async crawlAll(): Promise<void>;
+  async crawlSource(source: TelegramSource): Promise<number>;
+  private async processMessage(
+    message: TelegramMessage,
+    source: TelegramSource
+  ): Promise<void>;
+  private async checkDuplicate(
+    title: string,
+    startDate: Date
+  ): Promise<boolean>;
 }
 ```
 
 ### Phase 3: Scraper Implementation
 
 #### 3.1 Telegram Scraper
+
 **File**: `apps/crawler/src/scrapers/telegram.scraper.ts`
 
 Following the existing scraper pattern (similar to `alx.scraper.ts`):
@@ -234,9 +269,11 @@ export class TelegramScraper extends BaseScraper {
 ```
 
 #### 3.2 Update Crawler Service
+
 **File**: `apps/crawler/src/services/crawler.service.ts`
 
 Add Telegram scraper to the crawler rotation:
+
 ```typescript
 import { TelegramScraper } from '../scrapers/telegram.scraper.js';
 
@@ -248,12 +285,14 @@ await this.runScraper(telegramScraper);
 ### Phase 4: Error Handling and Logging
 
 #### 4.1 Error Handling Strategy
+
 - **Telegram API Errors**: Retry with exponential backoff
 - **LLM Parsing Errors**: Log error, skip message, continue processing
 - **Image Upload Errors**: Save event without image, log error
 - **Database Errors**: Retry once, then log and skip
 
 #### 4.2 Logging
+
 ```typescript
 interface CrawlerLog {
   timestamp: DateTime;
@@ -269,7 +308,9 @@ Log to console and optionally to a log file or monitoring service.
 ### Phase 5: Configuration and Management
 
 #### 5.1 Admin Endpoints (API Service)
+
 Add endpoints to manage Telegram sources:
+
 ```
 POST   /api/admin/telegram-sources       - Create new source
 GET    /api/admin/telegram-sources       - List all sources
@@ -279,9 +320,11 @@ POST   /api/admin/telegram-sources/:id/crawl - Manually trigger crawl
 ```
 
 #### 5.2 Seed Data
+
 **File**: `packages/database/prisma/seed.ts`
 
 Add sample Telegram sources:
+
 ```typescript
 await prisma.telegramSource.createMany({
   data: [
@@ -292,24 +335,27 @@ await prisma.telegramSource.createMany({
       categoryId: defaultCategoryId,
     },
     // Add more channels
-  ]
+  ],
 });
 ```
 
 ## Testing Strategy
 
 ### Unit Tests
+
 - Test LLM parser with sample event texts
 - Test image upload service with mock images
 - Test date parsing for Ethiopian calendar
 - Test deduplication logic
 
 ### Integration Tests
+
 - Test full pipeline with mock Telegram messages
 - Test database operations
 - Test Cloudinary integration
 
 ### Manual Testing
+
 1. Create test Telegram channel
 2. Post sample event messages
 3. Run crawler manually
@@ -320,6 +366,7 @@ await prisma.telegramSource.createMany({
 ## LLM Prompt Examples
 
 ### System Prompt
+
 ```
 You are an expert at extracting structured event information from text posts.
 Extract event details from Telegram messages that may be in English, Amharic, or mixed languages.
@@ -336,6 +383,7 @@ Rules:
 ```
 
 ### User Prompt Template
+
 ```
 Extract event information from this Telegram post:
 
@@ -362,6 +410,7 @@ Return JSON with this structure:
 ### Example Input/Output
 
 **Input:**
+
 ```
 🎉 ADDIS MUSIC FESTIVAL 2024 🎉
 
@@ -377,6 +426,7 @@ Get your tickets now: https://tickets.example.com
 ```
 
 **LLM Output:**
+
 ```json
 {
   "title": "Addis Music Festival 2024",
@@ -393,18 +443,21 @@ Get your tickets now: https://tickets.example.com
 ## Security Considerations
 
 ### Telegram Bot Security
+
 - Store bot token securely in environment variables
 - Use webhook instead of polling for production
 - Validate incoming messages
 - Rate limit processing
 
 ### LLM API Security
+
 - Secure API keys
 - Monitor API usage and costs
 - Implement request timeouts
 - Sanitize inputs before sending to LLM
 
 ### Data Validation
+
 - Validate all dates (not in past, reasonable future limit)
 - Sanitize text to prevent injection attacks
 - Validate image sizes before upload
@@ -413,16 +466,19 @@ Get your tickets now: https://tickets.example.com
 ## Performance Optimization
 
 ### Batch Processing
+
 - Process multiple messages in parallel (with rate limiting)
 - Batch database insertions
 - Cache category lookups
 
 ### Rate Limiting
+
 - Respect Telegram API rate limits (30 requests/second)
 - Implement exponential backoff for retries
 - Queue messages if rate limit exceeded
 
 ### Caching
+
 - Cache LLM responses for similar messages
 - Cache Cloudinary upload results
 - Cache category mappings
@@ -430,6 +486,7 @@ Get your tickets now: https://tickets.example.com
 ## Monitoring and Observability
 
 ### Metrics to Track
+
 - Messages processed per hour
 - Events created per hour
 - LLM API costs
@@ -438,6 +495,7 @@ Get your tickets now: https://tickets.example.com
 - Error rates by type
 
 ### Alerts
+
 - Telegram API connection failures
 - LLM API errors exceeding threshold
 - Database connection issues
@@ -447,11 +505,13 @@ Get your tickets now: https://tickets.example.com
 ## Deployment
 
 ### Environment-Specific Configuration
+
 - **Development**: Manual trigger, verbose logging
 - **Staging**: Hourly schedule, test Telegram channels
 - **Production**: 2-hour schedule, production channels
 
 ### Rollout Strategy
+
 1. Deploy with feature flag disabled
 2. Add test Telegram sources
 3. Test manually with small dataset
@@ -462,12 +522,14 @@ Get your tickets now: https://tickets.example.com
 ## Estimated Costs
 
 ### API Costs (Monthly)
+
 - **Telegram API**: Free
 - **OpenAI GPT-4**: ~$0.03/message × 10,000 messages = $300
 - **Anthropic Claude 3**: ~$0.025/message × 10,000 messages = $250
 - **Cloudinary**: Free tier (25GB storage, 25GB bandwidth)
 
 ### Optimization Options
+
 - Use GPT-3.5 for simpler messages ($0.001/message)
 - Implement caching to reduce LLM calls
 - Compress images before upload
@@ -475,6 +537,7 @@ Get your tickets now: https://tickets.example.com
 ## Future Enhancements
 
 ### Phase 2 Features
+
 1. **Smart Categorization**: Use LLM to auto-assign categories
 2. **Image Analysis**: Use vision LLM to extract info from poster images
 3. **Duplicate Detection**: Use semantic similarity for better deduplication
@@ -484,6 +547,7 @@ Get your tickets now: https://tickets.example.com
 7. **Analytics Dashboard**: Visualize crawler performance and statistics
 
 ### Integration Opportunities
+
 1. **Notification System**: Notify users of new events from their favorite sources
 2. **Quality Scoring**: Rate event completeness and accuracy
 3. **Source Reputation**: Track source reliability and accuracy
@@ -532,24 +596,28 @@ apps/api/
 ## Implementation Timeline
 
 ### Week 1: Foundation
+
 - [ ] Database schema design and migration
 - [ ] Install dependencies
 - [ ] Setup Telegram client service
 - [ ] Basic message fetching
 
 ### Week 2: Core Features
+
 - [ ] Implement LLM parser service
 - [ ] Implement image upload service
 - [ ] Build main crawler service
 - [ ] Integration testing
 
 ### Week 3: Integration
+
 - [ ] Integrate with existing crawler
 - [ ] Admin API endpoints
 - [ ] Error handling and logging
 - [ ] Manual testing
 
 ### Week 4: Polish and Deploy
+
 - [ ] Performance optimization
 - [ ] Documentation
 - [ ] Monitoring setup
@@ -558,6 +626,7 @@ apps/api/
 ## Success Criteria
 
 ### MVP Requirements
+
 - ✅ Successfully fetch messages from Telegram channels
 - ✅ Parse at least 80% of event messages accurately
 - ✅ Upload images to Cloudinary
@@ -566,6 +635,7 @@ apps/api/
 - ✅ Handle errors gracefully without crashing
 
 ### Performance Targets
+
 - Process 100+ messages per hour
 - LLM parsing accuracy > 80%
 - Image upload success rate > 95%
@@ -575,6 +645,7 @@ apps/api/
 ## References and Resources
 
 ### Documentation
+
 - Telegram Bot API: https://core.telegram.org/bots/api
 - Telegraf Framework: https://telegraf.js.org/
 - OpenAI API: https://platform.openai.com/docs/api-reference
@@ -583,6 +654,7 @@ apps/api/
 - Prisma: https://www.prisma.io/docs/
 
 ### Similar Projects
+
 - Event extraction from social media
 - Automated content moderation
 - News aggregation bots

@@ -5,6 +5,7 @@ import {
   EventFiltersInput,
   calculatePagination,
   Roles,
+  EventStatus,
 } from '@whats-up-addis/shared';
 import { AppError } from '../middleware/error-handler.js';
 
@@ -26,6 +27,7 @@ export class EventService {
 
     const where: Record<string, unknown> = {
       isActive: true,
+      status: EventStatus.Accepted,
     };
 
     if (categoryId) {
