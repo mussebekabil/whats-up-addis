@@ -170,7 +170,10 @@ async function main() {
   for (const event of sampleEvents) {
     if (event.categoryId) {
       await prisma.event.create({
-        data: event,
+        data: {
+          ...event,
+          categoryId: event.categoryId as string,
+        },
       });
     }
   }

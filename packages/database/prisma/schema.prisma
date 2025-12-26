@@ -36,6 +36,7 @@ model Event {
   startDate   DateTime    @map("start_date")
   endDate     DateTime?   @map("end_date")
   imageUrl    String?     @map("image_url") @db.VarChar(500)
+  videoUrl    String?     @map("video_url") @db.VarChar(500)
   price       Decimal?    @db.Decimal(10, 2)
   source      String      @db.VarChar(100) // manual or crawler
   sourceUrl   String?     @map("source_url") @db.VarChar(500)
@@ -67,7 +68,8 @@ model Category {
   description String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at")
 
-  events Event[]
+  events          Event[]
+  telegramSources TelegramSource[]
 
   @@map("categories")
 }
@@ -94,6 +96,23 @@ model CrawlerSource {
   createdAt      DateTime  @default(now()) @map("created_at")
 
   @@map("crawler_sources")
+}
+
+model TelegramSource {
+  id            String    @id @default(uuid())
+  name          String    @db.VarChar(255)
+  chatId        String    @unique @map("chat_id") @db.VarChar(255)
+  chatType      String    @map("chat_type") @db.VarChar(50)
+  isActive      Boolean   @default(true) @map("is_active")
+  lastMessageId Int?      @map("last_message_id")
+  lastCrawledAt DateTime? @map("last_crawled_at")
+  categoryId    String?   @map("category_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  category Category? @relation(fields: [categoryId], references: [id])
+
+  @@map("telegram_sources")
 }
 
 model Comment {

@@ -54,3 +54,4 @@ prisma/migrations/*.sql
 
 # Local scripts
 git-fix.sh
+.telegram-session

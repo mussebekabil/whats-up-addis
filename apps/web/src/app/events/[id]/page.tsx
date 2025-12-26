@@ -341,7 +341,7 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
               </div>
             )}
 
-            {event.sourceUrl && (
+            {event.sourceUrl && event.source != 'telegram' && (
               <div className="border-t dark:border-gray-700 pt-6 mt-6">
                 <a
                   href={event.sourceUrl}

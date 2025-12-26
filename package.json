@@ -21,7 +21,9 @@
     "db:studio": "pnpm --filter @whats-up-addis/database db:studio",
     "api:dev": "pnpm --filter @whats-up-addis/api dev",
     "web:dev": "pnpm --filter @whats-up-addis/web dev",
-    "crawler:dev": "pnpm --filter @whats-up-addis/crawler dev"
+    "crawler:dev": "pnpm --filter @whats-up-addis/crawler dev",
+    "telegram:dev": "pnpm --filter @whats-up-addis/telegram-scraper dev",
+    "telegram:scrape": "pnpm --filter @whats-up-addis/telegram-scraper scrape"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

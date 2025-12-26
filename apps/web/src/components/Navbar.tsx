@@ -129,7 +129,7 @@ export default function Navbar() {
                           onClick={() => setIsDropdownOpen(false)}
                           className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         >
-                          Admin Panel
+                          Manage Events
                         </Link>
                       )}
                       <Link
