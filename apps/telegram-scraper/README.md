@@ -4,12 +4,14 @@ A microservice that listens to Telegram channels/groups, extracts event informat
 
 ## Features
 
-- Real-time message listening from Telegram channels/groups
-- Event information extraction using Anthropic Claude LLM
-- Automatic image upload to Cloudinary
-- Duplicate event detection
-- Multiple operation modes (listen, cron, once)
-- Comprehensive error handling and logging
+- 🤖 **AI-Powered Parsing** - Event information extraction using Anthropic Claude LLM
+- 📂 **Smart Categorization** - Automatically categorizes events using LLM based on content
+- 📸 **Media Support** - Downloads and uploads both images and videos to Cloudinary
+- 🔄 **Real-time Listening** - Real-time message listening from Telegram channels/groups
+- 🌍 **Multi-language** - Handles English, Amharic, and mixed-language posts
+- 🔍 **Duplicate Detection** - Smart duplicate event detection
+- 📅 **Multiple Operation Modes** - Listen, cron, or once modes
+- ⚡ **Comprehensive Error Handling** - Graceful error handling and detailed logging
 
 ## Architecture
 
@@ -154,6 +156,45 @@ The LLM parser extracts the following information:
 - **endDate** - End date/time (optional)
 - **price** - Ticket price as number (optional)
 - **tags** - Array of relevant keywords (optional)
+- **categoryId** - Auto-determined event category (optional)
+
+## Category Resolution
+
+The LLM automatically categorizes events based on content:
+
+**Available Categories:**
+- Music & Concerts
+- Sports & Fitness
+- Arts & Culture
+- Food & Drink
+- Business & Professional
+- Community & Social
+- Education & Learning
+- Technology
+
+**Fallback Order:**
+1. LLM-determined category (AI analyzes event content)
+2. Source's default category (if configured)
+3. "Uncategorized" category
+
+## Media Handling
+
+The scraper supports both images and videos:
+
+**Images:**
+- Resized to 1200x1200 (aspect ratio preserved)
+- Optimized quality (auto:good)
+- Automatic format conversion
+- Uploaded to Cloudinary
+
+**Videos:**
+- Resized to 1920x1080 (aspect ratio preserved)
+- Optimized quality (auto:good)
+- Automatic format conversion
+- Progress logging with file size
+- Uploaded to Cloudinary
+
+Both media types are stored in the database with their Cloudinary URLs (`imageUrl` and `videoUrl` fields).
 
 ## Error Handling
 
@@ -187,20 +228,76 @@ The service uses the `telegram_sources` table to track Telegram channels/groups:
 - `last_crawled_at` - Timestamp of last crawl
 - `category_id` - Default category for events from this source
 
+## Docker Deployment
+
+### Building the Image
+
+```bash
+# From the project root
+docker build -f apps/telegram-scraper/Dockerfile -t telegram-scraper .
+```
+
+### Running with Docker
+
+```bash
+docker run -d \
+  --name telegram-scraper \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/db" \
+  -e TELEGRAM_API_ID="your_api_id" \
+  -e TELEGRAM_API_HASH="your_api_hash" \
+  -e ANTHROPIC_API_KEY="your_key" \
+  -e CLOUDINARY_CLOUD_NAME="your_cloud" \
+  -e CLOUDINARY_API_KEY="your_key" \
+  -e CLOUDINARY_API_SECRET="your_secret" \
+  -e TELEGRAM_SCRAPER_MODE="listen" \
+  telegram-scraper
+```
+
+### Railway Deployment
+
+1. Create a new service on Railway
+2. Connect your GitHub repository
+3. Railway will automatically detect the Dockerfile
+4. Set environment variables in Railway dashboard:
+   - `TELEGRAM_API_ID`
+   - `TELEGRAM_API_HASH`
+   - `ANTHROPIC_API_KEY`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+   - `DATABASE_URL` (connect to Railway PostgreSQL)
+   - `TELEGRAM_SCRAPER_MODE=listen`
+
+5. Deploy!
+
+**Note**: For first deployment, you'll need to run locally once to authenticate and generate `.telegram-session`, then add the session content as an environment variable or mount as a volume.
+
+## Reset and Re-process
+
+To clear all telegram events and re-process messages:
+
+```bash
+pnpm --filter @whats-up-addis/telegram-scraper reset
+```
+
+This is useful when:
+- Testing new category resolution logic
+- Updating event parsing rules
+- Fixing data issues
+
 ## Limitations
 
-- Historical message fetching requires MTProto client (not implemented)
-- Current implementation works best with listen mode for new messages
-- For channels, the bot must be added as an admin to receive messages
+- First-time authentication must be done locally (requires phone verification)
+- Large videos may take time to upload depending on network speed
+- Historical message fetching works best in listen mode for real-time processing
 
 ## Future Enhancements
 
-- Support for MTProto client for better historical message fetching
-- Multi-language support improvements
-- Image-based event extraction using vision models
+- Vision-based event extraction (analyze event posters/flyers)
 - Semantic similarity for better duplicate detection
 - Event verification and quality scoring
 - Admin API endpoints for managing sources
+- Support for multiple languages in LLM prompts
 
 ## Troubleshooting
 
