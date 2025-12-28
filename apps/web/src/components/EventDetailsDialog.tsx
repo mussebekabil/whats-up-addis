@@ -45,13 +45,26 @@ export default function EventDetailsDialog({
         </div>
 
         <div className="p-6">
-          {event.imageUrl && (
+          {(event.imageUrl || event.videoUrl) && (
             <div className="mb-6">
-              <img
-                src={event.imageUrl}
-                alt={event.title}
-                className="w-full h-64 object-cover rounded-lg"
-              />
+              {event.videoUrl ? (
+                <video
+                  src={event.videoUrl}
+                  controls
+                  autoPlay
+                  muted
+                  className="w-full h-auto max-h-96 rounded-lg"
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : event.imageUrl ? (
+                <img
+                  src={event.imageUrl}
+                  alt={event.title}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              ) : null}
             </div>
           )}
 

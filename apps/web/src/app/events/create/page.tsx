@@ -8,6 +8,7 @@ import { categoryService } from '@/lib/categories';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ImageUpload from '@/components/ImageUpload';
+import VideoUpload from '@/components/VideoUpload';
 import { User, Category, Roles } from '@whats-up-addis/shared';
 
 function CreateEventForm() {
@@ -27,6 +28,7 @@ function CreateEventForm() {
     startDate: '',
     endDate: '',
     imageUrl: '',
+    videoUrl: '',
     sourceUrl: '',
     price: '',
     categoryId: '',
@@ -70,6 +72,7 @@ function CreateEventForm() {
             startDate: '',
             endDate: '',
             imageUrl: eventToDuplicate.imageUrl || '',
+            videoUrl: eventToDuplicate.videoUrl || '',
             sourceUrl: eventToDuplicate.sourceUrl || '',
             price:
               eventToDuplicate.price !== null &&
@@ -128,6 +131,7 @@ function CreateEventForm() {
           ? new Date(formData.endDate).toISOString()
           : null,
         imageUrl: formData.imageUrl || null,
+        videoUrl: formData.videoUrl || null,
         sourceUrl: formData.sourceUrl || null,
         price: formData.price ? parseFloat(formData.price) : null,
         categoryId: formData.categoryId,
@@ -348,37 +352,57 @@ function CreateEventForm() {
               </select>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  htmlFor="price"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Price (USD)
-                </label>
-                <input
-                  type="number"
-                  id="price"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                  min="0"
-                  step="0.01"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Leave empty for free events"
-                />
-              </div>
+            <div>
+              <label
+                htmlFor="price"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Price (USD)
+              </label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="Leave empty for free events"
+              />
+            </div>
 
-              <div>
-                <ImageUpload
-                  currentImageUrl={formData.imageUrl}
-                  onImageUploaded={(url) =>
-                    setFormData((prev) => ({ ...prev, imageUrl: url }))
-                  }
-                  onImageRemoved={() =>
-                    setFormData((prev) => ({ ...prev, imageUrl: '' }))
-                  }
-                />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Event Media
+              </label>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Upload an image or video for your event (optional)
+              </p>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <ImageUpload
+                    currentImageUrl={formData.imageUrl}
+                    onImageUploaded={(url) =>
+                      setFormData((prev) => ({ ...prev, imageUrl: url }))
+                    }
+                    onImageRemoved={() =>
+                      setFormData((prev) => ({ ...prev, imageUrl: '' }))
+                    }
+                  />
+                </div>
+
+                <div>
+                  <VideoUpload
+                    currentVideoUrl={formData.videoUrl}
+                    onVideoUploaded={(url) =>
+                      setFormData((prev) => ({ ...prev, videoUrl: url }))
+                    }
+                    onVideoRemoved={() =>
+                      setFormData((prev) => ({ ...prev, videoUrl: '' }))
+                    }
+                  />
+                </div>
               </div>
             </div>
 

@@ -259,22 +259,51 @@ docker run -d \
 
 ### Railway Deployment
 
+Railway doesn't support interactive terminal input, so you need to pre-generate a session string.
+
+#### Step 1: Generate Session String Locally
+
+```bash
+pnpm --filter @whats-up-addis/telegram-scraper generate-session
+```
+
+This will:
+
+- Prompt for your phone number, verification code, and 2FA password
+- Generate a session string
+- Display the session string for you to copy
+
+**IMPORTANT:** This session will be used ONLY for Railway. Don't use the same session locally to avoid `AUTH_KEY_DUPLICATED` errors.
+
+#### Step 2: Deploy to Railway
+
 1. Create a new service on Railway
 2. Connect your GitHub repository
 3. Railway will automatically detect the Dockerfile
 4. Set environment variables in Railway dashboard:
-   - `TELEGRAM_API_ID`
-   - `TELEGRAM_API_HASH`
-   - `ANTHROPIC_API_KEY`
-   - `CLOUDINARY_CLOUD_NAME`
-   - `CLOUDINARY_API_KEY`
-   - `CLOUDINARY_API_SECRET`
-   - `DATABASE_URL` (connect to Railway PostgreSQL)
-   - `TELEGRAM_SCRAPER_MODE=listen`
+   - `TELEGRAM_API_ID` - Your API ID
+   - `TELEGRAM_API_HASH` - Your API hash
+   - `TELEGRAM_SESSION_STRING` - **The session string from step 1**
+   - `ANTHROPIC_API_KEY` - Your Anthropic key
+   - `CLOUDINARY_CLOUD_NAME` - Your Cloudinary cloud name
+   - `CLOUDINARY_API_KEY` - Your Cloudinary API key
+   - `CLOUDINARY_API_SECRET` - Your Cloudinary secret
+   - `DATABASE_URL` - PostgreSQL connection (connect to Railway PostgreSQL)
+   - `TELEGRAM_SCRAPER_MODE=listen` - Operation mode
 
 5. Deploy!
 
-**Note**: For first deployment, you'll need to run locally once to authenticate and generate `.telegram-session`, then add the session content as an environment variable or mount as a volume.
+#### Step 3: For Local Development
+
+For local development, use a SEPARATE session:
+
+```bash
+# Don't set TELEGRAM_SESSION_STRING in your .env file
+# Let the app prompt you interactively and save to .telegram-session file
+pnpm --filter @whats-up-addis/telegram-scraper dev
+```
+
+This keeps your Railway and local sessions separate, preventing conflicts.
 
 ## Reset and Re-process
 
@@ -306,13 +335,49 @@ This is useful when:
 
 ## Troubleshooting
 
+### ❌ "406: AUTH_KEY_DUPLICATED" Error
+
+**This is the most common deployment error!**
+
+**Cause:** You're using the same Telegram session in multiple places at once (both locally and on Railway).
+
+**Solution:**
+
+1. **Delete your local session file:**
+
+   ```bash
+   rm apps/telegram-scraper/.telegram-session
+   ```
+
+2. **Generate a NEW session for Railway:**
+
+   ```bash
+   pnpm --filter @whats-up-addis/telegram-scraper generate-session
+   ```
+
+3. **Copy the session string** and add it to Railway as `TELEGRAM_SESSION_STRING`
+
+4. **Important:**
+   - Use this session ONLY on Railway
+   - For local dev, don't set `TELEGRAM_SESSION_STRING` in `.env`
+   - Let your local instance authenticate separately (it will prompt you)
+
+**Why this happens:** Telegram only allows ONE active connection per session. If you use the same session locally and on Railway simultaneously, they conflict.
+
 ### Not Receiving Messages
 
 1. Ensure you're a member of the channel/group
 2. Check that `chat_id` in database matches the actual chat ID
 3. For private groups, use the numeric chat ID (e.g., `-1001234567890`)
 4. Verify `TELEGRAM_API_ID` and `TELEGRAM_API_HASH` are correct
-5. Check that your session is authenticated (`.telegram-session` file exists)
+5. Check that your session is authenticated
+
+### "Failed to connect to Telegram"
+
+1. Verify `TELEGRAM_API_ID` and `TELEGRAM_API_HASH` are correct
+2. Check if `TELEGRAM_SESSION_STRING` is set correctly in Railway
+3. Session might be expired - generate a new one
+4. Make sure the session isn't being used elsewhere (AUTH_KEY_DUPLICATED)
 
 ### LLM Parsing Failures
 

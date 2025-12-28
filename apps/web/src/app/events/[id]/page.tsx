@@ -180,19 +180,32 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
         </div>
 
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:items-start">
-          {/* Event Image - Shows on top for mobile */}
-          {event.imageUrl && (
+          {/* Event Media - Shows on top for mobile */}
+          {(event.imageUrl || event.videoUrl) && (
             <div className="relative w-full bg-black dark:bg-black rounded-lg shadow-lg overflow-hidden lg:sticky lg:top-24">
-              <div className="relative w-full aspect-[4/3] lg:aspect-auto lg:h-[calc(100vh-8rem)]">
-                <Image
-                  src={event.imageUrl}
-                  alt={event.title}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                />
-              </div>
+              {event.videoUrl ? (
+                <video
+                  src={event.videoUrl}
+                  controls
+                  autoPlay
+                  muted
+                  className="w-full h-auto max-h-[calc(100vh-8rem)]"
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : event.imageUrl ? (
+                <div className="relative w-full aspect-[4/3] lg:aspect-auto lg:h-[calc(100vh-8rem)]">
+                  <Image
+                    src={event.imageUrl}
+                    alt={event.title}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    priority
+                  />
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -341,31 +354,32 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
               </div>
             )}
 
-            {event.sourceUrl && event.source != 'telegram' && (
-              <div className="border-t dark:border-gray-700 pt-6 mt-6">
-                <a
-                  href={event.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
-                >
-                  View Original Source
-                  <svg
-                    className="w-4 h-4 ml-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+            {event.sourceUrl &&
+              (event.source !== 'telegram' || user?.role === Roles.Admin) && (
+                <div className="border-t dark:border-gray-700 pt-6 mt-6">
+                  <a
+                    href={event.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
-              </div>
-            )}
+                    View Original Source
+                    <svg
+                      className="w-4 h-4 ml-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </a>
+                </div>
+              )}
           </div>
         </div>
 

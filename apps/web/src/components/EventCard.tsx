@@ -8,20 +8,33 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event }: EventCardProps) {
+  const hasMedia = event.imageUrl || event.videoUrl;
+
   return (
     <Link
       href={`/events/${event.id}`}
       className="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden"
     >
-      {event.imageUrl && (
+      {hasMedia && (
         <div className="relative h-64 bg-gray-200 dark:bg-gray-700">
-          <Image
-            src={event.imageUrl}
-            alt={event.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+          {event.videoUrl ? (
+            <video
+              src={event.videoUrl}
+              className="w-full h-full object-cover"
+              preload="metadata"
+              autoPlay
+              muted
+              loop
+            />
+          ) : event.imageUrl ? (
+            <Image
+              src={event.imageUrl}
+              alt={event.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : null}
         </div>
       )}
       <div className="p-4">

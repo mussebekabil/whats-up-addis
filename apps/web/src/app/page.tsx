@@ -8,24 +8,24 @@ import Footer from '@/components/Footer';
 
 export default async function Home() {
   let upcomingEvents: any[] = [];
-  let pastEvents: any[] = [];
+  let featuredEvents: any[] = [];
   let categories: any[] = [];
   let error = null;
 
   try {
     const now = new Date().toISOString();
 
-    const [upcomingResponse, pastResponse, categoriesResponse] =
+    const [upcomingResponse, allEventsResponse, categoriesResponse] =
       await Promise.all([
         eventService.getEvents({ page: 1, limit: 6, endDateGte: now }),
-        eventService.getEvents({ page: 1, limit: 20, endDateLt: now }),
+        eventService.getEvents({ page: 1, limit: 50 }),
         categoryService.getCategories(),
       ]);
 
     upcomingEvents = upcomingResponse.data;
-    // Filter past events to only show those with images, limit to 3
-    pastEvents = pastResponse.data
-      .filter((event) => event.imageUrl)
+    // Filter events to only show those with video content, limit to 3
+    featuredEvents = allEventsResponse.data
+      .filter((event) => event.videoUrl)
       .slice(0, 3);
     categories = categoriesResponse;
   } catch (err) {
@@ -93,22 +93,22 @@ export default async function Home() {
           </section>
         )}
 
-        {pastEvents.length > 0 && (
+        {featuredEvents.length > 0 && (
           <section className="bg-gradient-to-b from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 py-12">
             <div className="container mx-auto px-4">
               <div className="relative mb-12">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-left">
-                  Past Events
+                  Featured Events
                 </h2>
                 <Link
-                  href="/events?filter=past"
+                  href="/events"
                   className="absolute right-0 top-1/2 -translate-y-1/2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                 >
                   View all →
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pastEvents.map((event) => (
+                {featuredEvents.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
               </div>

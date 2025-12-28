@@ -18,6 +18,7 @@ export interface Event {
   startDate: Date;
   endDate: Date;
   imageUrl?: string | null;
+  videoUrl?: string | null;
   price?: number | null;
   source: string;
   sourceUrl?: string | null;

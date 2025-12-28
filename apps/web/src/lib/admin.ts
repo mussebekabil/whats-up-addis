@@ -10,6 +10,7 @@ export interface Event {
   startDate: string;
   endDate?: string;
   imageUrl?: string;
+  videoUrl?: string;
   price?: number;
   source: string;
   sourceUrl?: string;
