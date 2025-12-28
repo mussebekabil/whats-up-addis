@@ -9,6 +9,7 @@
     "start": "dotenv -e ../../.env -- node dist/index.js",
     "scrape": "dotenv -e ../../.env -- tsx src/index.ts",
     "reset": "dotenv -e ../../.env -- tsx src/reset-scraper.ts",
+    "generate-session": "dotenv -e ../../.env -- tsx src/generate-session.ts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {

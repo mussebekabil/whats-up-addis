@@ -163,6 +163,7 @@ The LLM parser extracts the following information:
 The LLM automatically categorizes events based on content:
 
 **Available Categories:**
+
 - Music & Concerts
 - Sports & Fitness
 - Arts & Culture
@@ -173,6 +174,7 @@ The LLM automatically categorizes events based on content:
 - Technology
 
 **Fallback Order:**
+
 1. LLM-determined category (AI analyzes event content)
 2. Source's default category (if configured)
 3. "Uncategorized" category
@@ -182,12 +184,14 @@ The LLM automatically categorizes events based on content:
 The scraper supports both images and videos:
 
 **Images:**
+
 - Resized to 1200x1200 (aspect ratio preserved)
 - Optimized quality (auto:good)
 - Automatic format conversion
 - Uploaded to Cloudinary
 
 **Videos:**
+
 - Resized to 1920x1080 (aspect ratio preserved)
 - Optimized quality (auto:good)
 - Automatic format conversion
@@ -281,6 +285,7 @@ pnpm --filter @whats-up-addis/telegram-scraper reset
 ```
 
 This is useful when:
+
 - Testing new category resolution logic
 - Updating event parsing rules
 - Fixing data issues

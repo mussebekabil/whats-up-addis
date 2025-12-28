@@ -22,7 +22,8 @@
     "api:dev": "pnpm --filter @whats-up-addis/api dev",
     "web:dev": "pnpm --filter @whats-up-addis/web dev",
     "telegram:dev": "pnpm --filter @whats-up-addis/telegram-scraper dev",
-    "telegram:scrape": "pnpm --filter @whats-up-addis/telegram-scraper scrape"
+    "telegram:scrape": "pnpm --filter @whats-up-addis/telegram-scraper scrape",
+    "telegram:generate-session": "pnpm --filter @whats-up-addis/telegram-scraper generate-session"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

@@ -25,9 +25,10 @@ export class TelegramClientService {
       throw new Error('TELEGRAM_API_ID and TELEGRAM_API_HASH are required');
     }
 
-    // Load or create session
+    // Load session from environment variable (Railway) or file (local)
     this.sessionFile = path.join(process.cwd(), '.telegram-session');
-    const sessionString = this.loadSession();
+    const sessionString =
+      process.env.TELEGRAM_SESSION_STRING || this.loadSession();
     const session = new StringSession(sessionString);
 
     this.client = new TelegramClient(session, apiId, apiHash, {
@@ -39,18 +40,31 @@ export class TelegramClientService {
     try {
       console.log('Connecting to Telegram...');
 
-      await this.client.start({
-        phoneNumber: async () =>
-          await input.text('Please enter your phone number: '),
-        password: async () => await input.text('Please enter your password: '),
-        phoneCode: async () =>
-          await input.text('Please enter the code you received: '),
-        onError: (err) => console.error('Error during authentication:', err),
-      });
-
-      // Save session for future use
+      // If session string is already provided (Railway), connect without prompts
       const sessionString = this.client.session.save() as unknown as string;
-      this.saveSession(sessionString);
+      const hasSessionString =
+        !!process.env.TELEGRAM_SESSION_STRING || sessionString.length > 0;
+
+      if (hasSessionString) {
+        // Connect using existing session (no interactive prompts needed)
+        await this.client.connect();
+        console.log('Connected using existing session');
+      } else {
+        // Interactive authentication (for local development)
+        await this.client.start({
+          phoneNumber: async () =>
+            await input.text('Please enter your phone number: '),
+          password: async () =>
+            await input.text('Please enter your password: '),
+          phoneCode: async () =>
+            await input.text('Please enter the code you received: '),
+          onError: (err) => console.error('Error during authentication:', err),
+        });
+
+        // Save session for future use
+        const sessionString = this.client.session.save() as unknown as string;
+        this.saveSession(sessionString);
+      }
 
       this.isConnected = true;
       const me = await this.client.getMe();
