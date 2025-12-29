@@ -6,6 +6,10 @@ import CategoryCard from '@/components/CategoryCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
+// Make the page dynamic to ensure fresh data on each request
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function Home() {
   let upcomingEvents: any[] = [];
   let featuredEvents: any[] = [];
@@ -25,7 +29,7 @@ export default async function Home() {
     upcomingEvents = upcomingResponse.data;
     // Filter events to only show those with video content, limit to 3
     featuredEvents = allEventsResponse.data
-      .filter((event) => event.videoUrl)
+      .filter((event) => event.videoUrl && event.videoUrl.trim() !== '')
       .slice(0, 3);
     categories = categoriesResponse;
   } catch (err) {
