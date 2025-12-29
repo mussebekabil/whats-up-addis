@@ -86,7 +86,8 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         : "Discover what's happening in Addis Ababa";
 
   // Generate structured data for event list
-  const eventListSchema = events.length > 0 ? generateEventListSchema(events) : null;
+  const eventListSchema =
+    events.length > 0 ? generateEventListSchema(events) : null;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -157,28 +158,112 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
             </div>
 
             {pagination && pagination.totalPages > 1 && (
-              <div className="mt-8 flex justify-center gap-2">
-                {Array.from(
-                  { length: pagination.totalPages },
-                  (_, i) => i + 1
-                ).map((page) => {
-                  const pageUrl = filter
-                    ? `/events?page=${page}&filter=${filter}`
-                    : `/events?page=${page}`;
-                  return (
-                    <Link
-                      key={page}
-                      href={pageUrl}
-                      className={`px-4 py-2 rounded transition-colors ${
-                        page === currentPage
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                      }`}
-                    >
-                      {page}
-                    </Link>
-                  );
-                })}
+              <div className="mt-8 flex justify-center gap-2 items-center">
+                {/* Previous button */}
+                {currentPage > 1 && (
+                  <Link
+                    href={
+                      filter
+                        ? `/events?page=${currentPage - 1}&filter=${filter}`
+                        : `/events?page=${currentPage - 1}`
+                    }
+                    className="px-3 py-2 rounded transition-colors bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  >
+                    ←
+                  </Link>
+                )}
+
+                {/* First page */}
+                <Link
+                  href={
+                    filter
+                      ? `/events?page=1&filter=${filter}`
+                      : `/events?page=1`
+                  }
+                  className={`px-4 py-2 rounded transition-colors ${
+                    currentPage === 1
+                      ? 'bg-primary-600 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  1
+                </Link>
+
+                {/* Show dots if current page is far from start */}
+                {currentPage > 3 && (
+                  <span className="px-2 text-gray-500 dark:text-gray-400">
+                    ...
+                  </span>
+                )}
+
+                {/* Show pages around current page */}
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                  .filter((page) => {
+                    // Show current page and adjacent pages
+                    return (
+                      page !== 1 &&
+                      page !== pagination.totalPages &&
+                      page >= currentPage - 1 &&
+                      page <= currentPage + 1
+                    );
+                  })
+                  .map((page) => {
+                    const pageUrl = filter
+                      ? `/events?page=${page}&filter=${filter}`
+                      : `/events?page=${page}`;
+                    return (
+                      <Link
+                        key={page}
+                        href={pageUrl}
+                        className={`px-4 py-2 rounded transition-colors ${
+                          page === currentPage
+                            ? 'bg-primary-600 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        {page}
+                      </Link>
+                    );
+                  })}
+
+                {/* Show dots if current page is far from end */}
+                {currentPage < pagination.totalPages - 2 && (
+                  <span className="px-2 text-gray-500 dark:text-gray-400">
+                    ...
+                  </span>
+                )}
+
+                {/* Last page */}
+                {pagination.totalPages > 1 && (
+                  <Link
+                    href={
+                      filter
+                        ? `/events?page=${pagination.totalPages}&filter=${filter}`
+                        : `/events?page=${pagination.totalPages}`
+                    }
+                    className={`px-4 py-2 rounded transition-colors ${
+                      currentPage === pagination.totalPages
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {pagination.totalPages}
+                  </Link>
+                )}
+
+                {/* Next button */}
+                {currentPage < pagination.totalPages && (
+                  <Link
+                    href={
+                      filter
+                        ? `/events?page=${currentPage + 1}&filter=${filter}`
+                        : `/events?page=${currentPage + 1}`
+                    }
+                    className="px-3 py-2 rounded transition-colors bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                  >
+                    →
+                  </Link>
+                )}
               </div>
             )}
           </>

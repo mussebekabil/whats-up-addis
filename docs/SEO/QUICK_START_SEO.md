@@ -3,6 +3,7 @@
 ## ⚡ 3 Critical Steps (Do in the next hour!)
 
 ### Step 1: Deploy Your Changes (5 minutes)
+
 Your site now has proper SEO implementation. Deploy these changes:
 
 ```bash
@@ -12,12 +13,14 @@ pnpm build
 ```
 
 **Verify after deployment:**
+
 - Visit: https://whatsupaddis.io/robots.txt (should show content)
 - Visit: https://whatsupaddis.io/sitemap.xml (should show XML sitemap)
 
 ---
 
 ### Step 2: Google Search Console (15 minutes)
+
 **This is THE most important step!**
 
 1. Go to: https://search.google.com/search-console
@@ -29,11 +32,13 @@ pnpm build
 **Edit:** `/apps/web/src/app/layout.tsx`
 
 Change this line:
+
 ```typescript
 google: 'your-google-verification-code', // Line 72
 ```
 
 To:
+
 ```typescript
 google: 'ABC123xyz...', // Paste your actual code here
 ```
@@ -64,6 +69,7 @@ google: 'ABC123xyz...', // Paste your actual code here
    - Your site logo on transparent background
 
 **Free tools:**
+
 - Canva: https://canva.com
 - Remove.bg: https://remove.bg (for transparent logos)
 - Unsplash: https://unsplash.com (free stock photos of Addis Ababa)
@@ -83,24 +89,30 @@ google: 'ABC123xyz...', // Paste your actual code here
 ## 🎯 Why You're Not Showing Up Yet
 
 ### Reason 1: Google doesn't know you exist
+
 **Fix:** Google Search Console (Step 2 above)
 
 ### Reason 2: Your site is too new
+
 **Reality:** New sites take 2-4 weeks to appear
 **Fix:** Be patient, but also...
 
 ### Reason 3: Not enough content
+
 **Current:** ~10 pages (events)
 **Goal:** 30+ pages
 
 **Quick win:** Add these pages:
+
 - About page
 - Contact page
 - 5 blog posts about Addis Ababa events
 
 ### Reason 4: No backlinks
+
 **What:** Other websites linking to you
 **Fix:**
+
 - Submit to Ethiopian business directories
 - Partner with event venues
 - Share on social media
@@ -110,28 +122,32 @@ google: 'ABC123xyz...', // Paste your actual code here
 
 ## ⏰ Expected Timeline
 
-| Time | What Happens |
-|------|-------------|
-| **Day 1** | Submit to Google Search Console |
-| **Week 1** | Site appears in Google (for "whatsupaddis.io") |
-| **Week 2-3** | Appears for "What's Up Addis" (brand name) |
-| **Month 2** | Starts ranking for "events in Addis Ababa" (position 50-100) |
-| **Month 3** | Ranking improves (position 20-50) |
-| **Month 6** | Competitive rankings (position 5-20) |
+| Time         | What Happens                                                 |
+| ------------ | ------------------------------------------------------------ |
+| **Day 1**    | Submit to Google Search Console                              |
+| **Week 1**   | Site appears in Google (for "whatsupaddis.io")               |
+| **Week 2-3** | Appears for "What's Up Addis" (brand name)                   |
+| **Month 2**  | Starts ranking for "events in Addis Ababa" (position 50-100) |
+| **Month 3**  | Ranking improves (position 20-50)                            |
+| **Month 6**  | Competitive rankings (position 5-20)                         |
 
 ---
 
 ## 🔥 Boost Your Rankings Fast
 
 ### 1. Create Weekly Blog Posts
+
 Topics that will rank quickly:
+
 - "Top 10 Events in Addis Ababa This Week"
 - "Guide to [Specific Venue] in Addis Ababa"
 - "What to Do in Addis This Weekend"
 - "Best Concerts in Addis Ababa [Month Year]"
 
 ### 2. Get Your First 10 Backlinks
+
 Easy wins:
+
 - Ethiopian business directories
 - Facebook groups (post your events)
 - Partner websites (exchange links)
@@ -139,6 +155,7 @@ Easy wins:
 - Local news sites (send press releases)
 
 ### 3. Optimize Your Content
+
 - Every event should have 2-3 sentences description MINIMUM
 - Include location details (neighborhood, landmarks)
 - Add Ethiopian calendar dates if applicable
@@ -159,16 +176,20 @@ Easy wins:
 ## 📱 Immediate Actions (Right Now!)
 
 ### Action 1: Deploy (5 min)
+
 ```bash
 pnpm build
 # Deploy
 ```
 
 ### Action 2: Google Search Console (15 min)
+
 Follow Step 2 above
 
 ### Action 3: Manual submission (5 min)
+
 Submit your URL directly:
+
 - Google: https://www.google.com/ping?sitemap=https://whatsupaddis.io/sitemap.xml
 
 ---
@@ -176,6 +197,7 @@ Submit your URL directly:
 ## 💡 Pro Tips
 
 ### For Faster Indexing:
+
 1. Create a Google Business Profile
 2. Post on social media daily
 3. Add your site to your email signature
@@ -183,6 +205,7 @@ Submit your URL directly:
 5. Answer questions on Reddit/Quora about Addis events
 
 ### For Better Rankings:
+
 1. Update old events weekly (Google likes fresh content)
 2. Add high-quality photos to every event
 3. Encourage users to leave comments/ratings
@@ -194,11 +217,13 @@ Submit your URL directly:
 ## 📞 Need Help?
 
 ### Testing Tools:
+
 - **Rich Results Test:** https://search.google.com/test/rich-results
 - **Mobile-Friendly Test:** https://search.google.com/test/mobile-friendly
 - **PageSpeed Insights:** https://pagespeed.web.dev
 
 ### Monitoring:
+
 - Check Google Search Console weekly
 - Track rankings: https://seranking.com (free trial)
 - Monitor competitors: See what ranks for "events in Addis Ababa"
@@ -208,6 +233,7 @@ Submit your URL directly:
 ## ✅ Success Indicators
 
 You'll know it's working when:
+
 - ✅ Search Console shows "Valid" pages
 - ✅ Sitemap shows all pages indexed
 - ✅ You appear for your brand name

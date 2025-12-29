@@ -1,8 +1,6 @@
 # Allow all search engines to crawl the entire site
 User-agent: *
 Allow: /
-Allow: /events
-Allow: /categories
 
 # Disallow admin and auth pages from indexing
 Disallow: /admin/

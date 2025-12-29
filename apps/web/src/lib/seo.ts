@@ -99,7 +99,8 @@ export function generateWebSiteSchema() {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://whatsupaddis.io/events?search={search_term_string}',
+        urlTemplate:
+          'https://whatsupaddis.io/events?search={search_term_string}',
       },
       'query-input': 'required name=search_term_string',
     },

@@ -75,7 +75,7 @@ export default function Navbar() {
             </Link>
             <div className="flex items-center gap-6">
               <Link
-                href="/events"
+                href="/events?filter=upcoming"
                 className="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
                 Events
@@ -209,7 +209,7 @@ export default function Navbar() {
           </Link>
 
           <Link
-            href="/events"
+            href="/events?filter=upcoming"
             className={`flex flex-col items-center justify-center flex-1 h-full ${
               isActive('/events') || pathname?.startsWith('/events/')
                 ? 'text-primary-600 dark:text-primary-400'
@@ -340,7 +340,7 @@ export default function Navbar() {
                 onClick={() => setIsDropdownOpen(false)}
                 className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                Admin Panel
+                Manage Events
               </Link>
             )}
             <Link
