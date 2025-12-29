@@ -1,11 +1,44 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { eventService } from '@/lib/events';
 import EventCard from '@/components/EventCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { generateEventListSchema } from '@/lib/seo';
 
 interface EventsPageProps {
   searchParams: Promise<{ page?: string; filter?: string }>;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: EventsPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const filter = params.filter;
+
+  const title =
+    filter === 'upcoming'
+      ? 'Upcoming Events in Addis Ababa'
+      : filter === 'past'
+        ? 'Past Events in Addis Ababa'
+        : 'All Events in Addis Ababa';
+
+  const description =
+    filter === 'upcoming'
+      ? 'Browse upcoming concerts, conferences, workshops, and entertainment events happening soon in Addis Ababa, Ethiopia.'
+      : filter === 'past'
+        ? 'Explore past events that took place in Addis Ababa, Ethiopia.'
+        : 'Discover all events happening in Addis Ababa, Ethiopia. From concerts to conferences, workshops to cultural events.';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://whatsupaddis.io/events${filter ? `?filter=${filter}` : ''}`,
+    },
+  };
 }
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
@@ -52,8 +85,19 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         ? 'Past events in Addis Ababa'
         : "Discover what's happening in Addis Ababa";
 
+  // Generate structured data for event list
+  const eventListSchema = events.length > 0 ? generateEventListSchema(events) : null;
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Structured Data for SEO */}
+      {eventListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(eventListSchema) }}
+        />
+      )}
+
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">

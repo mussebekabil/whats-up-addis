@@ -5,10 +5,29 @@ import EventCard from '@/components/EventCard';
 import CategoryCard from '@/components/CategoryCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import {
+  generateOrganizationSchema,
+  generateWebSiteSchema,
+  generateEventListSchema,
+} from '@/lib/seo';
+
+import type { Metadata } from 'next';
 
 // Make the page dynamic to ensure fresh data on each request
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: 'Home',
+  description:
+    'Discover concerts, conferences, workshops, cultural events and entertainment happening in Addis Ababa, Ethiopia. Browse upcoming events, featured activities, and explore by category.',
+  openGraph: {
+    title: "What's Up Addis - Events in Addis Ababa, Ethiopia",
+    description:
+      'Your ultimate guide to concerts, conferences, workshops and entertainment in Addis Ababa.',
+    url: 'https://whatsupaddis.io',
+  },
+};
 
 export default async function Home() {
   let upcomingEvents: any[] = [];
@@ -37,8 +56,31 @@ export default async function Home() {
     console.error('Error fetching data:', err);
   }
 
+  // Prepare structured data for search engines
+  const organizationSchema = generateOrganizationSchema();
+  const webSiteSchema = generateWebSiteSchema();
+  const allEvents = [...upcomingEvents, ...featuredEvents];
+  const eventListSchema =
+    allEvents.length > 0 ? generateEventListSchema(allEvents) : null;
+
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteSchema) }}
+      />
+      {eventListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(eventListSchema) }}
+        />
+      )}
+
       <Navbar />
 
       <main className="flex-1 pb-16 md:pb-0">
