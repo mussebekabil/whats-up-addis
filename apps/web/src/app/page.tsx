@@ -38,18 +38,45 @@ export default async function Home() {
   try {
     const now = new Date().toISOString();
 
-    const [upcomingResponse, allEventsResponse, categoriesResponse] =
+    const [upcomingResponse, allUpcomingEventsResponse, categoriesResponse] =
       await Promise.all([
         eventService.getEvents({ page: 1, limit: 6, startDate: now }),
-        eventService.getEvents({ page: 1, limit: 50 }),
+        eventService.getEvents({ page: 1, limit: 50, startDate: now }),
         categoryService.getCategories(),
       ]);
 
     upcomingEvents = upcomingResponse.data;
-    // Filter events to only show those with video content, limit to 3
-    featuredEvents = allEventsResponse.data
-      .filter((event) => event.videoUrl && event.videoUrl.trim() !== '')
-      .slice(0, 3);
+    const allUpcomingEvents = allUpcomingEventsResponse.data;
+
+    // Get the IDs of events already shown in the upcoming section
+    const upcomingEventIds = new Set(upcomingEvents.map((event) => event.id));
+
+    // Try to get 3 events with video from upcoming events
+    const eventsWithVideo = allUpcomingEvents.filter(
+      (event) => event.videoUrl && event.videoUrl.trim() !== ''
+    );
+
+    if (eventsWithVideo.length >= 3) {
+      // If we have 3+ events with video, use the first 3
+      featuredEvents = eventsWithVideo.slice(0, 3);
+    } else {
+      // Otherwise, supplement with upcoming events not in the main section
+      featuredEvents = [...eventsWithVideo];
+      const remainingSlots = 3 - eventsWithVideo.length;
+
+      if (remainingSlots > 0) {
+        const additionalEvents = allUpcomingEvents
+          .filter((event) => !upcomingEventIds.has(event.id))
+          .filter(
+            (event) =>
+              !eventsWithVideo.some((featured) => featured.id === event.id)
+          )
+          .slice(0, remainingSlots);
+
+        featuredEvents = [...featuredEvents, ...additionalEvents];
+      }
+    }
+
     categories = categoriesResponse;
   } catch (err) {
     error = 'Failed to load data. Please make sure the API server is running.';
