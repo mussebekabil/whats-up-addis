@@ -176,6 +176,27 @@ export class TelegramClientService {
     return `https://t.me/${cleanChatId}/${messageId}`;
   }
 
+  async resolveChatIds(chatIds: string[]): Promise<Map<string, string>> {
+    if (!this.isConnected) {
+      await this.connect();
+    }
+
+    const chatIdMapping = new Map<string, string>();
+
+    for (const chatId of chatIds) {
+      try {
+        const entity = await this.client.getEntity(chatId);
+        const numericId = this.getChatId(entity);
+        chatIdMapping.set(chatId, String(numericId));
+        console.log(`Resolved ${chatId} -> ${numericId}`);
+      } catch (error) {
+        console.error(`Failed to resolve chat ${chatId}:`, error);
+      }
+    }
+
+    return chatIdMapping;
+  }
+
   async startListening(
     chatIds: string[],
     onMessage: (message: TelegramMessage) => Promise<void>
@@ -185,7 +206,7 @@ export class TelegramClientService {
     }
 
     try {
-      // Resolve all chat entities and get their IDs
+      // Resolve all chat entities
       const chatEntities = [];
       for (const chatId of chatIds) {
         try {
@@ -202,7 +223,6 @@ export class TelegramClientService {
       }
 
       // Add event handler for new messages
-      // Pass chatIds directly instead of resolved entities
       this.client.addEventHandler(
         async (event: NewMessageEvent) => {
           try {

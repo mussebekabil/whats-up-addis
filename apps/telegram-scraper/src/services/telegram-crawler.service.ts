@@ -172,14 +172,29 @@ export class TelegramCrawlerService {
     // Extract chat IDs
     const chatIds = sources.map((s) => s.chatId);
 
-    // Start listening for new messages
+    // First, resolve chat IDs to get the mapping
+    console.log('Resolving chat IDs...');
+    const chatIdMapping = await this.telegramClient.resolveChatIds(chatIds);
+
+    // Create a reverse mapping: numeric ID -> source
+    const numericIdToSource = new Map<string, (typeof sources)[0]>();
+    for (const source of sources) {
+      const numericId = chatIdMapping.get(source.chatId);
+      if (numericId) {
+        numericIdToSource.set(numericId, source);
+        console.log(
+          `Mapped ${source.chatId} -> ${numericId} for ${source.name}`
+        );
+      } else {
+        // If resolution failed, check if chatId is already numeric
+        numericIdToSource.set(source.chatId, source);
+      }
+    }
+
+    // Now start listening for new messages
     await this.telegramClient.startListening(chatIds, async (message) => {
-      // Find the source for this message
-      const source = sources.find(
-        (s) =>
-          s.chatId === String(message.chatId) ||
-          s.chatId === `@${message.chatId}`
-      );
+      // Find the source for this message using the numeric ID
+      const source = numericIdToSource.get(String(message.chatId));
 
       if (!source) {
         console.log(`Received message from unknown source: ${message.chatId}`);
