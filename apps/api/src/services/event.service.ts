@@ -34,33 +34,66 @@ export class EventService {
       where.categoryId = categoryId;
     }
 
-    if (startDate) {
-      where.startDate = {
-        gte: new Date(startDate),
+    // Handle startDate filtering for upcoming events
+    if (startDate || endDateGte) {
+      where.startDate = {} as Record<string, unknown>;
+      if (startDate) {
+        (where.startDate as Record<string, unknown>).gte = new Date(startDate);
+      }
+      if (endDateGte) {
+        (where.startDate as Record<string, unknown>).gte = new Date(endDateGte);
+      }
+    }
+
+    // Handle past event filtering - check endDate if exists, otherwise startDate
+    if (endDateLt) {
+      where.OR = [
+        // Events with endDate: check if endDate < now
+        {
+          endDate: {
+            not: null,
+            lt: new Date(endDateLt),
+          },
+        },
+        // Events without endDate: check if startDate < now
+        {
+          endDate: null,
+          startDate: {
+            lt: new Date(endDateLt),
+          },
+        },
+      ];
+    }
+
+    if (endDate) {
+      where.endDate = {
+        gte: new Date(endDate),
       } as Record<string, unknown>;
     }
 
-    // Handle endDate filtering with more granular control
-    if (endDate || endDateGte || endDateLt) {
-      where.endDate = {} as Record<string, unknown>;
-      if (endDate) {
-        (where.endDate as Record<string, unknown>).gte = new Date(endDate);
-      }
-      if (endDateGte) {
-        (where.endDate as Record<string, unknown>).gte = new Date(endDateGte);
-      }
-      if (endDateLt) {
-        (where.endDate as Record<string, unknown>).lt = new Date(endDateLt);
-      }
-    }
-
     if (search) {
-      where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { location: { contains: search, mode: 'insensitive' } },
-        { venue: { contains: search, mode: 'insensitive' } },
-      ];
+      // If we already have an OR clause from endDateLt, we need to combine them with AND
+      if (where.OR) {
+        where.AND = [
+          { OR: where.OR },
+          {
+            OR: [
+              { title: { contains: search, mode: 'insensitive' } },
+              { description: { contains: search, mode: 'insensitive' } },
+              { location: { contains: search, mode: 'insensitive' } },
+              { venue: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+        ];
+        delete where.OR;
+      } else {
+        where.OR = [
+          { title: { contains: search, mode: 'insensitive' } },
+          { description: { contains: search, mode: 'insensitive' } },
+          { location: { contains: search, mode: 'insensitive' } },
+          { venue: { contains: search, mode: 'insensitive' } },
+        ];
+      }
     }
 
     if (isFree !== undefined) {

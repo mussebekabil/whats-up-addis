@@ -40,7 +40,7 @@ export default async function Home() {
 
     const [upcomingResponse, allEventsResponse, categoriesResponse] =
       await Promise.all([
-        eventService.getEvents({ page: 1, limit: 6, endDateGte: now }),
+        eventService.getEvents({ page: 1, limit: 6, startDate: now }),
         eventService.getEvents({ page: 1, limit: 50 }),
         categoryService.getCategories(),
       ]);

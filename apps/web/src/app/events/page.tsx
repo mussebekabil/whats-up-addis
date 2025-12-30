@@ -56,7 +56,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
     // Apply date filter based on the filter parameter
     if (filter === 'upcoming') {
-      queryParams.endDateGte = now;
+      queryParams.startDate = now;
     } else if (filter === 'past') {
       queryParams.endDateLt = now;
     }
