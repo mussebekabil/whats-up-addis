@@ -31,101 +31,45 @@ export class TelegramClientService {
 
     this.client = new TelegramClient(session, apiId, apiHash, {
       connectionRetries: 5,
-      timeout: 30000,
     });
-  }
-
-  private async connectWithRetry(maxRetries: number = 5): Promise<void> {
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      try {
-        if (attempt > 0) {
-          const delay = Math.pow(2, attempt) * 1000;
-          console.log(
-            `Reconnection attempt ${attempt}/${maxRetries} — waiting ${delay}ms before retrying...`
-          );
-          await new Promise((resolve) => setTimeout(resolve, delay));
-        }
-
-        const sessionString = this.client.session.save() as unknown as string;
-        const hasSessionString =
-          !!process.env.TELEGRAM_SESSION_STRING || sessionString.length > 0;
-
-        if (hasSessionString) {
-          await this.client.connect();
-          console.log(
-            attempt === 0
-              ? 'Connected using existing session'
-              : `Reconnected successfully on attempt ${attempt}`
-          );
-        } else {
-          // Interactive authentication (for local development)
-          // @ts-ignore - no types available
-          const inputLib = (await import('input')).default;
-          await this.client.start({
-            phoneNumber: async () =>
-              await inputLib.text('Please enter your phone number: '),
-            password: async () =>
-              await inputLib.text('Please enter your password: '),
-            phoneCode: async () =>
-              await inputLib.text('Please enter the code you received: '),
-            onError: (err: Error) =>
-              console.error('Error during authentication:', err),
-          });
-
-          const newSessionString =
-            this.client.session.save() as unknown as string;
-          this.saveSession(newSessionString);
-        }
-
-        return; // Connection succeeded — exit retry loop
-      } catch (error) {
-        console.error(
-          `Connection attempt ${attempt + 1}/${maxRetries + 1} failed:`,
-          error
-        );
-        if (attempt === maxRetries) {
-          throw error;
-        }
-      }
-    }
   }
 
   async connect(): Promise<void> {
     try {
       console.log('Connecting to Telegram...');
 
-      await this.connectWithRetry();
+      const sessionString = this.client.session.save() as unknown as string;
+      const hasSessionString =
+        !!process.env.TELEGRAM_SESSION_STRING || sessionString.length > 0;
+
+      if (hasSessionString) {
+        await this.client.connect();
+        console.log('Connected using existing session');
+      } else {
+        // Interactive authentication (for local development)
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const input = require('input');
+        await this.client.start({
+          phoneNumber: async () =>
+            await input.text('Please enter your phone number: '),
+          password: async () =>
+            await input.text('Please enter your password: '),
+          phoneCode: async () =>
+            await input.text('Please enter the code you received: '),
+          onError: (err: Error) =>
+            console.error('Error during authentication:', err),
+        });
+
+        const newSessionString =
+          this.client.session.save() as unknown as string;
+        this.saveSession(newSessionString);
+      }
 
       this.isConnected = true;
       const me = await this.client.getMe();
       console.log(
         `Connected to Telegram as ${(me as Api.User).firstName || 'User'}`
       );
-
-      // Register disconnection handler for automatic reconnection
-      this.client.addEventHandler(async (update: any) => {
-        if (update?.className === 'UpdatesTooLong' || !this.client.connected) {
-          return;
-        }
-      });
-
-      // Listen for connection drops and reconnect automatically
-      (this.client as any).on?.('disconnected', async () => {
-        console.warn(
-          'Telegram client disconnected — attempting to reconnect...'
-        );
-        this.isConnected = false;
-        try {
-          await this.connectWithRetry();
-          this.isConnected = true;
-          console.log('Telegram client reconnected successfully');
-        } catch (error) {
-          console.error(
-            'Failed to reconnect to Telegram after all retries:',
-            error
-          );
-        }
-      });
     } catch (error) {
       console.error('Failed to connect to Telegram:', error);
       throw error;
