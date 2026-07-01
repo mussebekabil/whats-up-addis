@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { categoryService } from '@/lib/categories';
+import CategoryCard from '@/components/CategoryCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -16,56 +16,48 @@ export default async function CategoriesPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
-            Event Categories
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            Browse events by category
-          </p>
+      <main className="flex-1 pb-20 md:pb-0">
+        <div className="border-b border-border">
+          <div className="mx-auto max-w-7xl px-6 py-12">
+            <span className="font-mono text-xs uppercase tracking-widest text-ember">
+              Browse
+            </span>
+            <h1 className="mt-2 font-display text-5xl md:text-6xl">
+              Event Categories
+            </h1>
+            <p className="mt-3 text-muted-foreground">
+              Find events by what you love
+            </p>
+          </div>
         </div>
 
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-8">
-            {error}
-          </div>
-        )}
-
-        {categories.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/categories/${category.slug}`}
-                className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow hover:shadow-lg transition-shadow border border-gray-200 dark:border-gray-700"
-              >
-                <h3 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">
-                  {category.name}
-                </h3>
-                {category.description && (
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {category.description}
-                  </p>
-                )}
-                <div className="mt-4 text-primary-600 dark:text-primary-400 font-medium">
-                  View events →
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          !error && (
-            <div className="text-center py-16">
-              <p className="text-gray-600 dark:text-gray-400">
-                No categories available yet.
-              </p>
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          {error && (
+            <div className="mb-8 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {error}
             </div>
-          )
-        )}
+          )}
+
+          {categories.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {categories.map((category) => (
+                <CategoryCard key={category.id} category={category} />
+              ))}
+            </div>
+          ) : (
+            !error && (
+              <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
+                <p className="font-display text-2xl">No categories yet.</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Check back soon!
+                </p>
+              </div>
+            )
+          )}
+        </div>
       </main>
 
       <Footer />

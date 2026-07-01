@@ -34,11 +34,10 @@ export default function AdminEventsPage() {
         if (user.role !== 'ADMIN') {
           router.push('/');
         }
-      } catch (err) {
+      } catch {
         router.push('/auth/login');
       }
     };
-
     checkAuth();
   }, [router]);
 
@@ -54,7 +53,6 @@ export default function AdminEventsPage() {
         router.push('/auth/login');
         return;
       }
-
       const response = await adminApi.getEvents(token, page, 20, statusFilter);
       setEvents(response.data);
       setTotalPages(response.pagination.totalPages);
@@ -74,10 +72,7 @@ export default function AdminEventsPage() {
       setUpdating(eventId);
       const token = authService.getToken();
       if (!token) return;
-
       await adminApi.updateEventStatus(eventId, newStatus, token);
-
-      // Refresh the list
       await fetchEvents();
       setSelectedEvent(null);
     } catch (err) {
@@ -98,9 +93,8 @@ export default function AdminEventsPage() {
 
   const getSortedEvents = () => {
     return [...events].sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
+      let aValue: string | number;
+      let bValue: string | number;
       switch (sortField) {
         case 'title':
           aValue = a.title.toLowerCase();
@@ -121,7 +115,6 @@ export default function AdminEventsPage() {
         default:
           return 0;
       }
-
       if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
       return 0;
@@ -131,11 +124,13 @@ export default function AdminEventsPage() {
   const getStatusBadgeClass = (status: EventStatus) => {
     switch (status) {
       case EventStatus.Pending:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-400/15 text-yellow-600 dark:text-yellow-400';
       case EventStatus.Accepted:
-        return 'bg-green-100 text-green-800';
+        return 'bg-primary/15 text-primary';
       case EventStatus.Rejected:
-        return 'bg-red-100 text-red-800';
+        return 'bg-destructive/15 text-destructive';
+      default:
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -143,7 +138,7 @@ export default function AdminEventsPage() {
     if (sortField !== field) {
       return (
         <svg
-          className="w-4 h-4 ml-1 opacity-40"
+          className="ml-1 h-3 w-3 opacity-30"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -159,7 +154,7 @@ export default function AdminEventsPage() {
     }
     return sortOrder === 'asc' ? (
       <svg
-        className="w-4 h-4 ml-1"
+        className="ml-1 h-3 w-3"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -173,7 +168,7 @@ export default function AdminEventsPage() {
       </svg>
     ) : (
       <svg
-        className="w-4 h-4 ml-1"
+        className="ml-1 h-3 w-3"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -190,13 +185,13 @@ export default function AdminEventsPage() {
 
   if (loading && events.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
         <Navbar />
-        <div className="flex-1 flex items-center justify-center pb-16 md:pb-0">
+        <div className="flex flex-1 items-center justify-center pb-16 md:pb-0">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
-              Loading events...
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-border border-t-ember" />
+            <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              Loading…
             </p>
           </div>
         </div>
@@ -206,156 +201,137 @@ export default function AdminEventsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Navbar />
 
       <main className="flex-1 pb-16 md:pb-0">
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Event Management
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          {/* Header */}
+          <div className="mb-10">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-ember">
+              Admin
+            </span>
+            <h1 className="mt-1 font-display text-4xl">Event Management</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
               Review and manage submitted events
             </p>
           </div>
 
+          {/* Error */}
           {error && (
-            <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
-              {error}
+            <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              {error}{' '}
+              <button
+                onClick={() => setError('')}
+                className="ml-2 underline-offset-2 hover:underline"
+              >
+                Dismiss
+              </button>
             </div>
           )}
 
-          <div className="mb-6 flex gap-2 flex-wrap">
-            <button
-              onClick={() => {
-                setStatusFilter(EventStatus.Pending);
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                statusFilter === EventStatus.Pending
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              Pending
-            </button>
-            <button
-              onClick={() => {
-                setStatusFilter(EventStatus.Accepted);
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                statusFilter === EventStatus.Accepted
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              Accepted
-            </button>
-            <button
-              onClick={() => {
-                setStatusFilter(EventStatus.Rejected);
-                setPage(1);
-              }}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                statusFilter === EventStatus.Rejected
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
-            >
-              Rejected
-            </button>
+          {/* Status filter tabs */}
+          <div className="mb-6 flex flex-wrap gap-2">
+            {(
+              [
+                EventStatus.Pending,
+                EventStatus.Accepted,
+                EventStatus.Rejected,
+              ] as EventStatus[]
+            ).map((s) => (
+              <button
+                key={s}
+                onClick={() => {
+                  setStatusFilter(s);
+                  setPage(1);
+                }}
+                className={`inline-flex h-8 items-center rounded-full px-4 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+                  statusFilter === s
+                    ? 'border bg-ember text-foreground'
+                    : 'border border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground'
+                }`}
+              >
+                {s}
+              </button>
+            ))}
           </div>
 
-          <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+          {/* Table */}
+          <div className="rounded-2xl border border-border bg-card overflow-hidden">
             {events.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                No {statusFilter.toLowerCase()} events found
+              <div className="px-8 py-16 text-center">
+                <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                  No {statusFilter.toLowerCase()} events found
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead className="bg-gray-50 dark:bg-gray-900">
-                    <tr>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        onClick={() => handleSort('title')}
-                      >
-                        <div className="flex items-center">
-                          Event
-                          <SortIcon field="title" />
-                        </div>
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/30">
+                      {(
+                        [
+                          { label: 'Event', field: 'title' },
+                          { label: 'Category', field: 'category' },
+                          { label: 'Date', field: 'date' },
+                          { label: 'Creator', field: 'creator' },
+                        ] as { label: string; field: SortField }[]
+                      ).map(({ label, field }) => (
+                        <th
+                          key={field}
+                          onClick={() => handleSort(field)}
+                          className="px-6 py-3 text-left cursor-pointer hover:text-foreground transition-colors"
+                        >
+                          <div className="flex items-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                            {label}
+                            <SortIcon field={field} />
+                          </div>
+                        </th>
+                      ))}
+                      <th className="px-6 py-3 text-left">
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          Status
+                        </span>
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        onClick={() => handleSort('category')}
-                      >
-                        <div className="flex items-center">
-                          Category
-                          <SortIcon field="category" />
-                        </div>
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        onClick={() => handleSort('date')}
-                      >
-                        <div className="flex items-center">
-                          Date
-                          <SortIcon field="date" />
-                        </div>
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                        onClick={() => handleSort('creator')}
-                      >
-                        <div className="flex items-center">
-                          Creator
-                          <SortIcon field="creator" />
-                        </div>
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Actions
+                      <th className="px-6 py-3 text-left">
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                          Actions
+                        </span>
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="divide-y divide-border">
                     {getSortedEvents().map((event) => (
                       <tr
                         key={event.id}
-                        className="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                        className="cursor-pointer transition-colors hover:bg-muted/30"
                         onClick={() => setSelectedEvent(event)}
                       >
                         <td className="px-6 py-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          <div className="text-sm font-medium text-foreground">
                             {event.title}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                          <div className="mt-0.5 truncate max-w-xs font-mono text-[10px] text-muted-foreground">
                             {event.location}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                           {event.category.name}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 whitespace-nowrap font-mono text-[11px] text-muted-foreground">
                           {new Date(event.startDate).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                           {event.creator?.name || 'Unknown'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
-                              event.status
-                            )}`}
+                            className={`inline-flex rounded-full px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-widest ${getStatusBadgeClass(event.status)}`}
                           >
                             {event.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div
                             className="flex gap-2"
                             onClick={(e) => e.stopPropagation()}
@@ -369,11 +345,9 @@ export default function AdminEventsPage() {
                                   )
                                 }
                                 disabled={updating === event.id}
-                                className="px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs"
+                                className="inline-flex h-7 items-center rounded-full bg-primary px-3 font-mono text-[10px] uppercase tracking-widest text-primary-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
                               >
-                                {updating === event.id
-                                  ? 'Accepting...'
-                                  : 'Accept'}
+                                {updating === event.id ? '…' : 'Accept'}
                               </button>
                             )}
                             {event.status !== EventStatus.Rejected && (
@@ -385,11 +359,9 @@ export default function AdminEventsPage() {
                                   )
                                 }
                                 disabled={updating === event.id}
-                                className="px-3 py-1.5 border border-red-600 dark:border-red-400 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs"
+                                className="inline-flex h-7 items-center rounded-full border border-destructive/40 px-3 font-mono text-[10px] uppercase tracking-widest text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
                               >
-                                {updating === event.id
-                                  ? 'Rejecting...'
-                                  : 'Reject'}
+                                {updating === event.id ? '…' : 'Reject'}
                               </button>
                             )}
                             {event.status !== EventStatus.Pending && (
@@ -401,11 +373,9 @@ export default function AdminEventsPage() {
                                   )
                                 }
                                 disabled={updating === event.id}
-                                className="px-3 py-1.5 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs"
+                                className="inline-flex h-7 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                               >
-                                {updating === event.id
-                                  ? 'Resetting...'
-                                  : 'Reset'}
+                                {updating === event.id ? '…' : 'Reset'}
                               </button>
                             )}
                           </div>
@@ -418,24 +388,25 @@ export default function AdminEventsPage() {
             )}
           </div>
 
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-6 flex justify-center gap-2">
+            <div className="mt-6 flex items-center justify-center gap-3">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex h-9 items-center rounded-full border border-border px-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Previous
+                ← Prev
               </button>
-              <span className="px-4 py-2 text-gray-700 dark:text-gray-300">
-                Page {page} of {totalPages}
+              <span className="font-mono text-xs text-muted-foreground">
+                {page} / {totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex h-9 items-center rounded-full border border-border px-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Next
+                Next →
               </button>
             </div>
           )}

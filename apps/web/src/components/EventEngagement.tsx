@@ -72,7 +72,6 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
 
   const handleRating = async (rating: number) => {
     if (!user) return;
-
     try {
       setError(null);
       await ratingService.createOrUpdateRating(eventId, { rating });
@@ -86,7 +85,6 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !newComment.trim()) return;
-
     try {
       setError(null);
       await commentService.createComment(eventId, {
@@ -103,7 +101,6 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
 
   const handleToggleLike = async (commentId: string) => {
     if (!user) return;
-
     try {
       setError(null);
       await commentService.toggleLike(commentId);
@@ -119,7 +116,6 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
 
   const confirmDeleteComment = async () => {
     if (!deleteConfirmation.commentId) return;
-
     try {
       setError(null);
       await commentService.deleteComment(deleteConfirmation.commentId);
@@ -149,13 +145,12 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
       const isHalfStar = position === Math.ceil(rating) && rating % 1 !== 0;
 
       if (readonly && isHalfStar) {
-        // Show half star for readonly ratings
         const percentage = ((rating % 1) * 100).toFixed(0);
         return (
           <div key={position} className="relative inline-block text-2xl">
-            <span className="text-gray-300 dark:text-gray-600">★</span>
+            <span className="text-muted-foreground/30">★</span>
             <span
-              className="absolute top-0 left-0 text-yellow-400 overflow-hidden"
+              className="absolute top-0 left-0 overflow-hidden text-ember"
               style={{ width: `${percentage}%` }}
             >
               ★
@@ -170,9 +165,9 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
           type="button"
           disabled={readonly || !user}
           onClick={() => onRate?.(position)}
-          className={`text-2xl ${readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'} transition-transform ${
-            isFullStar ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'
-          }`}
+          className={`text-2xl transition-transform ${
+            readonly ? 'cursor-default' : 'cursor-pointer hover:scale-110'
+          } ${isFullStar ? 'text-ember' : 'text-muted-foreground/30'}`}
         >
           ★
         </button>
@@ -194,39 +189,39 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
     isReply?: boolean;
   }) => (
     <div
-      className={`${isReply ? 'ml-12 mt-4' : 'mb-6'} border-l-2 border-gray-200 dark:border-gray-700 pl-4`}
+      className={`${isReply ? 'ml-10 mt-3' : 'py-4'} border-l-2 border-border pl-4`}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-semibold text-gray-900 dark:text-white">
+          <div className="mb-1.5 flex items-baseline gap-2">
+            <span className="text-sm font-medium text-foreground">
               {comment.user.name}
             </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="font-mono text-[10px] text-muted-foreground">
               {formatDistanceToNow(new Date(comment.createdAt), {
                 addSuffix: true,
               })}
             </span>
           </div>
-          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+          <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
             {comment.content}
           </p>
-          <div className="flex items-center gap-4 mt-2">
+          <div className="mt-2 flex items-center gap-4">
             <button
               onClick={() => handleToggleLike(comment.id)}
               disabled={!user}
-              className={`flex items-center gap-1 text-sm ${
+              className={`flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest transition-colors disabled:opacity-40 ${
                 comment.isLikedByUser
-                  ? 'text-primary-600 dark:text-primary-400'
-                  : 'text-gray-500 dark:text-gray-400'
-              } hover:text-primary-600 dark:hover:text-primary-400 disabled:opacity-50`}
+                  ? 'text-ember'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
             >
-              ❤️ {comment.likesCount}
+              ♥ {comment.likesCount}
             </button>
             {!isReply && user && (
               <button
                 onClick={() => setReplyTo(comment.id)}
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
+                className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
               >
                 Reply
               </button>
@@ -235,7 +230,7 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
               (user.id === comment.userId || user.role === Roles.Admin) && (
                 <button
                   onClick={() => handleDeleteComment(comment.id)}
-                  className="text-sm text-red-500 hover:text-red-700 dark:hover:text-red-600"
+                  className="font-mono text-[10px] uppercase tracking-widest text-destructive transition-colors hover:text-destructive/10"
                 >
                   Delete
                 </button>
@@ -244,7 +239,7 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
         </div>
       </div>
       {comment.replies && comment.replies.length > 0 && (
-        <div className="mt-4">
+        <div className="mt-3">
           {comment.replies.map((reply) => (
             <CommentItem key={reply.id} comment={reply} isReply />
           ))}
@@ -257,25 +252,23 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
     if (!deleteConfirmation.isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            Delete Comment
-          </h3>
-          <p className="text-gray-700 dark:text-gray-300 mb-6">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-void/60 p-4 backdrop-blur-sm">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+          <h3 className="font-display text-xl">Delete Comment</h3>
+          <p className="mt-2 mb-6 text-sm text-muted-foreground">
             Are you sure you want to delete this comment? This action cannot be
             undone.
           </p>
-          <div className="flex gap-3 justify-end">
+          <div className="flex justify-end gap-3">
             <button
               onClick={cancelDeleteComment}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+              className="inline-flex h-9 items-center rounded-full border border-border px-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
             >
               Cancel
             </button>
             <button
               onClick={confirmDeleteComment}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              className="inline-flex h-9 items-center rounded-full bg-destructive px-4 font-mono text-[11px] uppercase tracking-widest text-destructive-foreground transition-transform hover:-translate-y-0.5"
             >
               Delete
             </button>
@@ -286,101 +279,77 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
   };
 
   return (
-    <div className="mt-12 space-y-8">
-      {/* Error Message */}
+    <div className="mt-12 space-y-6">
+      {/* Error */}
       {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start gap-3">
-          <svg
-            className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div className="flex-1">
-            <p className="text-red-800 dark:text-red-200">{error}</p>
-          </div>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {error}{' '}
           <button
             onClick={() => setError(null)}
-            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-200"
+            className="ml-2 underline-offset-2 hover:underline"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            Dismiss
           </button>
         </div>
       )}
 
-      {/* Ratings Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Rate This Event
-        </h2>
+      {/* Ratings */}
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-ember">
+          Ratings
+        </span>
+        <h2 className="mt-1 font-display text-2xl">Rate This Event</h2>
+
         {isLoadingRatings ? (
-          <div className="text-gray-600 dark:text-gray-400">
-            Loading ratings...
-          </div>
+          <p className="mt-4 font-mono text-xs text-muted-foreground">
+            Loading…
+          </p>
         ) : (
-          <>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="text-4xl font-bold text-gray-900 dark:text-white">
-                {ratingStats?.averageRating.toFixed(1) || '0.0'}
-              </div>
+          <div className="mt-4 space-y-4">
+            <div className="flex items-center gap-4">
+              <span className="font-display text-4xl">
+                {ratingStats?.averageRating.toFixed(1) ?? '0.0'}
+              </span>
               <div>
-                <StarRating rating={ratingStats?.averageRating || 0} readonly />
-                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {ratingStats?.totalRatings || 0} ratings
-                </div>
+                <StarRating rating={ratingStats?.averageRating ?? 0} readonly />
+                <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {ratingStats?.totalRatings ?? 0} ratings
+                </p>
               </div>
             </div>
-            {user && (
-              <div className="border-t dark:border-gray-700 pt-4">
-                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                  Your rating:
+
+            {user ? (
+              <div className="border-t border-border pt-4">
+                <p className="mb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Your rating
                 </p>
                 <StarRating rating={selectedRating} onRate={handleRating} />
               </div>
-            )}
-            {!user && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
-                Please log in to rate this event
+            ) : (
+              <p className="font-mono text-xs text-muted-foreground">
+                Sign in to rate this event
               </p>
             )}
-          </>
+          </div>
         )}
       </div>
 
-      {/* Comments Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-          Comments
-        </h2>
+      {/* Comments */}
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-ember">
+          Discussion
+        </span>
+        <h2 className="mt-1 font-display text-2xl">Comments</h2>
 
         {user && (
-          <form onSubmit={handleSubmitComment} className="mb-8">
+          <form onSubmit={handleSubmitComment} className="mt-5 space-y-3">
             {replyTo && (
-              <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                Replying to comment...{' '}
+              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Replying to comment…{' '}
                 <button
                   type="button"
                   onClick={() => setReplyTo(null)}
-                  className="text-primary-600 hover:underline"
+                  className="text-ember hover:opacity-80"
                 >
                   Cancel
                 </button>
@@ -389,14 +358,14 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
+              placeholder="Write a comment…"
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white mb-2"
               required
+              className="w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
             <button
               type="submit"
-              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+              className="inline-flex h-9 items-center rounded-full bg-ember px-5 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
             >
               Post Comment
             </button>
@@ -404,29 +373,28 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
         )}
 
         {!user && (
-          <p className="text-sm text-gray-500 dark:text-gray-400 italic mb-6">
-            Please log in to comment
+          <p className="mt-4 font-mono text-xs text-muted-foreground">
+            Sign in to join the discussion
           </p>
         )}
 
-        {isLoadingComments ? (
-          <div className="text-gray-600 dark:text-gray-400">
-            Loading comments...
-          </div>
-        ) : comments.length === 0 ? (
-          <p className="text-gray-500 dark:text-gray-400">
-            No comments yet. Be the first to comment!
-          </p>
-        ) : (
-          <div>
-            {comments.map((comment) => (
-              <CommentItem key={comment.id} comment={comment} />
-            ))}
-          </div>
-        )}
+        <div className="mt-6">
+          {isLoadingComments ? (
+            <p className="font-mono text-xs text-muted-foreground">Loading…</p>
+          ) : comments.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No comments yet. Be the first!
+            </p>
+          ) : (
+            <div className="divide-y divide-border">
+              {comments.map((comment) => (
+                <CommentItem key={comment.id} comment={comment} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Confirmation Dialog */}
       <ConfirmDialog />
     </div>
   );

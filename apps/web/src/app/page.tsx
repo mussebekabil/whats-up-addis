@@ -5,6 +5,7 @@ import EventCard from '@/components/EventCard';
 import CategoryCard from '@/components/CategoryCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import FadeIn from '@/components/FadeIn';
 import {
   generateOrganizationSchema,
   generateWebSiteSchema,
@@ -12,15 +13,16 @@ import {
 } from '@/lib/seo';
 
 import type { Metadata } from 'next';
+import RoundTextPrimary from '@/components/ui-nuggets/RoundTextPrimary';
+import TypewriterText from '@/components/TypewriterText';
 
-// Make the page dynamic to ensure fresh data on each request
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: 'Home',
   description:
-    'Discover concerts, conferences, workshops, cultural events and entertainment happening in Addis Ababa, Ethiopia. Browse upcoming events, featured activities, and explore by category.',
+    'Discover concerts, conferences, workshops, cultural events and entertainment happening in Addis Ababa, Ethiopia.',
   openGraph: {
     title: "What's Up Addis - Events in Addis Ababa, Ethiopia",
     description:
@@ -30,6 +32,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
+  let allUpcomingEvents: any[] = [];
   let upcomingEvents: any[] = [];
   let featuredEvents: any[] = [];
   let categories: any[] = [];
@@ -46,34 +49,25 @@ export default async function Home() {
       ]);
 
     upcomingEvents = upcomingResponse.data;
-    const allUpcomingEvents = allUpcomingEventsResponse.data;
-
-    // Get the IDs of events already shown in the upcoming section
-    const upcomingEventIds = new Set(upcomingEvents.map((event) => event.id));
-
-    // Try to get 3 events with video from upcoming events
+    allUpcomingEvents = allUpcomingEventsResponse.data;
+    const upcomingEventIds = new Set(upcomingEvents.map((e) => e.id));
     const eventsWithVideo = allUpcomingEvents.filter(
-      (event) => event.videoUrl && event.videoUrl.trim() !== ''
+      (e) => e.videoUrl && e.videoUrl.trim() !== ''
     );
 
     if (eventsWithVideo.length >= 3) {
-      // If we have 3+ events with video, use the first 3
       featuredEvents = eventsWithVideo.slice(0, 3);
     } else {
-      // Otherwise, supplement with upcoming events not in the main section
       featuredEvents = [...eventsWithVideo];
       const remainingSlots = 3 - eventsWithVideo.length;
-
       if (remainingSlots > 0) {
-        const additionalEvents = allUpcomingEvents
-          .filter((event) => !upcomingEventIds.has(event.id))
-          .filter(
-            (event) =>
-              !eventsWithVideo.some((featured) => featured.id === event.id)
-          )
-          .slice(0, remainingSlots);
-
-        featuredEvents = [...featuredEvents, ...additionalEvents];
+        featuredEvents = [
+          ...featuredEvents,
+          ...allUpcomingEvents
+            .filter((e) => !upcomingEventIds.has(e.id))
+            .filter((e) => !eventsWithVideo.some((f) => f.id === e.id))
+            .slice(0, remainingSlots),
+        ];
       }
     }
 
@@ -83,7 +77,6 @@ export default async function Home() {
     console.error('Error fetching data:', err);
   }
 
-  // Prepare structured data for search engines
   const organizationSchema = generateOrganizationSchema();
   const webSiteSchema = generateWebSiteSchema();
   const allEvents = [...upcomingEvents, ...featuredEvents];
@@ -91,8 +84,7 @@ export default async function Home() {
     allEvents.length > 0 ? generateEventListSchema(allEvents) : null;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Structured Data for SEO */}
+    <div className="min-h-screen bg-background text-foreground">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -110,109 +102,221 @@ export default async function Home() {
 
       <Navbar />
 
-      <main className="flex-1 pb-16 md:pb-0">
-        <section className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-5xl font-bold mb-4">
-            Discover Events in Addis Ababa
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            Find concerts, conferences, workshops, and more happening in your
-            city
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="absolute inset-0">
+          <img
+            src="/hero-addis.jpg"
+            alt="Addis Ababa skyline at golden hour"
+            className="h-full w-full object-cover opacity-60 dark:opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/60 to-background" />
+        </div>
+
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-6 pb-28 pt-20 md:pb-36 md:pt-28">
+          <div className="flex items-center gap-3">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-ember" />
+            <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Live · {Math.ceil(allUpcomingEvents.length / 10) * 10}+ upcoming
+              event{allUpcomingEvents.length === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          <TypewriterText
+            tag="h1"
+            immediate
+            startDelay={300}
+            speed={100}
+            className="max-w-4xl font-display text-5xl leading-[0.95] tracking-tight md:text-7xl lg:text-8xl"
+            segments={[
+              { text: 'Everything ' },
+              { text: 'happening', em: true },
+              { text: '\nin Addis, tonight.' },
+            ]}
+          />
+
+          <p className="max-w-xl text-lg text-muted-foreground">
+            A handpicked agenda of music, food, art and community across the
+            city. No noise — just what&apos;s actually worth showing up to.
           </p>
-          <div className="flex justify-center gap-4">
+
+          <div className="flex w-full max-w-2xl items-center gap-2 rounded-full border border-border bg-card p-2 shadow-sm">
+            <span className="pl-4 font-mono text-xs text-muted-foreground">
+              BROWSE
+            </span>
+            <Link
+              href="/events?filter=upcoming"
+              className="flex-1 px-2 py-2 text-base text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+            >
+              Try upcoming events, concerts, workshops…
+            </Link>
             <Link
               href="/events"
-              className="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-lg transition-colors"
+              className="inline-flex h-9 items-center rounded-full bg-ember px-5 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
             >
-              Browse Events
-            </Link>
-            <Link
-              href="/events/create"
-              className="px-8 py-3 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 text-lg transition-colors"
-            >
-              Create Event
+              Explore
             </Link>
           </div>
-        </section>
+        </div>
+      </section>
 
+      <main className="pb-20 md:pb-0">
         {error && (
-          <div className="container mx-auto px-4 mb-8">
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded">
+          <div className="mx-auto max-w-7xl px-6 py-6">
+            <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
             </div>
           </div>
         )}
 
+        {/* Upcoming Events */}
         {upcomingEvents.length > 0 && (
-          <section className="bg-white dark:bg-gray-950 py-12">
-            <div className="container mx-auto px-4">
-              <div className="relative mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-left">
+          <section className="mx-auto max-w-7xl px-6 py-16">
+            <div className="mb-10 flex items-end justify-between">
+              <div>
+                <span className="font-mono text-xs uppercase tracking-widest text-ember">
+                  What&apos;s next
+                </span>
+                <h2 className="mt-2 font-display text-4xl md:text-5xl">
                   Upcoming Events
                 </h2>
-                <Link
-                  href="/events?filter=upcoming"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
-                >
-                  View all →
-                </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {upcomingEvents.map((event) => (
-                  <EventCard key={event.id} event={event} />
-                ))}
-              </div>
+              <Link
+                href="/events?filter=upcoming"
+                className="font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+              >
+                View all →
+              </Link>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {upcomingEvents.map((event, i) => (
+                <FadeIn key={event.id} delay={i * 80}>
+                  <EventCard event={event} />
+                </FadeIn>
+              ))}
             </div>
           </section>
         )}
 
+        {/* Featured Events */}
         {featuredEvents.length > 0 && (
-          <section className="bg-gradient-to-b from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 py-12">
-            <div className="container mx-auto px-4">
-              <div className="relative mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white text-left">
-                  Featured Events
-                </h2>
+          <section className="border-y border-border bg-muted/40 py-16">
+            <div className="mx-auto max-w-7xl px-6">
+              <div className="mb-10 flex items-end justify-between">
+                <div>
+                  <span className="font-mono text-xs uppercase tracking-widest text-ember">
+                    Editor&apos;s pick
+                  </span>
+                  <h2 className="mt-2 font-display text-4xl md:text-5xl">
+                    Featured Events
+                  </h2>
+                </div>
                 <Link
                   href="/events"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                  className="font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
                 >
                   View all →
                 </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredEvents.map((event) => (
-                  <EventCard key={event.id} event={event} />
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {featuredEvents.map((event, i) => (
+                  <FadeIn key={event.id} delay={i * 80}>
+                    <EventCard event={event} />
+                  </FadeIn>
                 ))}
               </div>
             </div>
           </section>
         )}
 
+        {/* Categories */}
         {categories.length > 0 ? (
-          <section className="bg-primary-50 dark:bg-gray-900/50 py-16">
-            <div className="container mx-auto px-4">
-              <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
+          <section className="mx-auto max-w-7xl px-6 py-16">
+            <div className="mb-10">
+              <RoundTextPrimary>By interest</RoundTextPrimary>
+              <h2 className="mt-2 font-display text-4xl md:text-5xl">
                 Browse by Category
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {categories.map((category) => (
-                  <CategoryCard key={category.id} category={category} />
-                ))}
-              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {categories.map((category, i) => (
+                <FadeIn key={category.id} delay={i * 70}>
+                  <CategoryCard category={category} />
+                </FadeIn>
+              ))}
             </div>
           </section>
         ) : (
           !error && (
-            <section className="bg-primary-50 dark:bg-gray-900/50 py-16">
-              <div className="container mx-auto px-4 text-center">
-                <p className="text-gray-600 dark:text-gray-400">
-                  No categories available yet. Check back soon!
-                </p>
-              </div>
+            <section className="mx-auto max-w-7xl px-6 py-16">
+              <p className="text-center text-muted-foreground">
+                No categories available yet. Check back soon!
+              </p>
             </section>
           )
         )}
+
+        {/* Organizer CTA */}
+        <section className="bg-ember text-void">
+          <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+            <div className="grid gap-12 md:grid-cols-2 md:items-center">
+              <FadeIn>
+                <span className="rounded-md border border-void/10 bg-bone/10 px-2 py-1 font-mono text-xs uppercase tracking-widest text-primary-foreground">
+                  For organizers
+                </span>
+                <TypewriterText
+                  tag="h2"
+                  startDelay={300}
+                  speed={185}
+                  className="mt-4 font-display text-4xl leading-[0.95] tracking-tight md:text-6xl"
+                  segments={[{ text: 'List your event.\nSell it out.' }]}
+                />
+                <p className="mt-6 max-w-md text-lg text-void/80">
+                  From small gatherings to sold-out shows — publish in minutes
+                  and reach everyone who&apos;s looking for something to do in
+                  Addis.
+                </p>
+                <div className="mt-8 flex flex-wrap items-center gap-4">
+                  <Link
+                    href="/events/create"
+                    className="inline-flex h-11 items-center rounded-full bg-void px-6 font-mono text-xs uppercase tracking-widest text-bone transition-transform hover:-translate-y-0.5"
+                  >
+                    Create an event
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="inline-flex h-11 items-center rounded-full border border-void/30 bg-bone/10 px-6 font-mono text-xs uppercase tracking-widest text-void transition-colors hover:border-void"
+                  >
+                    Sign up free
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="inline-flex h-11 items-center rounded-full border border-void/30 bg-bone/10 px-6 font-mono text-xs uppercase tracking-widest text-void transition-colors hover:border-void"
+                  >
+                    Contact us
+                  </Link>
+                </div>
+              </FadeIn>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { value: categories.length || '8', label: 'Categories' },
+                  { value: '0', label: 'ETB to list' },
+                  { value: '24h', label: 'Approval' },
+                  { value: '∞', label: 'Good vibes' },
+                ].map(({ value, label }, i) => (
+                  <FadeIn key={label} delay={i * 80}>
+                    <div className="rounded-2xl border border-void/10 bg-bone/10 p-6 backdrop-blur-sm">
+                      <span className="font-display text-4xl">{value}</span>
+                      <p className="mt-1 font-mono text-xs uppercase tracking-widest text-void/60">
+                        {label}
+                      </p>
+                    </div>
+                  </FadeIn>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />

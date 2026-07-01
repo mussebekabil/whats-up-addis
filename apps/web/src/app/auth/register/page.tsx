@@ -22,20 +22,16 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-
-    // Validate password length
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
     }
 
     setIsLoading(true);
-
     try {
       await authService.register(
         formData.email,
@@ -51,37 +47,41 @@ export default function RegisterPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const inputClass =
+    'w-full rounded-xl border border-input bg-background px-4 py-2.5 text-foreground placeholder:text-muted-foreground/60 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20';
+  const labelClass =
+    'font-mono text-xs uppercase tracking-widest text-muted-foreground';
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
-        <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white text-center">
-            Create Account
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-center mb-8">
-            Join What&apos;s Up Addis today
-          </p>
+      <main className="flex-1 flex items-center justify-center px-6 py-16 pb-24 md:pb-16">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <div className="mb-8 text-center">
+            <span className="font-mono text-xs uppercase tracking-widest text-ember">
+              Get started
+            </span>
+            <h1 className="mt-2 font-display text-4xl text-foreground">
+              Create account
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Join What&apos;s Up Addis today
+            </p>
+          </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-6">
+            <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <label htmlFor="name" className={labelClass}>
                 Full Name
               </label>
               <input
@@ -92,17 +92,14 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 minLength={2}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="John Doe"
+                placeholder="Your full name"
+                className={inputClass}
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Email Address
+            <div className="space-y-1.5">
+              <label htmlFor="email" className={labelClass}>
+                Email
               </label>
               <input
                 type="email"
@@ -111,16 +108,13 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="you@example.com"
+                className={inputClass}
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
+            <div className="space-y-1.5">
+              <label htmlFor="password" className={labelClass}>
                 Password
               </label>
               <input
@@ -131,16 +125,13 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
                 minLength={8}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Min. 8 characters"
+                className={inputClass}
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
+            <div className="space-y-1.5">
+              <label htmlFor="confirmPassword" className={labelClass}>
                 Confirm Password
               </label>
               <input
@@ -150,31 +141,29 @@ export default function RegisterPage() {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Re-enter your password"
+                className={inputClass}
               />
             </div>
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+              className="w-full rounded-full bg-ember py-3 font-mono text-xs uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isLoading ? 'Creating account...' : 'Sign Up'}
+              {isLoading ? 'Creating account…' : 'Sign Up'}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-300">
-              Already have an account?{' '}
-              <Link
-                href="/auth/login"
-                className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Already have an account?{' '}
+            <Link
+              href="/auth/login"
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
       </main>
 

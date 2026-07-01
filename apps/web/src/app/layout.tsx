@@ -1,8 +1,27 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
+import { ThemeScript } from '@/components/ThemeScript';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  variable: '--font-instrument-serif',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://whatsupaddis.io'),
@@ -69,7 +88,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'DMysoX9hvkX7ViccBtwScaOTU8M9W6iOsW7Hhe_G_0g', // You'll need to add this from Google Search Console
+    google: 'DMysoX9hvkX7ViccBtwScaOTU8M9W6iOsW7Hhe_G_0g',
   },
 };
 
@@ -79,8 +98,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>{children}</body>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
+    >
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }
