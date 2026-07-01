@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import RoundTextPrimary from "./ui-nuggets/RoundTextPrimary";
 
 export default function Footer() {
@@ -8,6 +9,12 @@ export default function Footer() {
           <span className="font-display text-xl">What&apos;s Up</span>
            <RoundTextPrimary>Addis</RoundTextPrimary>
         </div>
+        <Link
+          href="/contact"
+          className="font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Contact Us
+        </Link>
         <p className="font-mono text-xs text-muted-foreground">
           &copy; {new Date().getFullYear()} &middot; Made in Addis Ababa ✦
         </p>

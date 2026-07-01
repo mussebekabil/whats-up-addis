@@ -286,6 +286,12 @@ export default async function Home() {
                   >
                     Sign up free
                   </Link>
+                  <Link
+                    href="/contact"
+                    className="inline-flex h-11 items-center rounded-full border border-void/30 bg-bone/10 px-6 font-mono text-xs uppercase tracking-widest text-void transition-colors hover:border-void"
+                  >
+                    Contact us
+                  </Link>
                 </div>
               </FadeIn>
               <div className="grid grid-cols-2 gap-4">

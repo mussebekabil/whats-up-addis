@@ -85,6 +85,12 @@ export default function Navbar() {
             >
               Categories
             </Link>
+            <Link
+              href="/contact"
+              className="text-xs text-muted-foreground uppercase transition-colors hover:text-foreground"
+            >
+              Contact
+            </Link>
             {user?.role === Roles.Admin && (
               <Link
                 href="/admin/events"
@@ -280,6 +286,21 @@ export default function Navbar() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
             <span className="font-mono text-[9px] uppercase tracking-widest">Categories</span>
+          </Link>
+
+          <Link
+            href="/contact"
+            className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+              isActive('/contact')
+                ? 'text-ember'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span className="font-mono text-[9px] uppercase tracking-widest">Contact</span>
           </Link>
 
           {user ? (

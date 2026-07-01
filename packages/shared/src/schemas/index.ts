@@ -139,3 +139,15 @@ export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
 export type CreateRatingInput = z.infer<typeof createRatingSchema>;
 export type UpdateRatingInput = z.infer<typeof updateRatingSchema>;
+
+// Contact schemas
+export const contactSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100),
+  email: z.string().email('Invalid email address'),
+  subject: z.string().min(3, 'Subject must be at least 3 characters').max(200),
+  message: z
+    .string()
+    .min(10, 'Message must be at least 10 characters')
+    .max(2000, 'Message is too long'),
+});
+export type ContactInput = z.infer<typeof contactSchema>;
