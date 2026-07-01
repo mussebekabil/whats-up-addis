@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { authService } from '@/lib/auth';
 import { eventService } from '@/lib/events';
 import { categoryService } from '@/lib/categories';
@@ -10,6 +11,10 @@ import Footer from '@/components/Footer';
 import ImageUpload from '@/components/ImageUpload';
 import VideoUpload from '@/components/VideoUpload';
 import { User, Category, Roles } from '@whats-up-addis/shared';
+
+const INPUT_CLASS =
+  'w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20';
+const LABEL_CLASS = 'mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground';
 
 function CreateEventForm() {
   const router = useRouter();
@@ -49,9 +54,7 @@ function CreateEventForm() {
         ]);
 
         if (userData.role !== Roles.Admin) {
-          setError(
-            'You do not have permission to create events. Admin access required.'
-          );
+          setError('You do not have permission to create events. Admin access required.');
           setIsLoading(false);
           return;
         }
@@ -59,11 +62,8 @@ function CreateEventForm() {
         setUser(userData);
         setCategories(categoriesData);
 
-        // If duplicating an event, fetch and pre-populate the form
         if (duplicateId) {
           const eventToDuplicate = await eventService.getEventById(duplicateId);
-
-          // Pre-populate form with the event data (except dates which we'll clear)
           setFormData({
             title: `${eventToDuplicate.title} (Copy)`,
             description: eventToDuplicate.description,
@@ -75,8 +75,7 @@ function CreateEventForm() {
             videoUrl: eventToDuplicate.videoUrl || '',
             sourceUrl: eventToDuplicate.sourceUrl || '',
             price:
-              eventToDuplicate.price !== null &&
-              eventToDuplicate.price !== undefined
+              eventToDuplicate.price !== null && eventToDuplicate.price !== undefined
                 ? String(eventToDuplicate.price)
                 : '',
             categoryId: eventToDuplicate.categoryId,
@@ -85,10 +84,7 @@ function CreateEventForm() {
         }
       } catch (err: any) {
         setError(err.message || 'Failed to load data');
-        if (
-          err.message?.includes('Unauthorized') ||
-          err.message?.includes('token')
-        ) {
+        if (err.message?.includes('Unauthorized') || err.message?.includes('token')) {
           authService.logout();
           router.push('/auth/login');
         }
@@ -101,9 +97,7 @@ function CreateEventForm() {
   }, [router, duplicateId]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -115,7 +109,6 @@ function CreateEventForm() {
     setIsSubmitting(true);
 
     try {
-      // Parse tags (comma-separated)
       const tagsArray = formData.tags
         .split(',')
         .map((tag) => tag.trim())
@@ -127,9 +120,7 @@ function CreateEventForm() {
         location: formData.location || null,
         venue: formData.venue || null,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: formData.endDate
-          ? new Date(formData.endDate).toISOString()
-          : null,
+        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
         imageUrl: formData.imageUrl || null,
         videoUrl: formData.videoUrl || null,
         sourceUrl: formData.sourceUrl || null,
@@ -141,9 +132,7 @@ function CreateEventForm() {
       const createdEvent = await eventService.createEvent(eventData);
       router.push(`/events/${createdEvent.id}`);
     } catch (err: any) {
-      setError(
-        err.message || 'Failed to create event. Please check all fields.'
-      );
+      setError(err.message || 'Failed to create event. Please check all fields.');
     } finally {
       setIsSubmitting(false);
     }
@@ -151,12 +140,14 @@ function CreateEventForm() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
+        <main className="flex flex-1 items-center justify-center pb-20 md:pb-0">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-border border-t-ember" />
+            <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              Loading…
+            </p>
           </div>
         </main>
         <Footer />
@@ -166,13 +157,13 @@ function CreateEventForm() {
 
   if (error && !user) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-6 py-4 rounded-lg">
-              <h2 className="text-lg font-semibold mb-2">Access Denied</h2>
-              <p>{error}</p>
+        <main className="flex-1 px-6 py-16 pb-20 md:pb-16">
+          <div className="mx-auto max-w-2xl">
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-6 py-5">
+              <h2 className="font-display text-xl text-destructive">Access Denied</h2>
+              <p className="mt-2 text-sm text-destructive/80">{error}</p>
             </div>
           </div>
         </main>
@@ -182,39 +173,42 @@ function CreateEventForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              {duplicateId ? 'Duplicate Event' : 'Create New Event'}
+      <main className="flex-1 pb-20 md:pb-0">
+        <div className="mx-auto max-w-3xl px-6 py-12">
+          {/* Back + header */}
+          <Link
+            href="/events"
+            className="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            ← Back to Events
+          </Link>
+          <div className="mt-6 mb-8">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-ember">
+              {duplicateId ? 'Duplicate' : 'New Event'}
+            </span>
+            <h1 className="mt-1 font-display text-4xl">
+              {duplicateId ? 'Duplicate Event' : 'Create Event'}
             </h1>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
+            <p className="mt-2 text-sm text-muted-foreground">
               {duplicateId
                 ? 'The form has been pre-filled with data from the original event'
                 : 'Fill in the details below to create a new event'}
             </p>
           </div>
 
+          {/* Inline error */}
           {error && user && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
+            <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
             </div>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6"
-          >
+          <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-8 space-y-6">
             <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Event Title *
-              </label>
+              <label htmlFor="title" className={LABEL_CLASS}>Event Title *</label>
               <input
                 type="text"
                 id="title"
@@ -224,18 +218,13 @@ function CreateEventForm() {
                 required
                 minLength={3}
                 maxLength={255}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Enter event title"
+                className={INPUT_CLASS}
               />
             </div>
 
             <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Description *
-              </label>
+              <label htmlFor="description" className={LABEL_CLASS}>Description *</label>
               <textarea
                 id="description"
                 name="description"
@@ -244,19 +233,14 @@ function CreateEventForm() {
                 required
                 minLength={10}
                 rows={5}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Describe the event"
+                className={INPUT_CLASS}
               />
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label
-                  htmlFor="location"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Location
-                </label>
+                <label htmlFor="location" className={LABEL_CLASS}>Location</label>
                 <input
                   type="text"
                   id="location"
@@ -265,18 +249,12 @@ function CreateEventForm() {
                   onChange={handleChange}
                   minLength={2}
                   maxLength={255}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="e.g., Addis Ababa"
+                  className={INPUT_CLASS}
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="venue"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Venue
-                </label>
+                <label htmlFor="venue" className={LABEL_CLASS}>Venue</label>
                 <input
                   type="text"
                   id="venue"
@@ -285,20 +263,15 @@ function CreateEventForm() {
                   onChange={handleChange}
                   minLength={2}
                   maxLength={255}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="e.g., Sheraton Hotel"
+                  className={INPUT_CLASS}
                 />
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label
-                  htmlFor="startDate"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  Start Date & Time *
-                </label>
+                <label htmlFor="startDate" className={LABEL_CLASS}>Start Date & Time *</label>
                 <input
                   type="datetime-local"
                   id="startDate"
@@ -306,42 +279,31 @@ function CreateEventForm() {
                   value={formData.startDate}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className={INPUT_CLASS}
                 />
               </div>
-
               <div>
-                <label
-                  htmlFor="endDate"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
-                  End Date & Time
-                </label>
+                <label htmlFor="endDate" className={LABEL_CLASS}>End Date & Time</label>
                 <input
                   type="datetime-local"
                   id="endDate"
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className={INPUT_CLASS}
                 />
               </div>
             </div>
 
             <div>
-              <label
-                htmlFor="categoryId"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Category *
-              </label>
+              <label htmlFor="categoryId" className={LABEL_CLASS}>Category *</label>
               <select
                 id="categoryId"
                 name="categoryId"
                 value={formData.categoryId}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className={INPUT_CLASS}
               >
                 <option value="">Select a category</option>
                 {categories.map((category) => (
@@ -353,12 +315,7 @@ function CreateEventForm() {
             </div>
 
             <div>
-              <label
-                htmlFor="price"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Price (USD)
-              </label>
+              <label htmlFor="price" className={LABEL_CLASS}>Price (ETB)</label>
               <input
                 type="number"
                 id="price"
@@ -367,99 +324,74 @@ function CreateEventForm() {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Leave empty for free events"
+                className={INPUT_CLASS}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Event Media
-              </label>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <span className={LABEL_CLASS}>Event Media</span>
+              <p className="mb-4 text-sm text-muted-foreground">
                 Upload an image or video for your event (optional)
               </p>
               <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <ImageUpload
-                    currentImageUrl={formData.imageUrl}
-                    onImageUploaded={(url) =>
-                      setFormData((prev) => ({ ...prev, imageUrl: url }))
-                    }
-                    onImageRemoved={() =>
-                      setFormData((prev) => ({ ...prev, imageUrl: '' }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <VideoUpload
-                    currentVideoUrl={formData.videoUrl}
-                    onVideoUploaded={(url) =>
-                      setFormData((prev) => ({ ...prev, videoUrl: url }))
-                    }
-                    onVideoRemoved={() =>
-                      setFormData((prev) => ({ ...prev, videoUrl: '' }))
-                    }
-                  />
-                </div>
+                <ImageUpload
+                  currentImageUrl={formData.imageUrl}
+                  onImageUploaded={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
+                  onImageRemoved={() => setFormData((prev) => ({ ...prev, imageUrl: '' }))}
+                />
+                <VideoUpload
+                  currentVideoUrl={formData.videoUrl}
+                  onVideoUploaded={(url) => setFormData((prev) => ({ ...prev, videoUrl: url }))}
+                  onVideoRemoved={() => setFormData((prev) => ({ ...prev, videoUrl: '' }))}
+                />
               </div>
             </div>
 
             <div>
-              <label
-                htmlFor="sourceUrl"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Source URL
-              </label>
+              <label htmlFor="sourceUrl" className={LABEL_CLASS}>Source URL</label>
               <input
                 type="url"
                 id="sourceUrl"
                 name="sourceUrl"
                 value={formData.sourceUrl}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="https://example.com/event-page"
+                className={INPUT_CLASS}
               />
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1.5 font-mono text-[10px] text-muted-foreground">
                 Original event page URL (if applicable)
               </p>
             </div>
 
             <div>
-              <label
-                htmlFor="tags"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Tags
-              </label>
+              <label htmlFor="tags" className={LABEL_CLASS}>Tags</label>
               <input
                 type="text"
                 id="tags"
                 name="tags"
                 value={formData.tags}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="music, live, concert (comma-separated)"
+                className={INPUT_CLASS}
               />
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-1.5 font-mono text-[10px] text-muted-foreground">
                 Separate multiple tags with commas
               </p>
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-3 pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+                className="flex-1 inline-flex h-11 items-center justify-center rounded-full bg-ember font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isSubmitting ? 'Creating Event...' : 'Create Event'}
+                {isSubmitting ? 'Creating…' : 'Create Event'}
               </button>
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium"
+                className="inline-flex h-11 items-center rounded-full border border-border px-6 font-mono text-[11px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
               >
                 Cancel
               </button>
@@ -477,13 +409,13 @@ export default function CreateEventPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex flex-col">
+        <div className="flex min-h-screen flex-col bg-background text-foreground">
           <Navbar />
-          <main className="flex-1 container mx-auto px-4 py-16 pb-20 md:pb-16">
+          <main className="flex flex-1 items-center justify-center pb-20 md:pb-0">
             <div className="text-center">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-300">
-                Loading...
+              <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-border border-t-ember" />
+              <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                Loading…
               </p>
             </div>
           </main>

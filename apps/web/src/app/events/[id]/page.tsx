@@ -11,9 +11,21 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventEngagement from '@/components/EventEngagement';
 import { Event, User, Roles } from '@whats-up-addis/shared';
+import RoundTextMuted from '@/components/ui-nuggets/RoundTextMuted';
 
 interface EventDetailsPageProps {
   params: Promise<{ id: string }>;
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="font-mono text-[10px] uppercase tracking-widest text-ember">
+        {label}
+      </div>
+      <div className="mt-1 text-sm text-foreground">{value}</div>
+    </div>
+  );
 }
 
 export default function EventDetailsPage({ params }: EventDetailsPageProps) {
@@ -34,7 +46,6 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
         const eventData = await eventService.getEventById(resolvedParams.id);
         setEvent(eventData);
 
-        // Check if user is logged in and is an admin
         if (authService.isAuthenticated()) {
           try {
             const userData = await authService.getMe();
@@ -56,7 +67,6 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
 
   const handleDelete = async () => {
     if (!eventId) return;
-
     setIsDeleting(true);
     try {
       await eventService.deleteEvent(eventId);
@@ -71,13 +81,13 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
         <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-16">
+        <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
-              Loading event...
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-border border-t-ember" />
+            <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              Loading…
             </p>
           </div>
         </main>
@@ -90,317 +100,167 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
     notFound();
   }
 
+  const price =
+    event.price !== null && event.price !== undefined
+      ? Number(event.price) === 0
+        ? 'Free'
+        : `${Number(event.price).toLocaleString()} ETB`
+      : 'Free';
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <Link
-            href="/events"
-            className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
-          >
-            <svg
-              className="w-5 h-5 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      <main className="flex-1 pb-20 md:pb-0">
+        <article className="mx-auto max-w-4xl px-6 py-12">
+          {/* Top bar: back + admin actions */}
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <Link
+              href="/events"
+              className="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Events
-          </Link>
+              ← Back to Events
+            </Link>
 
-          {user?.role === Roles.Admin && (
-            <div className="flex flex-wrap gap-2 sm:gap-3">
-              <Link
-                href={`/events/${eventId}/edit`}
-                className="inline-flex items-center px-3 py-2 md:px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium text-sm md:text-base"
-              >
-                <svg
-                  className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {user?.role === Roles.Admin && (
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href={`/events/${eventId}/edit`}
+                  className="inline-flex h-8 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-                Edit
-              </Link>
-              <Link
-                href={`/events/create?duplicate=${eventId}`}
-                className="inline-flex items-center px-3 py-2 md:px-4 border border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors font-medium text-sm md:text-base"
-              >
-                <svg
-                  className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                  Edit
+                </Link>
+                <Link
+                  href={`/events/create?duplicate=${eventId}`}
+                  className="inline-flex h-8 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                  />
-                </svg>
-                Duplicate
-              </Link>
-              <button
-                onClick={() => setShowDeleteModal(true)}
-                className="inline-flex items-center px-3 py-2 md:px-4 border border-red-600 text-red-600 dark:text-red-400 dark:border-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium text-sm md:text-base"
-              >
-                <svg
-                  className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                  Duplicate
+                </Link>
+                <button
+                  onClick={() => setShowDeleteModal(true)}
+                  className="inline-flex h-8 items-center rounded-full border border-destructive/40 px-3 font-mono text-[10px] uppercase tracking-widest text-destructive transition-colors hover:bg-destructive/10"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-                Delete
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:items-start">
-          {/* Event Media - Shows on top for mobile */}
-          {(event.imageUrl || event.videoUrl) && (
-            <div className="relative w-full bg-black dark:bg-black rounded-lg shadow-lg overflow-hidden lg:sticky lg:top-24">
-              {event.videoUrl ? (
-                <video
-                  src={event.videoUrl}
-                  controls
-                  autoPlay
-                  muted
-                  className="w-full h-auto max-h-[calc(100vh-8rem)]"
-                  preload="metadata"
-                >
-                  Your browser does not support the video tag.
-                </video>
-              ) : event.imageUrl ? (
-                <div className="relative w-full aspect-[4/3] lg:aspect-auto lg:h-[calc(100vh-8rem)]">
-                  <Image
-                    src={event.imageUrl}
-                    alt={event.title}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    priority
-                  />
-                </div>
-              ) : null}
-            </div>
-          )}
-
-          {/* Event Details - Shows below image on mobile */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8">
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              {event.category && (
-                <span className="text-sm bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 px-3 py-1 rounded-full font-medium">
-                  {event.category.name}
-                </span>
-              )}
-              {event.price !== null && event.price !== undefined ? (
-                <span className="text-sm bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
-                  ${Number(event.price).toFixed(2)}
-                </span>
-              ) : (
-                <span className="text-sm bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 px-3 py-1 rounded-full font-medium">
-                  Free
-                </span>
-              )}
-            </div>
-
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              {event.title}
-            </h1>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-gray-700 dark:text-gray-300">
-              <div className="flex items-start gap-3">
-                <svg
-                  className="w-6 h-6 text-primary-600 dark:text-primary-400 mt-1 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <div>
-                  <div className="font-semibold">Start Date</div>
-                  <div>
-                    {format(
-                      new Date(event.startDate),
-                      'MMMM dd, yyyy · h:mm a'
-                    )}
-                  </div>
-                </div>
-              </div>
-              {event.endDate && (
-                <div className="flex items-start gap-3">
-                  <svg
-                    className="w-6 h-6 text-primary-600 dark:text-primary-400 mt-1 flex-shrink-0"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-
-                  <div>
-                    <div className="font-semibold">End Date</div>
-                    <div>
-                      {format(
-                        new Date(event.endDate),
-                        'MMMM dd, yyyy · h:mm a'
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div className="flex items-start gap-3">
-                <svg
-                  className="w-6 h-6 text-primary-600 dark:text-primary-400 mt-1 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                <div>
-                  <div className="font-semibold">Venue</div>
-                  <div>{event.venue}</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <svg
-                  className="w-6 h-6 text-primary-600 dark:text-primary-400 mt-1 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <div>
-                  <div className="font-semibold">Location</div>
-                  <div>{event.location}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t dark:border-gray-700 pt-6">
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
-                About This Event
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
-                {event.description}
-              </p>
-            </div>
-
-            {event.tags && event.tags.length > 0 && (
-              <div className="border-t dark:border-gray-700 pt-6 mt-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                  Tags
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {event.tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full"
-                    >
-                      {tag.tag}
-                    </span>
-                  ))}
-                </div>
+                  Delete
+                </button>
               </div>
             )}
+          </div>
 
-            {event.sourceUrl &&
-              (event.source !== 'telegram' || user?.role === Roles.Admin) && (
-                <div className="border-t dark:border-gray-700 pt-6 mt-6">
+          {/* Hero media */}
+          <div className="relative aspect-[16/9] overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-ember/20 via-primary/10 to-background">
+            {event.videoUrl ? (
+              <video
+                src={event.videoUrl}
+                poster={event.imageUrl ?? undefined}
+                controls
+                autoPlay
+                muted
+                className="h-full w-full object-cover"
+              />
+            ) : event.imageUrl ? (
+              <Image
+                src={event.imageUrl}
+                alt={event.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 896px) 100vw, 896px"
+                priority
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center font-display text-6xl text-foreground/20">
+                {event.category?.name ?? 'Event'}
+              </div>
+            )}
+          </div>
+
+          {/* Category + date row */}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            {event.category && (
+              <span className="rounded-full bg-ember px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-primary-foreground">
+                {event.category.name}
+              </span>
+            )}
+            <span className="font-mono text-xs text-muted-foreground">
+              {format(new Date(event.startDate), 'MMMM d, yyyy · h:mm a')}
+              {event.endDate && (
+                <> → {format(new Date(event.endDate), 'h:mm a')}</>
+              )}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h1 className="mt-4 font-display text-4xl leading-tight md:text-5xl lg:text-6xl">
+            {event.title}
+          </h1>
+
+          {/* Body: description + aside */}
+          <div className="mt-10 grid gap-8 md:grid-cols-[1fr_260px]">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-ember">
+                About
+              </span>
+              <p className="mt-3 whitespace-pre-wrap text-base leading-relaxed text-muted-foreground">
+                {event.description}
+              </p>
+
+              {event.tags && event.tags.length > 0 && (
+                <div className="mt-8">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Tags
+                  </span>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {event.tags.map((tag) => (
+                      <RoundTextMuted key={tag.id}>#{tag.tag}</RoundTextMuted>
+
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Info aside */}
+            <aside className="self-start space-y-5 rounded-2xl border border-border bg-card p-5">
+              <Field label="Venue" value={event.venue ?? 'TBA'} />
+              <Field label="Location" value={event.location ?? 'Addis Ababa'} />
+              <Field label="Price" value={price} />
+              {event.endDate && (
+                <Field
+                  label="End Date"
+                  value={format(new Date(event.endDate), 'MMMM d, yyyy · h:mm a')}
+                />
+              )}
+
+              {event.sourceUrl &&
+                (event.source !== 'telegram' || user?.role === Roles.Admin) && (
                   <a
                     href={event.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                    className="block w-full rounded-xl bg-ember px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
                   >
-                    View Original Source
-                    <svg
-                      className="w-4 h-4 ml-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
+                    View Source ↗
                   </a>
-                </div>
-              )}
+                )}
+            </aside>
           </div>
-        </div>
+        </article>
 
-        {/* Ratings and Comments Section */}
-        <EventEngagement eventId={eventId} />
+        {/* Ratings and Comments */}
+        <div className="mx-auto max-w-4xl px-6">
+          <EventEngagement eventId={eventId} />
+        </div>
       </main>
 
       <Footer />
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mr-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-void/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+            <div className="mb-5 flex items-center gap-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive/10">
                 <svg
-                  className="w-6 h-6 text-red-600 dark:text-red-400"
+                  className="h-5 w-5 text-destructive"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -414,60 +274,34 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Delete Event
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <h3 className="font-display text-xl">Delete Event</h3>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   This action cannot be undone
                 </p>
               </div>
             </div>
 
-            <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Are you sure you want to delete <strong>{event?.title}</strong>?
-              This will permanently remove the event and all associated data
-              including ratings and comments.
+            <p className="mb-6 text-sm text-muted-foreground">
+              Are you sure you want to delete{' '}
+              <strong className="text-foreground">{event?.title}</strong>? This
+              will permanently remove the event and all associated data including
+              ratings and comments.
             </p>
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isDeleting}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex h-9 items-center rounded-full border border-border px-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                className="inline-flex h-9 items-center rounded-full bg-destructive px-4 font-mono text-[11px] uppercase tracking-widest text-destructive-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {isDeleting ? (
-                  <>
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Deleting...
-                  </>
-                ) : (
-                  'Delete Event'
-                )}
+                {isDeleting ? 'Deleting…' : 'Delete Event'}
               </button>
             </div>
           </div>
