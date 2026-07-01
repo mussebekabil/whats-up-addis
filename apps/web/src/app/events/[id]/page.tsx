@@ -211,7 +211,6 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
                   <div className="mt-3 flex flex-wrap gap-2">
                     {event.tags.map((tag) => (
                       <RoundTextMuted key={tag.id}>#{tag.tag}</RoundTextMuted>
-
                     ))}
                   </div>
                 </div>
@@ -226,7 +225,10 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
               {event.endDate && (
                 <Field
                   label="End Date"
-                  value={format(new Date(event.endDate), 'MMMM d, yyyy · h:mm a')}
+                  value={format(
+                    new Date(event.endDate),
+                    'MMMM d, yyyy · h:mm a'
+                  )}
                 />
               )}
 
@@ -284,8 +286,8 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
             <p className="mb-6 text-sm text-muted-foreground">
               Are you sure you want to delete{' '}
               <strong className="text-foreground">{event?.title}</strong>? This
-              will permanently remove the event and all associated data including
-              ratings and comments.
+              will permanently remove the event and all associated data
+              including ratings and comments.
             </p>
 
             <div className="flex justify-end gap-3">

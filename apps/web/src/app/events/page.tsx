@@ -89,7 +89,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
   const tabs = [
     { label: 'All', href: '/events', active: !filter },
-    { label: 'Upcoming', href: '/events?filter=upcoming', active: filter === 'upcoming' },
+    {
+      label: 'Upcoming',
+      href: '/events?filter=upcoming',
+      active: filter === 'upcoming',
+    },
     { label: 'Past', href: '/events?filter=past', active: filter === 'past' },
   ];
 
@@ -155,24 +159,39 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 <div className="mt-12 flex justify-center gap-2 items-center">
                   {currentPage > 1 && (
                     <Link
-                      href={filter ? `/events?page=${currentPage - 1}&filter=${filter}` : `/events?page=${currentPage - 1}`}
+                      href={
+                        filter
+                          ? `/events?page=${currentPage - 1}&filter=${filter}`
+                          : `/events?page=${currentPage - 1}`
+                      }
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                     >
                       ←
                     </Link>
                   )}
 
-                  {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                    .filter((page) => page === 1 || page === pagination.totalPages || (page >= currentPage - 1 && page <= currentPage + 1))
+                  {Array.from(
+                    { length: pagination.totalPages },
+                    (_, i) => i + 1
+                  )
+                    .filter(
+                      (page) =>
+                        page === 1 ||
+                        page === pagination.totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                    )
                     .map((page, idx, arr) => {
                       const pageUrl = filter
                         ? `/events?page=${page}&filter=${filter}`
                         : `/events?page=${page}`;
-                      const showEllipsisBefore = idx > 0 && page - arr[idx - 1] > 1;
+                      const showEllipsisBefore =
+                        idx > 0 && page - arr[idx - 1] > 1;
                       return (
                         <span key={page} className="flex items-center gap-2">
                           {showEllipsisBefore && (
-                            <span className="font-mono text-xs text-muted-foreground">…</span>
+                            <span className="font-mono text-xs text-muted-foreground">
+                              …
+                            </span>
                           )}
                           <Link
                             href={pageUrl}
@@ -191,7 +210,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
                   {currentPage < pagination.totalPages && (
                     <Link
-                      href={filter ? `/events?page=${currentPage + 1}&filter=${filter}` : `/events?page=${currentPage + 1}`}
+                      href={
+                        filter
+                          ? `/events?page=${currentPage + 1}&filter=${filter}`
+                          : `/events?page=${currentPage + 1}`
+                      }
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                     >
                       →

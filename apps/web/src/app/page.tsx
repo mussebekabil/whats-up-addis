@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  let allUpcomingEvents: any [] = []; 
+  let allUpcomingEvents: any[] = [];
   let upcomingEvents: any[] = [];
   let featuredEvents: any[] = [];
   let categories: any[] = [];
@@ -117,7 +117,8 @@ export default async function Home() {
           <div className="flex items-center gap-3">
             <span className="h-2 w-2 animate-pulse rounded-full bg-ember" />
             <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Live · {Math.ceil(allUpcomingEvents.length / 10) * 10}+ upcoming event{allUpcomingEvents.length === 1 ? '' : 's'}
+              Live · {Math.ceil(allUpcomingEvents.length / 10) * 10}+ upcoming
+              event{allUpcomingEvents.length === 1 ? '' : 's'}
             </span>
           </div>
 
@@ -140,7 +141,9 @@ export default async function Home() {
           </p>
 
           <div className="flex w-full max-w-2xl items-center gap-2 rounded-full border border-border bg-card p-2 shadow-sm">
-            <span className="pl-4 font-mono text-xs text-muted-foreground">BROWSE</span>
+            <span className="pl-4 font-mono text-xs text-muted-foreground">
+              BROWSE
+            </span>
             <Link
               href="/events?filter=upcoming"
               className="flex-1 px-2 py-2 text-base text-muted-foreground/60 hover:text-muted-foreground transition-colors"

@@ -51,9 +51,7 @@ export default function EventCard({ event }: EventCardProps) {
         )}
 
         {/* Date badge */}
-        <RoundTextPrimary>
-          {day}
-        </RoundTextPrimary>
+        <RoundTextPrimary>{day}</RoundTextPrimary>
         {/* <div className="absolute left-3 top-3 flex items-baseline gap-1.5 rounded-xl bg-white/90 dark:bg-card/90 px-3 py-2 backdrop-blur-sm">
           <span className="font-display text-2xl leading-none text-foreground">{day}</span>
           <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{month}</span>

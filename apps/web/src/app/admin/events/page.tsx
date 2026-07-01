@@ -64,7 +64,10 @@ export default function AdminEventsPage() {
     }
   };
 
-  const handleStatusUpdate = async (eventId: string, newStatus: EventStatus) => {
+  const handleStatusUpdate = async (
+    eventId: string,
+    newStatus: EventStatus
+  ) => {
     try {
       setUpdating(eventId);
       const token = authService.getToken();
@@ -134,18 +137,48 @@ export default function AdminEventsPage() {
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
       return (
-        <svg className="ml-1 h-3 w-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        <svg
+          className="ml-1 h-3 w-3 opacity-30"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+          />
         </svg>
       );
     }
     return sortOrder === 'asc' ? (
-      <svg className="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+      <svg
+        className="ml-1 h-3 w-3"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M5 15l7-7 7 7"
+        />
       </svg>
     ) : (
-      <svg className="ml-1 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      <svg
+        className="ml-1 h-3 w-3"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 9l-7 7-7-7"
+        />
       </svg>
     );
   };
@@ -188,7 +221,10 @@ export default function AdminEventsPage() {
           {error && (
             <div className="mb-6 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}{' '}
-              <button onClick={() => setError('')} className="ml-2 underline-offset-2 hover:underline">
+              <button
+                onClick={() => setError('')}
+                className="ml-2 underline-offset-2 hover:underline"
+              >
                 Dismiss
               </button>
             </div>
@@ -196,10 +232,19 @@ export default function AdminEventsPage() {
 
           {/* Status filter tabs */}
           <div className="mb-6 flex flex-wrap gap-2">
-            {([EventStatus.Pending, EventStatus.Accepted, EventStatus.Rejected] as EventStatus[]).map((s) => (
+            {(
+              [
+                EventStatus.Pending,
+                EventStatus.Accepted,
+                EventStatus.Rejected,
+              ] as EventStatus[]
+            ).map((s) => (
               <button
                 key={s}
-                onClick={() => { setStatusFilter(s); setPage(1); }}
+                onClick={() => {
+                  setStatusFilter(s);
+                  setPage(1);
+                }}
                 className={`inline-flex h-8 items-center rounded-full px-4 font-mono text-[10px] uppercase tracking-widest transition-colors ${
                   statusFilter === s
                     ? 'border bg-ember text-foreground'
@@ -293,7 +338,12 @@ export default function AdminEventsPage() {
                           >
                             {event.status !== EventStatus.Accepted && (
                               <button
-                                onClick={() => handleStatusUpdate(event.id, EventStatus.Accepted)}
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    event.id,
+                                    EventStatus.Accepted
+                                  )
+                                }
                                 disabled={updating === event.id}
                                 className="inline-flex h-7 items-center rounded-full bg-primary px-3 font-mono text-[10px] uppercase tracking-widest text-primary-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
                               >
@@ -302,7 +352,12 @@ export default function AdminEventsPage() {
                             )}
                             {event.status !== EventStatus.Rejected && (
                               <button
-                                onClick={() => handleStatusUpdate(event.id, EventStatus.Rejected)}
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    event.id,
+                                    EventStatus.Rejected
+                                  )
+                                }
                                 disabled={updating === event.id}
                                 className="inline-flex h-7 items-center rounded-full border border-destructive/40 px-3 font-mono text-[10px] uppercase tracking-widest text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
                               >
@@ -311,7 +366,12 @@ export default function AdminEventsPage() {
                             )}
                             {event.status !== EventStatus.Pending && (
                               <button
-                                onClick={() => handleStatusUpdate(event.id, EventStatus.Pending)}
+                                onClick={() =>
+                                  handleStatusUpdate(
+                                    event.id,
+                                    EventStatus.Pending
+                                  )
+                                }
                                 disabled={updating === event.id}
                                 className="inline-flex h-7 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
                               >

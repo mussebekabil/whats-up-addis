@@ -10,15 +10,13 @@ export type TypewriterSegment = {
 interface TypewriterTextProps {
   segments: TypewriterSegment[];
   className?: string;
-  speed?: number;      // ms per character
+  speed?: number; // ms per character
   startDelay?: number; // ms before typing begins
   immediate?: boolean; // skip IntersectionObserver — start as soon as mounted
   tag?: 'h1' | 'h2';
 }
 
-type Node =
-  | { kind: 'text'; content: string; em: boolean }
-  | { kind: 'br' };
+type Node = { kind: 'text'; content: string; em: boolean } | { kind: 'br' };
 
 export default function TypewriterText({
   segments,
@@ -61,7 +59,7 @@ export default function TypewriterText({
     );
     observer.observe(el);
     return () => observer.disconnect();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Typing loop
@@ -94,13 +92,21 @@ export default function TypewriterText({
   }
 
   return (
-    <Tag ref={ref as React.RefObject<HTMLElement & HTMLHeadingElement>} className={`relative ${className ?? ''}`}>
+    <Tag
+      ref={ref as React.RefObject<HTMLElement & HTMLHeadingElement>}
+      className={`relative ${className ?? ''}`}
+    >
       {/* Invisible full text — establishes the final height so content below never shifts */}
-      <span aria-hidden="true" className="invisible pointer-events-none select-none">
+      <span
+        aria-hidden="true"
+        className="invisible pointer-events-none select-none"
+      >
         {segments.map((seg, si) =>
           seg.text.split('\n').flatMap((part, pi, arr) => [
             seg.em ? (
-              <em key={`${si}-${pi}`} className="text-ember not-italic">{part}</em>
+              <em key={`${si}-${pi}`} className="text-ember not-italic">
+                {part}
+              </em>
             ) : (
               <span key={`${si}-${pi}`}>{part}</span>
             ),

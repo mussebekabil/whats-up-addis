@@ -44,7 +44,10 @@ export class ContactService {
       }
     } catch (err) {
       console.error('Failed to send contact email:', err);
-      throw new AppError(500, 'Failed to send message. Please try again later.');
+      throw new AppError(
+        500,
+        'Failed to send message. Please try again later.'
+      );
     }
   }
 }

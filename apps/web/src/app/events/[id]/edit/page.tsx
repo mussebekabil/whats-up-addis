@@ -18,7 +18,8 @@ interface EditEventPageProps {
 
 const INPUT_CLASS =
   'w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20';
-const LABEL_CLASS = 'mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground';
+const LABEL_CLASS =
+  'mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground';
 
 export default function EditEventPage({ params }: EditEventPageProps) {
   const router = useRouter();
@@ -63,7 +64,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         ]);
 
         if (userData.role !== Roles.Admin) {
-          setError('You do not have permission to edit events. Admin access required.');
+          setError(
+            'You do not have permission to edit events. Admin access required.'
+          );
           setIsLoading(false);
           return;
         }
@@ -72,7 +75,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         setEvent(eventData);
         setCategories(categoriesData);
 
-        const startDateLocal = new Date(eventData.startDate).toISOString().slice(0, 16);
+        const startDateLocal = new Date(eventData.startDate)
+          .toISOString()
+          .slice(0, 16);
         const endDateLocal = eventData.endDate
           ? new Date(eventData.endDate).toISOString().slice(0, 16)
           : '';
@@ -96,7 +101,10 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         });
       } catch (err: any) {
         setError(err.message || 'Failed to load event data');
-        if (err.message?.includes('Unauthorized') || err.message?.includes('token')) {
+        if (
+          err.message?.includes('Unauthorized') ||
+          err.message?.includes('token')
+        ) {
           authService.logout();
           router.push('/auth/login');
         }
@@ -109,7 +117,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
   }, [params, router]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -132,7 +142,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         location: formData.location || null,
         venue: formData.venue || null,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
+        endDate: formData.endDate
+          ? new Date(formData.endDate).toISOString()
+          : null,
         imageUrl: formData.imageUrl || null,
         videoUrl: formData.videoUrl || null,
         sourceUrl: formData.sourceUrl || null,
@@ -144,7 +156,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
       await eventService.updateEvent(eventId, eventData);
       router.push(`/events/${eventId}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to update event. Please check all fields.');
+      setError(
+        err.message || 'Failed to update event. Please check all fields.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -174,7 +188,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
         <main className="flex-1 px-6 py-16 pb-20 md:pb-16">
           <div className="mx-auto max-w-2xl">
             <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-6 py-5">
-              <h2 className="font-display text-xl text-destructive">Access Denied</h2>
+              <h2 className="font-display text-xl text-destructive">
+                Access Denied
+              </h2>
               <p className="mt-2 text-sm text-destructive/80">{error}</p>
             </div>
           </div>
@@ -214,9 +230,14 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-8 space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-2xl border border-border bg-card p-8 space-y-6"
+          >
             <div>
-              <label htmlFor="title" className={LABEL_CLASS}>Event Title *</label>
+              <label htmlFor="title" className={LABEL_CLASS}>
+                Event Title *
+              </label>
               <input
                 type="text"
                 id="title"
@@ -232,7 +253,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
 
             <div>
-              <label htmlFor="description" className={LABEL_CLASS}>Description *</label>
+              <label htmlFor="description" className={LABEL_CLASS}>
+                Description *
+              </label>
               <textarea
                 id="description"
                 name="description"
@@ -248,7 +271,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="location" className={LABEL_CLASS}>Location</label>
+                <label htmlFor="location" className={LABEL_CLASS}>
+                  Location
+                </label>
                 <input
                   type="text"
                   id="location"
@@ -262,7 +287,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                 />
               </div>
               <div>
-                <label htmlFor="venue" className={LABEL_CLASS}>Venue</label>
+                <label htmlFor="venue" className={LABEL_CLASS}>
+                  Venue
+                </label>
                 <input
                   type="text"
                   id="venue"
@@ -279,7 +306,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="startDate" className={LABEL_CLASS}>Start Date & Time *</label>
+                <label htmlFor="startDate" className={LABEL_CLASS}>
+                  Start Date & Time *
+                </label>
                 <input
                   type="datetime-local"
                   id="startDate"
@@ -291,7 +320,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
                 />
               </div>
               <div>
-                <label htmlFor="endDate" className={LABEL_CLASS}>End Date & Time</label>
+                <label htmlFor="endDate" className={LABEL_CLASS}>
+                  End Date & Time
+                </label>
                 <input
                   type="datetime-local"
                   id="endDate"
@@ -304,7 +335,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
 
             <div>
-              <label htmlFor="categoryId" className={LABEL_CLASS}>Category *</label>
+              <label htmlFor="categoryId" className={LABEL_CLASS}>
+                Category *
+              </label>
               <select
                 id="categoryId"
                 name="categoryId"
@@ -323,7 +356,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
 
             <div>
-              <label htmlFor="price" className={LABEL_CLASS}>Price (ETB)</label>
+              <label htmlFor="price" className={LABEL_CLASS}>
+                Price (ETB)
+              </label>
               <input
                 type="number"
                 id="price"
@@ -345,19 +380,29 @@ export default function EditEventPage({ params }: EditEventPageProps) {
               <div className="grid md:grid-cols-2 gap-6">
                 <ImageUpload
                   currentImageUrl={formData.imageUrl}
-                  onImageUploaded={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
-                  onImageRemoved={() => setFormData((prev) => ({ ...prev, imageUrl: '' }))}
+                  onImageUploaded={(url) =>
+                    setFormData((prev) => ({ ...prev, imageUrl: url }))
+                  }
+                  onImageRemoved={() =>
+                    setFormData((prev) => ({ ...prev, imageUrl: '' }))
+                  }
                 />
                 <VideoUpload
                   currentVideoUrl={formData.videoUrl}
-                  onVideoUploaded={(url) => setFormData((prev) => ({ ...prev, videoUrl: url }))}
-                  onVideoRemoved={() => setFormData((prev) => ({ ...prev, videoUrl: '' }))}
+                  onVideoUploaded={(url) =>
+                    setFormData((prev) => ({ ...prev, videoUrl: url }))
+                  }
+                  onVideoRemoved={() =>
+                    setFormData((prev) => ({ ...prev, videoUrl: '' }))
+                  }
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="sourceUrl" className={LABEL_CLASS}>Source URL</label>
+              <label htmlFor="sourceUrl" className={LABEL_CLASS}>
+                Source URL
+              </label>
               <input
                 type="url"
                 id="sourceUrl"
@@ -373,7 +418,9 @@ export default function EditEventPage({ params }: EditEventPageProps) {
             </div>
 
             <div>
-              <label htmlFor="tags" className={LABEL_CLASS}>Tags</label>
+              <label htmlFor="tags" className={LABEL_CLASS}>
+                Tags
+              </label>
               <input
                 type="text"
                 id="tags"
@@ -388,11 +435,11 @@ export default function EditEventPage({ params }: EditEventPageProps) {
               </p>
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex justify-end gap-3 pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 inline-flex h-11 items-center justify-center rounded-full bg-ember font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-ember px-8 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? 'Saving…' : 'Save Changes'}
               </button>

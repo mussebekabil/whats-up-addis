@@ -188,7 +188,9 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
     comment: Comment;
     isReply?: boolean;
   }) => (
-    <div className={`${isReply ? 'ml-10 mt-3' : 'py-4'} border-l-2 border-border pl-4`}>
+    <div
+      className={`${isReply ? 'ml-10 mt-3' : 'py-4'} border-l-2 border-border pl-4`}
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
           <div className="mb-1.5 flex items-baseline gap-2">
@@ -196,7 +198,9 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
               {comment.user.name}
             </span>
             <span className="font-mono text-[10px] text-muted-foreground">
-              {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+              {formatDistanceToNow(new Date(comment.createdAt), {
+                addSuffix: true,
+              })}
             </span>
           </div>
           <p className="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">
@@ -222,14 +226,15 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
                 Reply
               </button>
             )}
-            {user && (user.id === comment.userId || user.role === Roles.Admin) && (
-              <button
-                onClick={() => handleDeleteComment(comment.id)}
-                className="font-mono text-[10px] uppercase tracking-widest text-destructive transition-colors hover:text-destructive/10"
-              >
-                Delete
-              </button>
-            )}
+            {user &&
+              (user.id === comment.userId || user.role === Roles.Admin) && (
+                <button
+                  onClick={() => handleDeleteComment(comment.id)}
+                  className="font-mono text-[10px] uppercase tracking-widest text-destructive transition-colors hover:text-destructive/10"
+                >
+                  Delete
+                </button>
+              )}
           </div>
         </div>
       </div>
@@ -251,7 +256,8 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
         <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
           <h3 className="font-display text-xl">Delete Comment</h3>
           <p className="mt-2 mb-6 text-sm text-muted-foreground">
-            Are you sure you want to delete this comment? This action cannot be undone.
+            Are you sure you want to delete this comment? This action cannot be
+            undone.
           </p>
           <div className="flex justify-end gap-3">
             <button
@@ -295,7 +301,9 @@ export default function EventEngagement({ eventId }: EventEngagementProps) {
         <h2 className="mt-1 font-display text-2xl">Rate This Event</h2>
 
         {isLoadingRatings ? (
-          <p className="mt-4 font-mono text-xs text-muted-foreground">Loading…</p>
+          <p className="mt-4 font-mono text-xs text-muted-foreground">
+            Loading…
+          </p>
         ) : (
           <div className="mt-4 space-y-4">
             <div className="flex items-center gap-4">

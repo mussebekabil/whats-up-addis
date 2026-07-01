@@ -1,7 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(pnpm -F web build)"
-    ]
+    "allow": ["Bash(pnpm -F web build)"]
   }
 }

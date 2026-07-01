@@ -8,10 +8,10 @@ Build a modern event discovery web app called **"What's Up Addis"** — a platfo
 
 Primary color is green. Use this custom Tailwind palette:
 rgb(250, 250, 249)
-     rgb(250, 207, 159)
-     rgb(25, 27, 29)
-     rgb(255, 97, 35)
-     rgb(13, 13, 13)
+rgb(250, 207, 159)
+rgb(25, 27, 29)
+rgb(255, 97, 35)
+rgb(13, 13, 13)
 
 Come up with good modern fonts that match the above color palate and minimalist edgy design
 
@@ -22,12 +22,14 @@ Support full **dark mode** using Tailwind's `dark:` variant. All cards, inputs, 
 ## Layout & Navigation
 
 **Desktop Navbar (sticky top):**
+
 - Left: logo "What's Up Addis" linking to `/`
 - Center links: Events (`/events?filter=upcoming`), Categories (`/categories`), Manage Events (`/admin/events`, admin only), Create Event (`/events/create`, admin only, styled as a green primary button)
 - Right: Login + Sign Up buttons (unauthenticated) OR user avatar circle showing initials with a dropdown (authenticated)
 - Dropdown shows: user full name, email, "View Profile" link, "Manage Events" link (admin only), red "Sign Out" button
 
 **Mobile Navigation (fixed bottom bar):**
+
 - 5 tabs with icon + label: Home (house), Events (calendar), Categories (grid), Create (plus, admin only), Profile (user avatar)
 - Active tab highlighted with primary color
 - Profile tab opens dropdown above the bar when logged in
@@ -40,51 +42,57 @@ Support full **dark mode** using Tailwind's `dark:` variant. All cards, inputs, 
 
 ```ts
 type Event = {
-  id: string
-  title: string
-  description: string
-  location?: string
-  venue?: string
-  startDate: string
-  endDate?: string
-  price?: number
-  imageUrl?: string
-  videoUrl?: string
-  sourceUrl?: string
-  tags: string[]
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED'
-  category: { id: string; name: string; slug: string }
-  creator: { id: string; name: string; email: string }
-  createdAt: string
-}
+  id: string;
+  title: string;
+  description: string;
+  location?: string;
+  venue?: string;
+  startDate: string;
+  endDate?: string;
+  price?: number;
+  imageUrl?: string;
+  videoUrl?: string;
+  sourceUrl?: string;
+  tags: string[];
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  category: { id: string; name: string; slug: string };
+  creator: { id: string; name: string; email: string };
+  createdAt: string;
+};
 
-type Category = { id: string; name: string; slug: string; description?: string }
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+};
 
 type User = {
-  id: string
-  name: string
-  email: string
-  role: 'USER' | 'ORGANIZER' | 'MODERATOR' | 'SUPPORT' | 'ADMIN'
-  createdAt: string
-}
+  id: string;
+  name: string;
+  email: string;
+  role: 'USER' | 'ORGANIZER' | 'MODERATOR' | 'SUPPORT' | 'ADMIN';
+  createdAt: string;
+};
 
 type Comment = {
-  id: string
-  content: string
-  user: { id: string; name: string }
-  createdAt: string
-  likeCount: number
-  replies: Comment[]
-}
+  id: string;
+  content: string;
+  user: { id: string; name: string };
+  createdAt: string;
+  likeCount: number;
+  replies: Comment[];
+};
 
-type Rating = { average: number; total: number; userRating?: number }
+type Rating = { average: number; total: number; userRating?: number };
 ```
 
 ---
 
-## Pages 
+## Pages
 
 ### `/` — Home
+
 - **Hero section**: Large heading "Discover Events in Addis Ababa", subtext, two CTA buttons: "Browse Events" (primary green, outlined) and "Create Event" (solid green, admin only)
 - **Upcoming Events section**: "Upcoming Events" heading + grid of 6 EventCards (2 cols mobile, 3 cols desktop)
 - **Featured Events section**: "Featured Events" heading + grid of 3 EventCards for events that have a `videoUrl`
@@ -92,6 +100,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - Each section has a loading skeleton state and an error state
 
 ### `/events` — Events Listing
+
 - Page heading + description
 - Filter tabs: "All Events" | "Upcoming" | "Past" — active tab has primary color underline/background
 - Grid of 12 EventCards (2 cols mobile, 3 cols tablet, 4 cols desktop)
@@ -99,6 +108,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - Empty state: icon + "No events found. Be the first to create one!" with CTA button
 
 ### `/events/[id]` — Event Detail
+
 - "← Back to Events" link
 - Admin-only action buttons top right: "Edit" (outline), "Duplicate" (outline), "Delete" (red outline)
 - **Two-column layout on desktop** (sticky left column for media, scrollable right for details):
@@ -114,6 +124,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - **Delete confirmation modal**: overlay, warning icon, "Delete Event" title, message with event title, Cancel + red Delete buttons
 
 ### `/events/create` and `/events/[id]/edit` — Event Form
+
 - Requires authentication (redirect to login otherwise)
 - Page title: "Create New Event" / "Duplicate Event" / "Edit Event"
 - Form fields (all in a single-column max-w-2xl centered card):
@@ -132,11 +143,13 @@ type Rating = { average: number; total: number; userRating?: number }
 - Bottom: Cancel (outline) + Submit (primary green) buttons
 
 ### `/categories` — Categories
+
 - "Event Categories" heading
 - Grid of CategoryCards (1 col mobile, 2 col tablet, 3 col desktop)
 - Empty state
 
 ### `/categories/[slug]` — Category Events
+
 - "← Back to Home" link
 - Category name heading + description
 - Grid of 12 EventCards
@@ -144,6 +157,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - Empty state: "No events in this category yet." + "Browse all events" link
 
 ### `/profile` — User Profile (auth required)
+
 - Centered card, max-w-md
 - Avatar circle (initials, primary-600 background, white text, large)
 - User full name (heading), email (subtext)
@@ -155,6 +169,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - Red "Sign Out" button at bottom
 
 ### `/auth/login` — Login
+
 - Centered card, max-w-md
 - "Welcome Back" heading
 - Email input
@@ -164,6 +179,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - "Don't have an account? Sign up" link
 
 ### `/auth/register` — Register
+
 - Centered card, max-w-md
 - "Create Account" heading
 - Full Name input
@@ -176,6 +192,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - "Already have an account? Sign in" link
 
 ### `/admin/events` — Admin Event Management (ADMIN only)
+
 - Redirect to home if not ADMIN
 - "Event Management" heading
 - Status filter tab buttons: "Pending" (yellow active), "Accepted" (green active), "Rejected" (red active) — currently active tab highlighted
@@ -192,6 +209,7 @@ type Rating = { average: number; total: number; userRating?: number }
 ## Existing Reusable Components
 
 ### EventCard
+
 - Rounded card with hover shadow transition
 - Top media area (fixed height ~160px): video (autoplay, muted, loop) OR image (object-cover) OR gray placeholder
 - Content area:
@@ -204,6 +222,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - Dark mode variants for all background/text colors
 
 ### CategoryCard
+
 - Rounded card, hover effect
 - Category name (bold)
 - Description (gray, 2-line clamp, shown if present)
@@ -213,11 +232,13 @@ type Rating = { average: number; total: number; userRating?: number }
 ### EventEngagement (Ratings + Comments)
 
 **Ratings section:**
+
 - Star display: 5 stars showing average (support half-star filled), total count, e.g. "4.2 (38 ratings)"
 - Interactive star rating (1–5) for logged-in users — hoverable + clickable, shows user's existing rating
 - "Please log in to rate this event" for unauthenticated users
 
 **Comments section:**
+
 - Comment count heading
 - Textarea + "Post Comment" button (auth required — show "Please log in to comment" otherwise)
 - Comment list:
@@ -230,6 +251,7 @@ type Rating = { average: number; total: number; userRating?: number }
 - Empty state: "No comments yet. Be the first to comment!"
 
 ### EventDetailsDialog (Admin modal)
+
 - Full-screen overlay with semi-transparent black background
 - Large centered scrollable card, max-w-2xl
 - Sticky header: event title + X close button
@@ -249,11 +271,13 @@ type Rating = { average: number; total: number; userRating?: number }
 - Filter components based on event metadata, for example, event category, or happening date
 
 ### Static Must visit places
+
 - Places to visit in addis which are opened for visitors in all time
 
 ### Blogs section
 
 - Blog to share post event experience by the people attended the event
+
 ---
 
 ## UX Details
@@ -273,26 +297,26 @@ type Rating = { average: number; total: number; userRating?: number }
 
 The app connects to an existing Express REST API at `NEXT_PUBLIC_API_URL`. All endpoints are prefixed `/api`. Key endpoints to wire up:
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/events?page=&limit=&filter=&categoryId=&sort=&status=` | Paginated events |
-| GET | `/api/events/:id` | Single event |
-| POST | `/api/events` | Create event (auth) |
-| PUT | `/api/events/:id` | Update event (auth) |
-| DELETE | `/api/events/:id` | Delete event (auth) |
-| PATCH | `/api/events/:id/status` | Change status (admin) |
-| GET | `/api/categories` | All categories |
-| GET | `/api/categories/:slug/events` | Events by category |
-| POST | `/api/auth/login` | Returns `{ token, user }` |
-| POST | `/api/auth/register` | Returns `{ token, user }` |
-| GET | `/api/comments/:eventId` | Comments for event |
-| POST | `/api/comments/:eventId` | Post comment (auth) |
-| DELETE | `/api/comments/:id` | Delete comment (auth) |
-| POST | `/api/comments/:id/like` | Toggle like (auth) |
-| GET | `/api/ratings/:eventId` | Ratings for event |
-| POST | `/api/ratings/:eventId` | Submit rating (auth) |
-| POST | `/api/upload/image` | Upload image → returns `{ url }` |
-| POST | `/api/upload/video` | Upload video → returns `{ url }` |
+| Method | Endpoint                                                     | Description                      |
+| ------ | ------------------------------------------------------------ | -------------------------------- |
+| GET    | `/api/events?page=&limit=&filter=&categoryId=&sort=&status=` | Paginated events                 |
+| GET    | `/api/events/:id`                                            | Single event                     |
+| POST   | `/api/events`                                                | Create event (auth)              |
+| PUT    | `/api/events/:id`                                            | Update event (auth)              |
+| DELETE | `/api/events/:id`                                            | Delete event (auth)              |
+| PATCH  | `/api/events/:id/status`                                     | Change status (admin)            |
+| GET    | `/api/categories`                                            | All categories                   |
+| GET    | `/api/categories/:slug/events`                               | Events by category               |
+| POST   | `/api/auth/login`                                            | Returns `{ token, user }`        |
+| POST   | `/api/auth/register`                                         | Returns `{ token, user }`        |
+| GET    | `/api/comments/:eventId`                                     | Comments for event               |
+| POST   | `/api/comments/:eventId`                                     | Post comment (auth)              |
+| DELETE | `/api/comments/:id`                                          | Delete comment (auth)            |
+| POST   | `/api/comments/:id/like`                                     | Toggle like (auth)               |
+| GET    | `/api/ratings/:eventId`                                      | Ratings for event                |
+| POST   | `/api/ratings/:eventId`                                      | Submit rating (auth)             |
+| POST   | `/api/upload/image`                                          | Upload image → returns `{ url }` |
+| POST   | `/api/upload/video`                                          | Upload video → returns `{ url }` |
 
 ---
 

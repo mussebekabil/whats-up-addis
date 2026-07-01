@@ -33,7 +33,11 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      await authService.register(formData.email, formData.password, formData.name);
+      await authService.register(
+        formData.email,
+        formData.password,
+        formData.name
+      );
       router.push('/events');
     } catch (err: any) {
       setError(err.message || 'Failed to create account. Please try again.');
@@ -77,7 +81,9 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label htmlFor="name" className={labelClass}>Full Name</label>
+              <label htmlFor="name" className={labelClass}>
+                Full Name
+              </label>
               <input
                 type="text"
                 id="name"
@@ -92,7 +98,9 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="email" className={labelClass}>Email</label>
+              <label htmlFor="email" className={labelClass}>
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
@@ -106,7 +114,9 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="password" className={labelClass}>Password</label>
+              <label htmlFor="password" className={labelClass}>
+                Password
+              </label>
               <input
                 type="password"
                 id="password"
@@ -121,7 +131,9 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="confirmPassword" className={labelClass}>Confirm Password</label>
+              <label htmlFor="confirmPassword" className={labelClass}>
+                Confirm Password
+              </label>
               <input
                 type="password"
                 id="confirmPassword"

@@ -14,7 +14,8 @@ import { User, Category, Roles } from '@whats-up-addis/shared';
 
 const INPUT_CLASS =
   'w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/20';
-const LABEL_CLASS = 'mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground';
+const LABEL_CLASS =
+  'mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground';
 
 function CreateEventForm() {
   const router = useRouter();
@@ -54,7 +55,9 @@ function CreateEventForm() {
         ]);
 
         if (userData.role !== Roles.Admin) {
-          setError('You do not have permission to create events. Admin access required.');
+          setError(
+            'You do not have permission to create events. Admin access required.'
+          );
           setIsLoading(false);
           return;
         }
@@ -75,7 +78,8 @@ function CreateEventForm() {
             videoUrl: eventToDuplicate.videoUrl || '',
             sourceUrl: eventToDuplicate.sourceUrl || '',
             price:
-              eventToDuplicate.price !== null && eventToDuplicate.price !== undefined
+              eventToDuplicate.price !== null &&
+              eventToDuplicate.price !== undefined
                 ? String(eventToDuplicate.price)
                 : '',
             categoryId: eventToDuplicate.categoryId,
@@ -84,7 +88,10 @@ function CreateEventForm() {
         }
       } catch (err: any) {
         setError(err.message || 'Failed to load data');
-        if (err.message?.includes('Unauthorized') || err.message?.includes('token')) {
+        if (
+          err.message?.includes('Unauthorized') ||
+          err.message?.includes('token')
+        ) {
           authService.logout();
           router.push('/auth/login');
         }
@@ -97,7 +104,9 @@ function CreateEventForm() {
   }, [router, duplicateId]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -120,7 +129,9 @@ function CreateEventForm() {
         location: formData.location || null,
         venue: formData.venue || null,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null,
+        endDate: formData.endDate
+          ? new Date(formData.endDate).toISOString()
+          : null,
         imageUrl: formData.imageUrl || null,
         videoUrl: formData.videoUrl || null,
         sourceUrl: formData.sourceUrl || null,
@@ -132,7 +143,9 @@ function CreateEventForm() {
       const createdEvent = await eventService.createEvent(eventData);
       router.push(`/events/${createdEvent.id}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to create event. Please check all fields.');
+      setError(
+        err.message || 'Failed to create event. Please check all fields.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -162,7 +175,9 @@ function CreateEventForm() {
         <main className="flex-1 px-6 py-16 pb-20 md:pb-16">
           <div className="mx-auto max-w-2xl">
             <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-6 py-5">
-              <h2 className="font-display text-xl text-destructive">Access Denied</h2>
+              <h2 className="font-display text-xl text-destructive">
+                Access Denied
+              </h2>
               <p className="mt-2 text-sm text-destructive/80">{error}</p>
             </div>
           </div>
@@ -206,9 +221,14 @@ function CreateEventForm() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-8 space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-2xl border border-border bg-card p-8 space-y-6"
+          >
             <div>
-              <label htmlFor="title" className={LABEL_CLASS}>Event Title *</label>
+              <label htmlFor="title" className={LABEL_CLASS}>
+                Event Title *
+              </label>
               <input
                 type="text"
                 id="title"
@@ -224,7 +244,9 @@ function CreateEventForm() {
             </div>
 
             <div>
-              <label htmlFor="description" className={LABEL_CLASS}>Description *</label>
+              <label htmlFor="description" className={LABEL_CLASS}>
+                Description *
+              </label>
               <textarea
                 id="description"
                 name="description"
@@ -240,7 +262,9 @@ function CreateEventForm() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="location" className={LABEL_CLASS}>Location</label>
+                <label htmlFor="location" className={LABEL_CLASS}>
+                  Location
+                </label>
                 <input
                   type="text"
                   id="location"
@@ -254,7 +278,9 @@ function CreateEventForm() {
                 />
               </div>
               <div>
-                <label htmlFor="venue" className={LABEL_CLASS}>Venue</label>
+                <label htmlFor="venue" className={LABEL_CLASS}>
+                  Venue
+                </label>
                 <input
                   type="text"
                   id="venue"
@@ -271,7 +297,9 @@ function CreateEventForm() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="startDate" className={LABEL_CLASS}>Start Date & Time *</label>
+                <label htmlFor="startDate" className={LABEL_CLASS}>
+                  Start Date & Time *
+                </label>
                 <input
                   type="datetime-local"
                   id="startDate"
@@ -283,7 +311,9 @@ function CreateEventForm() {
                 />
               </div>
               <div>
-                <label htmlFor="endDate" className={LABEL_CLASS}>End Date & Time</label>
+                <label htmlFor="endDate" className={LABEL_CLASS}>
+                  End Date & Time
+                </label>
                 <input
                   type="datetime-local"
                   id="endDate"
@@ -296,7 +326,9 @@ function CreateEventForm() {
             </div>
 
             <div>
-              <label htmlFor="categoryId" className={LABEL_CLASS}>Category *</label>
+              <label htmlFor="categoryId" className={LABEL_CLASS}>
+                Category *
+              </label>
               <select
                 id="categoryId"
                 name="categoryId"
@@ -315,7 +347,9 @@ function CreateEventForm() {
             </div>
 
             <div>
-              <label htmlFor="price" className={LABEL_CLASS}>Price (ETB)</label>
+              <label htmlFor="price" className={LABEL_CLASS}>
+                Price (ETB)
+              </label>
               <input
                 type="number"
                 id="price"
@@ -337,19 +371,29 @@ function CreateEventForm() {
               <div className="grid md:grid-cols-2 gap-6">
                 <ImageUpload
                   currentImageUrl={formData.imageUrl}
-                  onImageUploaded={(url) => setFormData((prev) => ({ ...prev, imageUrl: url }))}
-                  onImageRemoved={() => setFormData((prev) => ({ ...prev, imageUrl: '' }))}
+                  onImageUploaded={(url) =>
+                    setFormData((prev) => ({ ...prev, imageUrl: url }))
+                  }
+                  onImageRemoved={() =>
+                    setFormData((prev) => ({ ...prev, imageUrl: '' }))
+                  }
                 />
                 <VideoUpload
                   currentVideoUrl={formData.videoUrl}
-                  onVideoUploaded={(url) => setFormData((prev) => ({ ...prev, videoUrl: url }))}
-                  onVideoRemoved={() => setFormData((prev) => ({ ...prev, videoUrl: '' }))}
+                  onVideoUploaded={(url) =>
+                    setFormData((prev) => ({ ...prev, videoUrl: url }))
+                  }
+                  onVideoRemoved={() =>
+                    setFormData((prev) => ({ ...prev, videoUrl: '' }))
+                  }
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="sourceUrl" className={LABEL_CLASS}>Source URL</label>
+              <label htmlFor="sourceUrl" className={LABEL_CLASS}>
+                Source URL
+              </label>
               <input
                 type="url"
                 id="sourceUrl"
@@ -365,7 +409,9 @@ function CreateEventForm() {
             </div>
 
             <div>
-              <label htmlFor="tags" className={LABEL_CLASS}>Tags</label>
+              <label htmlFor="tags" className={LABEL_CLASS}>
+                Tags
+              </label>
               <input
                 type="text"
                 id="tags"
@@ -380,11 +426,11 @@ function CreateEventForm() {
               </p>
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex justify-end gap-3 pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 inline-flex h-11 items-center justify-center rounded-full bg-ember font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-ember px-8 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? 'Creating…' : 'Create Event'}
               </button>

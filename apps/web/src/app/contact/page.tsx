@@ -29,7 +29,9 @@ export default function ContactPage() {
       await contactService.submit(data);
       setSubmitted(true);
     } catch (err: any) {
-      setServerError(err.message || 'Failed to send message. Please try again.');
+      setServerError(
+        err.message || 'Failed to send message. Please try again.'
+      );
     }
   };
 
@@ -147,13 +149,15 @@ export default function ContactPage() {
                 )}
               </div>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full rounded-full bg-ember py-3 font-mono text-xs uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
-              </button>
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex h-11 items-center justify-center rounded-full bg-ember px-8 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Sending…' : 'Send Message'}
+                </button>
+              </div>
             </form>
           )}
         </div>

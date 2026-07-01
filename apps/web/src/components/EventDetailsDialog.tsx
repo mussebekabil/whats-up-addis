@@ -98,12 +98,23 @@ export default function EventDetailsDialog({
           {/* Meta grid */}
           <div className="grid grid-cols-2 gap-4 rounded-2xl border border-border bg-background p-5">
             <Field label="Category" value={event.category.name} />
-            <Field label="Price" value={event.price ? `${event.price} ETB` : 'Free'} />
-            <Field label="Start Date" value={new Date(event.startDate).toLocaleString()} />
+            <Field
+              label="Price"
+              value={event.price ? `${event.price} ETB` : 'Free'}
+            />
+            <Field
+              label="Start Date"
+              value={new Date(event.startDate).toLocaleString()}
+            />
             {event.endDate && (
-              <Field label="End Date" value={new Date(event.endDate).toLocaleString()} />
+              <Field
+                label="End Date"
+                value={new Date(event.endDate).toLocaleString()}
+              />
             )}
-            {event.location && <Field label="Location" value={event.location} />}
+            {event.location && (
+              <Field label="Location" value={event.location} />
+            )}
             {event.venue && <Field label="Venue" value={event.venue} />}
             <Field label="Source" value={event.source} />
             {event.creator && (
@@ -111,7 +122,9 @@ export default function EventDetailsDialog({
                 <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   Created By
                 </div>
-                <div className="mt-1 text-sm text-foreground">{event.creator.name}</div>
+                <div className="mt-1 text-sm text-foreground">
+                  {event.creator.name}
+                </div>
                 <div className="font-mono text-[10px] text-muted-foreground">
                   {event.creator.email}
                 </div>
