@@ -15,7 +15,7 @@
   "dependencies": {
     "@whats-up-addis/database": "workspace:*",
     "@whats-up-addis/shared": "workspace:*",
-    "@anthropic-ai/sdk": "^0.32.1",
+    "@google/generative-ai": "^0.21.0",
     "cloudinary": "^2.5.1",
     "dotenv": "^16.4.7",
     "dotenv-cli": "^7.4.2",

@@ -47,8 +47,7 @@ export class TelegramClientService {
         console.log('Connected using existing session');
       } else {
         // Interactive authentication (for local development)
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const input = require('input');
+        const { default: input } = await import('input');
         await this.client.start({
           phoneNumber: async () =>
             await input.text('Please enter your phone number: '),
