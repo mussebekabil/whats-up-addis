@@ -28,8 +28,8 @@ type Category = {
 
 export class LLMParserService {
   private genAI: GoogleGenerativeAI;
-  private modelName = 'gemini-2.0-flash-lite';
-  private BATCH_SIZE = 8;
+  private modelName = 'gemini-3.1-flash-lite';
+  private BATCH_SIZE = 20;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -93,8 +93,7 @@ export class LLMParserService {
       model: this.modelName,
       systemInstruction: this.buildSystemPrompt(),
       generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 8192,
+
         responseMimeType: 'application/json',
       },
     });
