@@ -29,7 +29,7 @@ type Category = {
 export class LLMParserService {
   private genAI: GoogleGenerativeAI;
   private modelName = 'gemini-2.0-flash-lite';
-  private BATCH_SIZE = 20;
+  private BATCH_SIZE = 8;
 
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -92,14 +92,36 @@ export class LLMParserService {
     const model = this.genAI.getGenerativeModel({
       model: this.modelName,
       systemInstruction: this.buildSystemPrompt(),
-      generationConfig: { temperature: 0.2 },
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 8192,
+        responseMimeType: 'application/json',
+      },
     });
 
     const prompt = this.buildBatchPrompt(messages, categories);
     const result = await model.generateContent(prompt);
-    const text = result.response.text();
 
-    return this.parseBatchResponse(text, messages);
+    const finishReason = result.response.candidates?.[0]?.finishReason;
+    if (finishReason && finishReason !== 'STOP') {
+      console.warn(
+        `Gemini response for chunk did not finish cleanly (reason: ${finishReason}), output may be truncated`
+      );
+    }
+
+    const text = result.response.text();
+    const parsedResults = this.parseBatchResponse(text, messages);
+
+    const nullCount = [...parsedResults.values()].filter(
+      (v) => v === null
+    ).length;
+    if (nullCount === messages.length && messages.length > 1) {
+      console.warn(
+        `All ${messages.length} messages in this chunk were parsed as non-events; raw response: ${text.slice(0, 500)}`
+      );
+    }
+
+    return parsedResults;
   }
 
   private buildSystemPrompt(): string {
