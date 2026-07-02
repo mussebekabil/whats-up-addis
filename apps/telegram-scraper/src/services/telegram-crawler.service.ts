@@ -107,11 +107,25 @@ export class TelegramCrawlerService {
         `Fetched ${messages.length} new messages from ${source.name}`
       );
 
+      // Bulk-parse all messages with text in a single LLM call (or a few batched calls)
+      const textMessages = messages.filter((m) => m.text);
+      const parsedBatch =
+        textMessages.length > 0
+          ? await this.llmParser.parseEventsBatch(
+              textMessages.map((m) => ({
+                messageId: m.messageId,
+                text: m.text!,
+              })),
+              this.categories
+            )
+          : new Map();
+
       for (const message of messages) {
         stats.messagesProcessed++;
 
         try {
-          await this.processMessage(message, source);
+          const eventData = parsedBatch.get(message.messageId) ?? null;
+          await this.processMessage(message, source, eventData);
           stats.eventsCreated++;
 
           // Update last message ID
@@ -222,7 +236,10 @@ export class TelegramCrawlerService {
 
   private async processMessage(
     message: TelegramMessage,
-    source: TelegramSource
+    source: TelegramSource,
+    preComputedEventData?:
+      | import('../types/telegram.types.js').ParsedEventData
+      | null
   ): Promise<void> {
     // Skip messages without text
     if (!message.text) {
@@ -233,11 +250,18 @@ export class TelegramCrawlerService {
     console.log(`Processing message ${message.messageId} from ${source.name}`);
 
     try {
-      // Parse message text with LLM, passing available categories
-      const eventData = await this.llmParser.parseEventText(
-        message.text,
-        this.categories
-      );
+      // Use pre-parsed result when available (crawlSource batch path), otherwise parse inline (listen mode)
+      const eventData =
+        preComputedEventData !== undefined
+          ? preComputedEventData
+          : await this.llmParser.parseEventText(message.text, this.categories);
+
+      if (!eventData) {
+        console.log(
+          `Message ${message.messageId} is not an event post, skipping`
+        );
+        return;
+      }
 
       // Check for duplicate events
       const isDuplicate = await this.checkDuplicate(
@@ -356,12 +380,6 @@ export class TelegramCrawlerService {
 
       console.log(`Created event: ${event.title} (${event.id})`);
     } catch (error) {
-      if (error instanceof Error && error.message === 'Not an event post') {
-        console.log(
-          `Message ${message.messageId} is not an event post, skipping`
-        );
-        return;
-      }
       throw error;
     }
   }

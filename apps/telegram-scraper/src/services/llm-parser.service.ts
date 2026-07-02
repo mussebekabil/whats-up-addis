@@ -1,69 +1,105 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ParsedEventData } from '../types/telegram.types.js';
 import { z } from 'zod';
 
 const EventDataSchema = z.object({
-  title: z.string().max(255),
+  title: z.string().max(255).nullable(),
   description: z.string(),
   location: z.string().optional().nullable(),
   venue: z.string().optional().nullable(),
-  startDate: z.string(),
+  startDate: z.string().optional().nullable(),
   endDate: z.string().optional().nullable(),
   price: z.number().optional().nullable(),
   tags: z.array(z.string()).optional().default([]),
   categoryId: z.string().optional().nullable(),
 });
 
+interface BatchMessage {
+  messageId: number;
+  text: string;
+}
+
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+};
+
 export class LLMParserService {
-  private client: Anthropic;
-  private model: string = 'claude-haiku-4-5-20251001';
+  private genAI: GoogleGenerativeAI;
+  private modelName = 'gemini-2.0-flash-lite';
+  private BATCH_SIZE = 20;
 
   constructor() {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error('ANTHROPIC_API_KEY is not configured');
+      throw new Error('GEMINI_API_KEY is not configured');
     }
-    this.client = new Anthropic({ apiKey });
+    this.genAI = new GoogleGenerativeAI(apiKey);
   }
 
+  async parseEventsBatch(
+    messages: BatchMessage[],
+    categories?: Category[]
+  ): Promise<Map<number, ParsedEventData | null>> {
+    const results = new Map<number, ParsedEventData | null>();
+
+    for (let i = 0; i < messages.length; i += this.BATCH_SIZE) {
+      const chunk = messages.slice(i, i + this.BATCH_SIZE);
+      console.log(
+        `Parsing batch ${Math.floor(i / this.BATCH_SIZE) + 1} (${chunk.length} messages)`
+      );
+
+      try {
+        const chunkResults = await this.parseChunk(chunk, categories);
+        for (const [id, data] of chunkResults) {
+          results.set(id, data);
+        }
+      } catch (error) {
+        console.error(`Batch parse failed for chunk starting at ${i}:`, error);
+        // Mark all messages in failed chunk as null so caller can skip them
+        for (const msg of chunk) {
+          results.set(msg.messageId, null);
+        }
+      }
+    }
+
+    return results;
+  }
+
+  // Convenience wrapper for single-message use (listen mode)
   async parseEventText(
     text: string,
-    categories?: Array<{
-      id: string;
-      name: string;
-      slug: string;
-      description: string | null;
-    }>
+    categories?: Category[]
   ): Promise<ParsedEventData> {
-    try {
-      const currentDate = new Date().toISOString();
-      const systemPrompt = this.buildSystemPrompt();
-      const userPrompt = this.buildUserPrompt(text, currentDate, categories);
-
-      const response = await this.client.messages.create({
-        model: this.model,
-        max_tokens: 2000,
-        temperature: 0.2,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: userPrompt,
-          },
-        ],
-      });
-
-      const content = response.content[0];
-      if (content.type !== 'text') {
-        throw new Error('Unexpected response type from LLM');
-      }
-
-      const parsedData = this.extractJsonFromResponse(content.text);
-      return this.validateParsedData(parsedData);
-    } catch (error) {
-      console.error('Failed to parse event text with LLM:', error);
-      throw error;
+    const syntheticId = 0;
+    const results = await this.parseEventsBatch(
+      [{ messageId: syntheticId, text }],
+      categories
+    );
+    const result = results.get(syntheticId);
+    if (!result) {
+      throw new Error('Not an event post');
     }
+    return result;
+  }
+
+  private async parseChunk(
+    messages: BatchMessage[],
+    categories?: Category[]
+  ): Promise<Map<number, ParsedEventData | null>> {
+    const model = this.genAI.getGenerativeModel({
+      model: this.modelName,
+      systemInstruction: this.buildSystemPrompt(),
+      generationConfig: { temperature: 0.2 },
+    });
+
+    const prompt = this.buildBatchPrompt(messages, categories);
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    return this.parseBatchResponse(text, messages);
   }
 
   private buildSystemPrompt(): string {
@@ -80,19 +116,15 @@ Rules:
 - Return null for missing optional fields
 - Always return valid JSON
 - Extract relevant tags/keywords from the event description
-- If the text doesn't contain event information, return null for title`;
+- If the text doesn't contain event information, set "event" to null for that message`;
   }
 
-  private buildUserPrompt(
-    text: string,
-    currentDate: string,
-    categories?: Array<{
-      id: string;
-      name: string;
-      slug: string;
-      description: string | null;
-    }>
+  private buildBatchPrompt(
+    messages: BatchMessage[],
+    categories?: Category[]
   ): string {
+    const currentDate = new Date().toISOString();
+
     let categorySection = '';
     if (categories && categories.length > 0) {
       categorySection = `\n\nAvailable categories:\n${categories
@@ -100,96 +132,127 @@ Rules:
           (cat) =>
             `- ID: ${cat.id}, Name: ${cat.name}, Slug: ${cat.slug}${cat.description ? `, Description: ${cat.description}` : ''}`
         )
-        .join('\n')}
-
-Based on the event content, select the most appropriate category ID from the list above.`;
+        .join(
+          '\n'
+        )}\n\nSelect the most appropriate categoryId from the list above for each event.`;
     }
 
-    return `Extract event information from this Telegram post:
+    const messagesJson = JSON.stringify(
+      messages.map((m) => ({ messageId: m.messageId, text: m.text }))
+    );
 
-"""
-${text}
-"""
-
-Current date: ${currentDate}
+    return `Current date: ${currentDate}
 Timezone: Africa/Addis_Ababa
 ${categorySection}
 
-Return JSON with this exact structure:
-{
-  "title": "string (required, max 255 chars)",
-  "description": "string (required)",
-  "location": "string or null",
-  "venue": "string or null",
-  "startDate": "ISO 8601 string (required)",
-  "endDate": "ISO 8601 string or null",
-  "price": number or null,
-  "tags": ["string"] or []${categories && categories.length > 0 ? ',\n  "categoryId": "string (category ID from the list above) or null"' : ''}
-}
+Parse each of the following Telegram messages and extract event information.
 
-Important:
-- If this is not an event post, return { "title": null, "description": "" }
-- Ensure startDate is in ISO 8601 format with timezone
-- Extract price as a number (remove currency symbols)${categories && categories.length > 0 ? '\n- Select the most appropriate categoryId based on the event type and content' : ''}`;
-  }
+Messages:
+${messagesJson}
 
-  private extractJsonFromResponse(text: string): any {
-    // Try to find JSON in the response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in LLM response');
-    }
-
-    try {
-      return JSON.parse(jsonMatch[0]);
-    } catch (error) {
-      console.error('Failed to parse JSON from LLM response:', text);
-      throw new Error('Invalid JSON in LLM response');
+Return a JSON array with exactly one entry per message, in the same order. Use this structure:
+[
+  {
+    "messageId": <number>,
+    "event": {
+      "title": "string (required, max 255 chars)",
+      "description": "string (required)",
+      "location": "string or null",
+      "venue": "string or null",
+      "startDate": "ISO 8601 string (required)",
+      "endDate": "ISO 8601 string or null",
+      "price": number or null,
+      "tags": ["string"] or []${categories && categories.length > 0 ? ',\n      "categoryId": "string (category ID) or null"' : ''}
     }
   }
+]
 
-  private validateParsedData(data: any): ParsedEventData {
+If a message is not an event post, set "event" to null for that entry.
+Return ONLY the JSON array, no other text.`;
+  }
+
+  private parseBatchResponse(
+    responseText: string,
+    messages: BatchMessage[]
+  ): Map<number, ParsedEventData | null> {
+    const results = new Map<number, ParsedEventData | null>();
+
+    const arrayMatch = responseText.match(/\[[\s\S]*\]/);
+    if (!arrayMatch) {
+      console.error('No JSON array found in Gemini response:', responseText);
+      for (const msg of messages) results.set(msg.messageId, null);
+      return results;
+    }
+
+    let parsed: Array<{ messageId: number; event: unknown }>;
     try {
-      const validated = EventDataSchema.parse(data);
+      parsed = JSON.parse(arrayMatch[0]);
+    } catch {
+      console.error('Failed to parse JSON array from Gemini response');
+      for (const msg of messages) results.set(msg.messageId, null);
+      return results;
+    }
 
-      // If title is null or empty, this is not an event
-      if (!validated.title) {
-        throw new Error('Not an event post');
+    for (const entry of parsed) {
+      if (!entry || typeof entry.messageId !== 'number') continue;
+
+      if (!entry.event) {
+        results.set(entry.messageId, null);
+        continue;
       }
 
-      // Validate that startDate is a valid date
-      const startDate = new Date(validated.startDate);
-      if (isNaN(startDate.getTime())) {
-        throw new Error('Invalid start date');
-      }
-
-      // Validate endDate if present
-      if (validated.endDate) {
-        const endDate = new Date(validated.endDate);
-        if (isNaN(endDate.getTime())) {
-          throw new Error('Invalid end date');
+      try {
+        const validated = EventDataSchema.parse(entry.event);
+        if (!validated.title || !validated.startDate) {
+          results.set(entry.messageId, null);
+          continue;
         }
-      }
 
-      return {
-        title: validated.title,
-        description: validated.description,
-        location: validated.location || undefined,
-        venue: validated.venue || undefined,
-        startDate: validated.startDate,
-        endDate: validated.endDate || undefined,
-        price: validated.price || undefined,
-        tags: validated.tags || [],
-        categoryId: validated.categoryId || undefined,
-      };
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        console.error('Validation error:', error.errors);
-        throw new Error(
-          `Invalid event data: ${error.errors.map((e) => e.message).join(', ')}`
-        );
+        const startDate = new Date(validated.startDate);
+        if (isNaN(startDate.getTime())) {
+          console.warn(
+            `Invalid startDate for message ${entry.messageId}, skipping`
+          );
+          results.set(entry.messageId, null);
+          continue;
+        }
+
+        if (validated.endDate) {
+          const endDate = new Date(validated.endDate);
+          if (isNaN(endDate.getTime())) {
+            validated.endDate = null;
+          }
+        }
+
+        results.set(entry.messageId, {
+          title: validated.title,
+          description: validated.description,
+          location: validated.location || undefined,
+          venue: validated.venue || undefined,
+          startDate: validated.startDate,
+          endDate: validated.endDate || undefined,
+          price: validated.price || undefined,
+          tags: validated.tags || [],
+          categoryId: validated.categoryId || undefined,
+        });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          console.warn(
+            `Validation failed for message ${entry.messageId}:`,
+            error.errors
+          );
+        }
+        results.set(entry.messageId, null);
       }
-      throw error;
     }
+
+    // Ensure every input message has an entry (default null for any missing)
+    for (const msg of messages) {
+      if (!results.has(msg.messageId)) {
+        results.set(msg.messageId, null);
+      }
+    }
+
+    return results;
   }
 }
