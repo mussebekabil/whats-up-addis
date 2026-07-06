@@ -44,6 +44,15 @@ export const authService = {
     return api.get<User>('/api/auth/me', token);
   },
 
+  async getAllUsers(): Promise<User[]> {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    return api.get<User[]>('/api/auth/users', token);
+  },
+
   logout(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(TOKEN_KEY);

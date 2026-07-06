@@ -81,7 +81,20 @@ export class AuthService {
       },
     };
   }
+  async getAllUsers() {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
+    return users;
+  }
   async getMe(userId: string) {
     const user = await prisma.user.findUnique({
       where: { id: userId },

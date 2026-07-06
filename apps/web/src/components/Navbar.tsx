@@ -165,6 +165,15 @@ export default function Navbar() {
                           Manage Events
                         </Link>
                       )}
+                      {user.role === Roles.Admin && (
+                        <Link
+                          href="/admin/users"
+                          onClick={() => setIsDropdownOpen(false)}
+                          className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                        >
+                          Manage Users
+                        </Link>
+                      )}
                       <Link
                         href="/profile"
                         onClick={() => setIsDropdownOpen(false)}
@@ -238,6 +247,15 @@ export default function Navbar() {
                         className="block px-4 py-2 text-sm text-foreground hover:bg-muted"
                       >
                         Manage Events
+                      </Link>
+                    )}
+                    {user.role === Roles.Admin && (
+                      <Link
+                        href="/admin/users"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground hover:bg-muted"
+                      >
+                        Manage Users
                       </Link>
                     )}
                     <Link

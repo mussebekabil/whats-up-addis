@@ -39,6 +39,18 @@ export class AuthController {
     }
   }
 
+  async getAllUsers(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      if (!req.user || req.user.role !== 'ADMIN') {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+      const users = await authService.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   logout(req: Request, res: Response) {
     res.json({ message: 'Logged out successfully' });
   }
