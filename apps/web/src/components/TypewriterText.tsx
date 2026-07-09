@@ -104,7 +104,7 @@ export default function TypewriterText({
         {segments.map((seg, si) =>
           seg.text.split('\n').flatMap((part, pi, arr) => [
             seg.em ? (
-              <em key={`${si}-${pi}`} className="text-ember not-italic">
+              <em key={`${si}-${pi}`} className="text-ember">
                 {part}
               </em>
             ) : (
@@ -121,7 +121,7 @@ export default function TypewriterText({
           node.kind === 'br' ? (
             <br key={i} />
           ) : node.em ? (
-            <em key={i} className="text-ember not-italic">
+            <em key={i} className="text-ember">
               {node.content}
             </em>
           ) : (

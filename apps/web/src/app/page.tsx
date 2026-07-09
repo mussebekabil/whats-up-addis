@@ -6,6 +6,7 @@ import CategoryCard from '@/components/CategoryCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FadeIn from '@/components/FadeIn';
+import SearchBar from '@/components/SearchBar';
 import {
   generateOrganizationSchema,
   generateWebSiteSchema,
@@ -140,23 +141,7 @@ export default async function Home() {
             city. No noise — just what&apos;s actually worth showing up to.
           </p>
 
-          <div className="flex w-full max-w-2xl items-center gap-2 rounded-full border border-border bg-card p-2 shadow-sm">
-            <span className="pl-4 font-mono text-xs text-muted-foreground">
-              BROWSE
-            </span>
-            <Link
-              href="/events?filter=upcoming"
-              className="flex-1 px-2 py-2 text-base text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-            >
-              Try upcoming events, concerts, workshops…
-            </Link>
-            <Link
-              href="/events"
-              className="inline-flex h-9 items-center rounded-full bg-ember px-5 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
-            >
-              Explore
-            </Link>
-          </div>
+          <SearchBar />
         </div>
       </section>
 

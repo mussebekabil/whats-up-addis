@@ -12,6 +12,7 @@ export default function EventCard({ event }: EventCardProps) {
   const hasMedia = event.imageUrl || event.videoUrl;
   const day = format(new Date(event.startDate), 'd');
   const month = format(new Date(event.startDate), 'MMM').toUpperCase();
+  const year = format(new Date(event.startDate), 'yyyy');
   const time = format(new Date(event.startDate), 'h:mm a');
   const price =
     event.price != null && Number(event.price) > 0
@@ -51,12 +52,13 @@ export default function EventCard({ event }: EventCardProps) {
         )}
 
         {/* Date badge */}
-        <RoundTextPrimary>{day}</RoundTextPrimary>
-        {/* <div className="absolute left-3 top-3 flex items-baseline gap-1.5 rounded-xl bg-white/90 dark:bg-card/90 px-3 py-2 backdrop-blur-sm">
-          <span className="font-display text-2xl leading-none text-foreground">{day}</span>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{month}</span>
-        </div> */}
-
+        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-xl bg-card px-3 py-2">
+          <span className="font-display text-3xl leading-none">{day}</span>
+          <div className="flex h-6 flex-col justify-between">
+            <span className="font-mono text-[10px] uppercase leading-none tracking-widest text-muted-foreground">{month}</span>
+            <span className="font-mono text-[10px] uppercase leading-none tracking-widest text-muted-foreground">{year}</span>
+          </div>
+        </div>
         {/* Video badge */}
         {hasMedia && event.videoUrl && (
           <span className="absolute right-3 top-3 rounded-full bg-ember px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-ember-foreground">

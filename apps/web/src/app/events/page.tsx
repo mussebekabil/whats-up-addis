@@ -6,9 +6,23 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { generateEventListSchema } from '@/lib/seo';
 import RoundTextPrimary from '@/components/ui-nuggets/RoundTextPrimary';
+import SearchBar from '@/components/SearchBar';
 
 interface EventsPageProps {
-  searchParams: Promise<{ page?: string; filter?: string }>;
+  searchParams: Promise<{ page?: string; filter?: string; search?: string }>;
+}
+
+function buildEventsUrl(params: {
+  page?: number;
+  filter?: string;
+  search?: string;
+}): string {
+  const query = new URLSearchParams();
+  if (params.page && params.page > 1) query.set('page', String(params.page));
+  if (params.filter) query.set('filter', params.filter);
+  if (params.search) query.set('search', params.search);
+  const queryString = query.toString();
+  return queryString ? `/events?${queryString}` : '/events';
 }
 
 export async function generateMetadata({
@@ -46,6 +60,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const params = await searchParams;
   const currentPage = parseInt(params.page || '1', 10);
   const filter = params.filter;
+  const search = params.search?.trim() || undefined;
 
   let events: any[] = [];
   let pagination: any = null;
@@ -59,6 +74,10 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       queryParams.startDate = now;
     } else if (filter === 'past') {
       queryParams.endDateLt = now;
+    }
+
+    if (search) {
+      queryParams.search = search;
     }
 
     const response = await eventService.getEvents(queryParams);
@@ -88,13 +107,21 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     events.length > 0 ? generateEventListSchema(events) : null;
 
   const tabs = [
-    { label: 'All', href: '/events', active: !filter },
+    {
+      label: 'All',
+      href: buildEventsUrl({ search }),
+      active: !filter,
+    },
     {
       label: 'Upcoming',
-      href: '/events?filter=upcoming',
+      href: buildEventsUrl({ filter: 'upcoming', search }),
       active: filter === 'upcoming',
     },
-    { label: 'Past', href: '/events?filter=past', active: filter === 'past' },
+    {
+      label: 'Past',
+      href: buildEventsUrl({ filter: 'past', search }),
+      active: filter === 'past',
+    },
   ];
 
   return (
@@ -117,6 +144,26 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               {pageTitle}
             </h1>
             <p className="mt-3 text-muted-foreground">{pageDescription}</p>
+            <div className="mt-6">
+              <SearchBar
+                defaultValue={search}
+                filter={filter}
+                buttonLabel="Search"
+              />
+            </div>
+            {search && (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <span className="text-sm text-foreground">
+                  Results for &ldquo;{search}&rdquo;
+                </span>
+                <Link
+                  href={buildEventsUrl({ filter })}
+                  className="font-mono text-xs uppercase tracking-widest text-muted-foreground underline transition-colors hover:text-foreground"
+                >
+                  Clear search
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
@@ -159,11 +206,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 <div className="mt-12 flex justify-center gap-2 items-center">
                   {currentPage > 1 && (
                     <Link
-                      href={
-                        filter
-                          ? `/events?page=${currentPage - 1}&filter=${filter}`
-                          : `/events?page=${currentPage - 1}`
-                      }
+                      href={buildEventsUrl({
+                        page: currentPage - 1,
+                        filter,
+                        search,
+                      })}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                     >
                       ←
@@ -181,9 +228,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                         (page >= currentPage - 1 && page <= currentPage + 1)
                     )
                     .map((page, idx, arr) => {
-                      const pageUrl = filter
-                        ? `/events?page=${page}&filter=${filter}`
-                        : `/events?page=${page}`;
+                      const pageUrl = buildEventsUrl({ page, filter, search });
                       const showEllipsisBefore =
                         idx > 0 && page - arr[idx - 1] > 1;
                       return (
@@ -210,11 +255,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
 
                   {currentPage < pagination.totalPages && (
                     <Link
-                      href={
-                        filter
-                          ? `/events?page=${currentPage + 1}&filter=${filter}`
-                          : `/events?page=${currentPage + 1}`
-                      }
+                      href={buildEventsUrl({
+                        page: currentPage + 1,
+                        filter,
+                        search,
+                      })}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                     >
                       →
