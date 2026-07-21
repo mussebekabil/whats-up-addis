@@ -12,8 +12,10 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isDesktopDropdownOpen, setIsDesktopDropdownOpen] = useState(false);
+  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false);
+  const desktopDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -33,10 +35,16 @@ export default function Navbar() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        desktopDropdownRef.current &&
+        !desktopDropdownRef.current.contains(event.target as Node)
       ) {
-        setIsDropdownOpen(false);
+        setIsDesktopDropdownOpen(false);
+      }
+      if (
+        mobileDropdownRef.current &&
+        !mobileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -46,7 +54,8 @@ export default function Navbar() {
   const handleLogout = () => {
     authService.logout();
     setUser(null);
-    setIsDropdownOpen(false);
+    setIsDesktopDropdownOpen(false);
+    setIsMobileDropdownOpen(false);
     router.push('/');
   };
 
@@ -138,15 +147,15 @@ export default function Navbar() {
                     Create event
                   </Link>
                 )}
-                <div className="relative" ref={dropdownRef}>
+                <div className="relative" ref={desktopDropdownRef}>
                   <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    onClick={() => setIsDesktopDropdownOpen(!isDesktopDropdownOpen)}
                     className="flex h-9 w-9 items-center justify-center rounded-full bg-ember font-mono text-xs font-bold text-primary-foreground transition-opacity hover:opacity-80"
                   >
                     {getUserInitials(user.name)}
                   </button>
 
-                  {isDropdownOpen && (
+                  {isDesktopDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-52 rounded-xl border border-border bg-card py-2 shadow-lg">
                       <div className="border-b border-border px-4 py-2">
                         <p className="text-sm font-medium text-foreground">
@@ -159,7 +168,7 @@ export default function Navbar() {
                       {user.role === Roles.Admin && (
                         <Link
                           href="/admin/events"
-                          onClick={() => setIsDropdownOpen(false)}
+                          onClick={() => setIsDesktopDropdownOpen(false)}
                           className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                         >
                           Manage Events
@@ -168,7 +177,7 @@ export default function Navbar() {
                       {user.role === Roles.Admin && (
                         <Link
                           href="/admin/users"
-                          onClick={() => setIsDropdownOpen(false)}
+                          onClick={() => setIsDesktopDropdownOpen(false)}
                           className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                         >
                           Manage Users
@@ -176,7 +185,7 @@ export default function Navbar() {
                       )}
                       <Link
                         href="/profile"
-                        onClick={() => setIsDropdownOpen(false)}
+                        onClick={() => setIsDesktopDropdownOpen(false)}
                         className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                       >
                         View Profile
@@ -223,14 +232,14 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             {user ? (
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative" ref={mobileDropdownRef}>
                 <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-ember font-mono text-xs font-bold text-ember-foreground"
                 >
                   {getUserInitials(user.name)}
                 </button>
-                {isDropdownOpen && (
+                {isMobileDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-52 rounded-xl border border-border bg-card py-2 shadow-lg">
                     <div className="border-b border-border px-4 py-2">
                       <p className="text-sm font-medium text-foreground">
@@ -243,7 +252,7 @@ export default function Navbar() {
                     {user.role === Roles.Admin && (
                       <Link
                         href="/admin/events"
-                        onClick={() => setIsDropdownOpen(false)}
+                        onClick={() => setIsMobileDropdownOpen(false)}
                         className="block px-4 py-2 text-sm text-foreground hover:bg-muted"
                       >
                         Manage Events
@@ -252,7 +261,7 @@ export default function Navbar() {
                     {user.role === Roles.Admin && (
                       <Link
                         href="/admin/users"
-                        onClick={() => setIsDropdownOpen(false)}
+                        onClick={() => setIsMobileDropdownOpen(false)}
                         className="block px-4 py-2 text-sm text-foreground hover:bg-muted"
                       >
                         Manage Users
@@ -260,7 +269,7 @@ export default function Navbar() {
                     )}
                     <Link
                       href="/profile"
-                      onClick={() => setIsDropdownOpen(false)}
+                      onClick={() => setIsMobileDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-foreground hover:bg-muted"
                     >
                       View Profile
@@ -393,6 +402,35 @@ export default function Navbar() {
             </span>
           </Link>
 
+          {user?.role === Roles.Admin && (
+            <Link
+              href="/events/create"
+              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+                isActive('/events/create')
+                  ? 'text-ember'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <div className="w-5 h-5 rounded-full bg-ember flex items-center justify-center text-ember-foreground">
+                <svg
+                  className="w-3 h-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </div>
+              <span className="font-mono text-[9px] uppercase tracking-widest">
+                Create
+              </span>
+            </Link>
+          )}
           {user ? (
             <Link
               href="/profile"
