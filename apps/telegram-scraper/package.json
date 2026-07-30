@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
     "build": "tsc",
-    "start": "dotenv -e ../../.env -- node dist/index.js",
+    "start": "dotenv -e ../../.env -- node --expose-gc dist/index.js",
     "scrape": "dotenv -e ../../.env -- tsx src/index.ts",
     "reset": "dotenv -e ../../.env -- tsx src/reset-scraper.ts",
     "generate-session": "dotenv -e ../../.env -- tsx src/generate-session.ts",

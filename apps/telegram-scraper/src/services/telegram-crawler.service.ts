@@ -77,6 +77,13 @@ export class TelegramCrawlerService {
             ],
           });
         }
+
+        // Encourage garbage collection between sources so memory used by
+        // one source's messages/parsed data doesn't linger while the next
+        // source is being crawled.
+        if (global.gc) {
+          global.gc();
+        }
       }
 
       return stats;
@@ -97,10 +104,17 @@ export class TelegramCrawlerService {
     };
 
     try {
+      // Limit the number of messages fetched per crawl cycle to avoid large memory spikes
+      const crawlerBatchSize = parseInt(
+        process.env.CRAWLER_BATCH_SIZE || '100',
+        10
+      );
+
       // Fetch new messages since last crawl
       const messages = await this.telegramClient.fetchMessages(
         source.chatId,
-        source.lastMessageId || undefined
+        source.lastMessageId || undefined,
+        crawlerBatchSize
       );
 
       console.log(
@@ -119,34 +133,52 @@ export class TelegramCrawlerService {
               this.categories
             )
           : new Map();
+      // Free the intermediate text-only array now that parsing is done
+      textMessages.length = 0;
 
-      for (const message of messages) {
-        stats.messagesProcessed++;
+      // Process messages in bounded chunks so the full message list never
+      // needs to be fully "in flight" at once, keeping memory usage low.
+      const processingBatchSize = 50;
+      for (let i = 0; i < messages.length; i += processingBatchSize) {
+        const batch = messages.slice(i, i + processingBatchSize);
 
-        try {
-          const eventData = parsedBatch.get(message.messageId) ?? null;
-          await this.processMessage(message, source, eventData);
-          stats.eventsCreated++;
+        for (const message of batch) {
+          stats.messagesProcessed++;
 
-          // Update last message ID
-          await this.prisma.telegramSource.update({
-            where: { id: source.id },
-            data: {
-              lastMessageId: message.messageId,
-              lastCrawledAt: new Date(),
-            },
-          });
-        } catch (error) {
-          console.error(
-            `Failed to process message ${message.messageId}:`,
-            error
-          );
-          stats.errors.push({
-            type: 'message_processing',
-            message: error instanceof Error ? error.message : 'Unknown error',
-          });
+          try {
+            const eventData = parsedBatch.get(message.messageId) ?? null;
+            await this.processMessage(message, source, eventData);
+            stats.eventsCreated++;
+
+            // Update last message ID
+            await this.prisma.telegramSource.update({
+              where: { id: source.id },
+              data: {
+                lastMessageId: message.messageId,
+                lastCrawledAt: new Date(),
+              },
+            });
+          } catch (error) {
+            console.error(
+              `Failed to process message ${message.messageId}:`,
+              error
+            );
+            stats.errors.push({
+              type: 'message_processing',
+              message:
+                error instanceof Error ? error.message : 'Unknown error',
+            });
+          }
         }
+
+        // Clear the processed batch from memory before loading the next one
+        batch.length = 0;
       }
+
+      // Explicitly clear the fetched messages array and parsed data map now
+      // that they're no longer needed, to help release memory promptly.
+      messages.length = 0;
+      parsedBatch.clear();
 
       // Update last crawled timestamp even if no new messages
       await this.prisma.telegramSource.update({
