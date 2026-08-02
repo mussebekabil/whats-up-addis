@@ -155,7 +155,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
         {/* Page header */}
         <div className="border-b border-border">
           <div className="mx-auto max-w-7xl px-6 py-12">
-            <RoundTextPrimary>Discover</RoundTextPrimary>
+            <span className="font-mono text-xs uppercase tracking-widest text-ember">
+              Discover
+            </span>
             <h1 className="mt-2 font-display text-5xl md:text-6xl">
               {pageTitle}
             </h1>
@@ -207,9 +209,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
               <CategoryFilter
                 categories={categories}
                 currentSlug={categorySlug}
-                getUrl={(slug) =>
-                  buildEventsUrl({ filter, search, category: slug ?? undefined })
-                }
+                mode="events-page"
+                filter={filter}
+                search={search}
               />
             )}
           </div>

@@ -132,7 +132,7 @@ export default async function Home() {
             segments={[
               { text: 'Everything ' },
               { text: 'happening', em: true },
-              { text: '\nin Addis, tonight.' },
+              { text: '\nin Addis!' },
             ]}
           />
 
@@ -218,7 +218,9 @@ export default async function Home() {
         {categories.length > 0 ? (
           <section className="mx-auto max-w-7xl px-6 py-16">
             <div className="mb-10">
-              <RoundTextPrimary>By interest</RoundTextPrimary>
+              <span className="font-mono text-xs uppercase tracking-widest text-ember">
+                By interest
+              </span>
               <h2 className="mt-2 font-display text-4xl md:text-5xl">
                 Browse by Category
               </h2>
@@ -243,19 +245,21 @@ export default async function Home() {
 
         {/* Categories Marquee */}
         {categories.length > 0 && (
-          <div className="overflow-hidden border-t border-ember bg-void py-3">
-            <div
-              className="flex gap-10 whitespace-nowrap"
-              style={{ animation: 'marquee 30s linear infinite' }}
-            >
-              {[...categories, ...categories].map((cat, i) => (
-                <span
-                  key={`${cat.id}-${i}`}
-                  className="shrink-0 font-mono text-sm text-ember"
-                >
-                  • {cat.name}
-                </span>
-              ))}
+          <div className="border-t border-ember bg-void py-3">
+            <div className="mx-auto max-w-7xl overflow-hidden px-6">
+              <div
+                className="flex gap-10 whitespace-nowrap"
+                style={{ animation: 'marquee 10s linear infinite' }}
+              >
+                {[...categories, ...categories].map((cat, i) => (
+                  <span
+                    key={`${cat.id}-${i}`}
+                    className="shrink-0 font-mono text-sm text-ember"
+                  >
+                    • {cat.name}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -265,7 +269,7 @@ export default async function Home() {
           <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
             <div className="grid gap-12 md:grid-cols-2 md:items-center">
               <FadeIn>
-                <span className="rounded-md border border-void/10 bg-bone/10 px-2 py-1 font-mono text-xs uppercase tracking-widest text-primary-foreground">
+                <span className="font-mono text-xs uppercase tracking-widest text-primary-foreground">
                   For organizers
                 </span>
                 <h2 className="mt-4 whitespace-pre-line font-display text-4xl leading-[0.95] tracking-tight md:text-6xl">

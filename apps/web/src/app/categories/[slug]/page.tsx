@@ -52,7 +52,7 @@ export default async function CategoryPage({
   const { slug } = await params;
   const sp = await searchParams;
   const currentPage = parseInt(sp.page || '1', 10);
-  // Default to upcoming when no filter is explicitly set
+  // 'upcoming' is the default; 'all' explicitly disables date filtering
   const filter = sp.filter ?? 'upcoming';
   const search = sp.search?.trim() || undefined;
 
@@ -70,6 +70,7 @@ export default async function CategoryPage({
     } else if (filter === 'past') {
       queryParams.endDateLt = now;
     }
+    // filter === 'all': no date filtering — shows every event in this category
     if (search) queryParams.search = search;
 
     const [categoryData, categoriesData] = await Promise.all([
@@ -91,18 +92,16 @@ export default async function CategoryPage({
 
   if (!category) notFound();
 
-  // "All" tab has no filter param — on load it will default to upcoming again,
-  // so we use a special href that explicitly removes filter from the URL
   const tabs = [
     {
       label: 'All',
-      href: `/categories/${slug}${search ? `?search=${encodeURIComponent(search)}` : ''}`,
-      active: sp.filter === undefined,
+      href: buildCategoryUrl(slug, { filter: 'all', search }),
+      active: filter === 'all',
     },
     {
       label: 'Upcoming',
       href: buildCategoryUrl(slug, { filter: 'upcoming', search }),
-      active: filter === 'upcoming' && sp.filter !== undefined,
+      active: filter === 'upcoming',
     },
     {
       label: 'Past',
@@ -181,11 +180,9 @@ export default async function CategoryPage({
               <CategoryFilter
                 categories={allCategories}
                 currentSlug={slug}
-                getUrl={(newSlug) =>
-                  newSlug
-                    ? buildCategoryUrl(newSlug, { filter, search })
-                    : '/events'
-                }
+                mode="category-page"
+                filter={filter}
+                search={search}
               />
             )}
           </div>
@@ -279,7 +276,8 @@ export default async function CategoryPage({
                   : filter === 'past'
                     ? 'past '
                     : ''}
-                events in this category.
+                events in this category
+                {filter === 'all' ? ' yet' : ''}.
               </p>
               <Link
                 href="/events"
