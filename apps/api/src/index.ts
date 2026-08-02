@@ -32,6 +32,7 @@ import commentRoutes from './routes/comment.routes.js';
 import ratingRoutes from './routes/rating.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
+import usersRoutes from './routes/users.routes.js';
 
 const app = express();
 const PORT = process.env.API_PORT || 3001;
@@ -53,6 +54,7 @@ app.use('/', healthRoutes);
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/admin', adminRoutes);
