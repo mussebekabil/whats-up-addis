@@ -149,7 +149,9 @@ export default function Navbar() {
                 )}
                 <div className="relative" ref={desktopDropdownRef}>
                   <button
-                    onClick={() => setIsDesktopDropdownOpen(!isDesktopDropdownOpen)}
+                    onClick={() =>
+                      setIsDesktopDropdownOpen(!isDesktopDropdownOpen)
+                    }
                     className="flex h-9 w-9 items-center justify-center rounded-full bg-ember font-mono text-xs font-bold text-primary-foreground transition-opacity hover:opacity-80"
                   >
                     {getUserInitials(user.name)}

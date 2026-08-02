@@ -5,16 +5,8 @@ import { UsersController } from '../controllers/users.controller.js';
 const router = Router();
 const usersController = new UsersController();
 
-router.get(
-  '/me/subscriptions',
-  authenticate,
-  usersController.getSubscriptions
-);
-router.post(
-  '/me/subscriptions',
-  authenticate,
-  usersController.addSubscription
-);
+router.get('/me/subscriptions', authenticate, usersController.getSubscriptions);
+router.post('/me/subscriptions', authenticate, usersController.addSubscription);
 router.delete(
   '/me/subscriptions/:categoryId',
   authenticate,

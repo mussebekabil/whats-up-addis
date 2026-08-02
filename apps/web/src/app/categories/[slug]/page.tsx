@@ -228,7 +228,8 @@ export default async function CategoryPage({
                         filter,
                         search,
                       });
-                      const showEllipsisBefore = idx > 0 && p - arr[idx - 1] > 1;
+                      const showEllipsisBefore =
+                        idx > 0 && p - arr[idx - 1] > 1;
                       return (
                         <span key={p} className="flex items-center gap-2">
                           {showEllipsisBefore && (

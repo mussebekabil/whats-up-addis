@@ -40,9 +40,7 @@ export function CategorySubscriptionGrid({
               disabled={disabled}
               onClick={() => onToggle(category, isSubscribed)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ember focus:ring-offset-2 ${
-                isSubscribed
-                  ? 'bg-ember'
-                  : 'bg-muted'
+                isSubscribed ? 'bg-ember' : 'bg-muted'
               }`}
             >
               <span

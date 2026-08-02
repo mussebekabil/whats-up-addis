@@ -130,7 +130,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     },
     {
       label: 'Upcoming',
-      href: buildEventsUrl({ filter: 'upcoming', search, category: categorySlug }),
+      href: buildEventsUrl({
+        filter: 'upcoming',
+        search,
+        category: categorySlug,
+      }),
       active: filter === 'upcoming',
     },
     {

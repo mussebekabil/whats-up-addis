@@ -27,12 +27,20 @@ function esc(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function dateParts(date: Date): { day: string; month: string; year: string; time: string } {
+function dateParts(date: Date): {
+  day: string;
+  month: string;
+  year: string;
+  time: string;
+} {
   return {
     day: date.toLocaleDateString('en-US', { day: 'numeric' }),
     month: date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
     year: date.toLocaleDateString('en-US', { year: 'numeric' }),
-    time: date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+    time: date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+    }),
   };
 }
 
@@ -103,7 +111,7 @@ function emailShell(
   subtitle: string,
   eventCards: string,
   viewAllUrl: string,
-  unsubscribeHtml: string,
+  unsubscribeHtml: string
 ): string {
   const year = new Date().getFullYear();
   return `<!DOCTYPE html>
@@ -195,7 +203,7 @@ export function buildDigestEmail({
     cards,
     `${appUrl}/events?filter=upcoming`,
     `You&#8217;re receiving this because you subscribed to event categories on What&#8217;s Up Addis.<br/>
-     <a href="${unsubscribeUrl}" style="color:${C.ember};">Manage your subscriptions</a>`,
+     <a href="${unsubscribeUrl}" style="color:${C.ember};">Manage your subscriptions</a>`
   );
 }
 
@@ -215,6 +223,6 @@ export function buildGenericEmail({
     cards,
     `${appUrl}/events?filter=upcoming`,
     `You&#8217;re receiving this as a registered What&#8217;s Up Addis user.<br/>
-     <a href="${unsubscribeUrl}" style="color:${C.ember};">Manage email preferences</a>`,
+     <a href="${unsubscribeUrl}" style="color:${C.ember};">Manage email preferences</a>`
   );
 }

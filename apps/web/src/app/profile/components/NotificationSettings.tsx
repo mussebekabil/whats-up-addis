@@ -35,7 +35,9 @@ export function NotificationSettings() {
       setSettings(notifSettings);
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : 'Failed to load notification settings'
+        err instanceof Error
+          ? err.message
+          : 'Failed to load notification settings'
       );
     } finally {
       setIsLoading(false);
@@ -51,7 +53,9 @@ export function NotificationSettings() {
     const prev = subscriptions;
     // Optimistic update
     if (isSubscribed) {
-      setSubscriptions((s) => s.filter((sub) => sub.categoryId !== category.id));
+      setSubscriptions((s) =>
+        s.filter((sub) => sub.categoryId !== category.id)
+      );
     } else {
       setSubscriptions((s) => [
         ...s,

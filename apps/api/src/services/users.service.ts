@@ -30,7 +30,8 @@ export class UsersService {
     const existing = await prisma.userCategorySubscription.findUnique({
       where: { userId_categoryId: { userId, categoryId } },
     });
-    if (existing) throw new AppError(409, 'Already subscribed to this category');
+    if (existing)
+      throw new AppError(409, 'Already subscribed to this category');
 
     return prisma.userCategorySubscription.create({
       data: { userId, categoryId },

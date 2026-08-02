@@ -14,7 +14,7 @@ const EVENT_SELECT = {
 
 export async function getUpcomingEventsForCategories(
   categoryIds: string[],
-  limit = 6,
+  limit = 6
 ) {
   const now = new Date();
   const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);

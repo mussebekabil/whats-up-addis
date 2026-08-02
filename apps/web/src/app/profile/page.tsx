@@ -32,10 +32,7 @@ export default function ProfilePage() {
         const message =
           err instanceof Error ? err.message : 'Failed to load user data';
         setError(message);
-        if (
-          message.includes('Unauthorized') ||
-          message.includes('token')
-        ) {
+        if (message.includes('Unauthorized') || message.includes('token')) {
           authService.logout();
           router.push('/auth/login');
         }

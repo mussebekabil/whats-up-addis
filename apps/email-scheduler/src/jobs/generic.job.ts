@@ -7,8 +7,7 @@ const GENERIC_FREQUENCY_DAYS = 7;
 
 function isDue(lastSentAt: Date | null): boolean {
   if (!lastSentAt) return true;
-  const elapsed =
-    (Date.now() - lastSentAt.getTime()) / (1000 * 60 * 60 * 24);
+  const elapsed = (Date.now() - lastSentAt.getTime()) / (1000 * 60 * 60 * 24);
   return elapsed >= GENERIC_FREQUENCY_DAYS;
 }
 

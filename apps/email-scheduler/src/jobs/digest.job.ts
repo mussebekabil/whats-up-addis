@@ -10,8 +10,7 @@ const FREQUENCY_DAYS: Record<string, number> = {
 
 function isDue(lastSentAt: Date | null, frequencyDays: number): boolean {
   if (!lastSentAt) return true;
-  const elapsed =
-    (Date.now() - lastSentAt.getTime()) / (1000 * 60 * 60 * 24);
+  const elapsed = (Date.now() - lastSentAt.getTime()) / (1000 * 60 * 60 * 24);
   return elapsed >= frequencyDays;
 }
 

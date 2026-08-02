@@ -55,8 +55,12 @@ export default function EventCard({ event }: EventCardProps) {
         <div className="absolute left-3 top-3 flex items-center gap-2 rounded-xl bg-card px-3 py-2">
           <span className="font-display text-3xl leading-none">{day}</span>
           <div className="flex h-6 flex-col justify-between">
-            <span className="font-mono text-[10px] uppercase leading-none tracking-widest text-muted-foreground">{month}</span>
-            <span className="font-mono text-[10px] uppercase leading-none tracking-widest text-muted-foreground">{year}</span>
+            <span className="font-mono text-[10px] uppercase leading-none tracking-widest text-muted-foreground">
+              {month}
+            </span>
+            <span className="font-mono text-[10px] uppercase leading-none tracking-widest text-muted-foreground">
+              {year}
+            </span>
           </div>
         </div>
         {/* Video badge */}

@@ -17,4 +17,6 @@ cron.schedule(CRON_SCHEDULE, async () => {
   }
 });
 
-console.log(`Email scheduler running. Digest fires on schedule: ${CRON_SCHEDULE}`);
+console.log(
+  `Email scheduler running. Digest fires on schedule: ${CRON_SCHEDULE}`
+);

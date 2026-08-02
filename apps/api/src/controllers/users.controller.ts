@@ -47,7 +47,9 @@ export class UsersController {
     next: NextFunction
   ) => {
     try {
-      const { categoryId } = z.object({ categoryId: z.string().uuid() }).parse(req.params);
+      const { categoryId } = z
+        .object({ categoryId: z.string().uuid() })
+        .parse(req.params);
       await usersService.removeSubscription(req.user!.id, categoryId);
       res.json({ message: 'Subscription removed' });
     } catch (error) {
@@ -61,9 +63,7 @@ export class UsersController {
     next: NextFunction
   ) => {
     try {
-      const settings = await usersService.getNotificationSettings(
-        req.user!.id
-      );
+      const settings = await usersService.getNotificationSettings(req.user!.id);
       res.json({ settings });
     } catch (error) {
       next(error);
