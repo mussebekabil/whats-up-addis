@@ -4,6 +4,8 @@ interface SearchBarProps {
   placeholder?: string;
   buttonLabel?: string;
   className?: string;
+  action?: string;
+  extraParams?: Record<string, string>;
 }
 
 export default function SearchBar({
@@ -12,10 +14,12 @@ export default function SearchBar({
   placeholder = 'Try upcoming events, concerts, workshops…',
   buttonLabel = 'Explore',
   className = '',
+  action = '/events',
+  extraParams,
 }: SearchBarProps) {
   return (
     <form
-      action="/events"
+      action={action}
       method="GET"
       className={`flex w-full max-w-2xl items-center gap-2 rounded-full border border-border bg-card p-2 shadow-sm ${className}`}
     >
@@ -23,6 +27,10 @@ export default function SearchBar({
         SEARCH
       </span>
       {filter && <input type="hidden" name="filter" value={filter} />}
+      {extraParams &&
+        Object.entries(extraParams).map(([key, value]) => (
+          <input key={key} type="hidden" name={key} value={value} />
+        ))}
       <input
         type="text"
         name="search"

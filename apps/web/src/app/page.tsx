@@ -241,6 +241,25 @@ export default async function Home() {
           )
         )}
 
+        {/* Categories Marquee */}
+        {categories.length > 0 && (
+          <div className="overflow-hidden border-t border-ember bg-void py-3">
+            <div
+              className="flex gap-10 whitespace-nowrap"
+              style={{ animation: 'marquee 30s linear infinite' }}
+            >
+              {[...categories, ...categories].map((cat, i) => (
+                <span
+                  key={`${cat.id}-${i}`}
+                  className="shrink-0 font-mono text-sm text-ember"
+                >
+                  • {cat.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Organizer CTA */}
         <section className="bg-ember text-void">
           <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
@@ -249,13 +268,9 @@ export default async function Home() {
                 <span className="rounded-md border border-void/10 bg-bone/10 px-2 py-1 font-mono text-xs uppercase tracking-widest text-primary-foreground">
                   For organizers
                 </span>
-                <TypewriterText
-                  tag="h2"
-                  startDelay={300}
-                  speed={185}
-                  className="mt-4 font-display text-4xl leading-[0.95] tracking-tight md:text-6xl"
-                  segments={[{ text: 'List your event.\nSell it out.' }]}
-                />
+                <h2 className="mt-4 whitespace-pre-line font-display text-4xl leading-[0.95] tracking-tight md:text-6xl">
+                  {'List your event.\nSell it out.'}
+                </h2>
                 <p className="mt-6 max-w-md text-lg text-void/80">
                   From small gatherings to sold-out shows — publish in minutes
                   and reach everyone who&apos;s looking for something to do in

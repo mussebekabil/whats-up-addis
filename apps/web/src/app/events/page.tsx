@@ -1,26 +1,36 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { eventService } from '@/lib/events';
+import { categoryService } from '@/lib/categories';
 import EventCard from '@/components/EventCard';
+import CategoryFilter from '@/components/CategoryFilter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { generateEventListSchema } from '@/lib/seo';
 import RoundTextPrimary from '@/components/ui-nuggets/RoundTextPrimary';
 import SearchBar from '@/components/SearchBar';
+import type { Category } from '@whats-up-addis/shared';
 
 interface EventsPageProps {
-  searchParams: Promise<{ page?: string; filter?: string; search?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    filter?: string;
+    search?: string;
+    category?: string;
+  }>;
 }
 
 function buildEventsUrl(params: {
   page?: number;
   filter?: string;
   search?: string;
+  category?: string;
 }): string {
   const query = new URLSearchParams();
   if (params.page && params.page > 1) query.set('page', String(params.page));
   if (params.filter) query.set('filter', params.filter);
   if (params.search) query.set('search', params.search);
+  if (params.category) query.set('category', params.category);
   const queryString = query.toString();
   return queryString ? `/events?${queryString}` : '/events';
 }
@@ -61,9 +71,11 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const currentPage = parseInt(params.page || '1', 10);
   const filter = params.filter;
   const search = params.search?.trim() || undefined;
+  const categorySlug = params.category || undefined;
 
   let events: any[] = [];
   let pagination: any = null;
+  let categories: Category[] = [];
   let error = null;
 
   try {
@@ -75,9 +87,13 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
     } else if (filter === 'past') {
       queryParams.endDateLt = now;
     }
+    if (search) queryParams.search = search;
 
-    if (search) {
-      queryParams.search = search;
+    categories = await categoryService.getCategories();
+
+    if (categorySlug) {
+      const match = categories.find((c) => c.slug === categorySlug);
+      if (match) queryParams.categoryId = match.id;
     }
 
     const response = await eventService.getEvents(queryParams);
@@ -109,17 +125,17 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
   const tabs = [
     {
       label: 'All',
-      href: buildEventsUrl({ search }),
+      href: buildEventsUrl({ search, category: categorySlug }),
       active: !filter,
     },
     {
       label: 'Upcoming',
-      href: buildEventsUrl({ filter: 'upcoming', search }),
+      href: buildEventsUrl({ filter: 'upcoming', search, category: categorySlug }),
       active: filter === 'upcoming',
     },
     {
       label: 'Past',
-      href: buildEventsUrl({ filter: 'past', search }),
+      href: buildEventsUrl({ filter: 'past', search, category: categorySlug }),
       active: filter === 'past',
     },
   ];
@@ -149,6 +165,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 defaultValue={search}
                 filter={filter}
                 buttonLabel="Search"
+                extraParams={
+                  categorySlug ? { category: categorySlug } : undefined
+                }
               />
             </div>
             {search && (
@@ -157,7 +176,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                   Results for &ldquo;{search}&rdquo;
                 </span>
                 <Link
-                  href={buildEventsUrl({ filter })}
+                  href={buildEventsUrl({ filter, category: categorySlug })}
                   className="font-mono text-xs uppercase tracking-widest text-muted-foreground underline transition-colors hover:text-foreground"
                 >
                   Clear search
@@ -167,9 +186,9 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
           </div>
         </div>
 
-        {/* Filter tabs */}
+        {/* Filter tabs + category dropdown */}
         <div className="border-b border-border">
-          <div className="mx-auto flex max-w-7xl gap-2 overflow-x-auto px-6 py-5">
+          <div className="mx-auto flex max-w-7xl flex-wrap gap-2 overflow-x-auto px-6 py-5">
             {tabs.map(({ label, href, active }) => (
               <Link
                 key={label}
@@ -184,6 +203,15 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 {label}
               </Link>
             ))}
+            {categories.length > 0 && (
+              <CategoryFilter
+                categories={categories}
+                currentSlug={categorySlug}
+                getUrl={(slug) =>
+                  buildEventsUrl({ filter, search, category: slug ?? undefined })
+                }
+              />
+            )}
           </div>
         </div>
 
@@ -210,6 +238,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                         page: currentPage - 1,
                         filter,
                         search,
+                        category: categorySlug,
                       })}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                     >
@@ -228,7 +257,12 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                         (page >= currentPage - 1 && page <= currentPage + 1)
                     )
                     .map((page, idx, arr) => {
-                      const pageUrl = buildEventsUrl({ page, filter, search });
+                      const pageUrl = buildEventsUrl({
+                        page,
+                        filter,
+                        search,
+                        category: categorySlug,
+                      });
                       const showEllipsisBefore =
                         idx > 0 && page - arr[idx - 1] > 1;
                       return (
@@ -259,6 +293,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                         page: currentPage + 1,
                         filter,
                         search,
+                        category: categorySlug,
                       })}
                       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                     >

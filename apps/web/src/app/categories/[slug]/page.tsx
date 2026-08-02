@@ -1,13 +1,48 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { categoryService } from '@/lib/categories';
+import { eventService } from '@/lib/events';
 import EventCard from '@/components/EventCard';
+import CategoryFilter from '@/components/CategoryFilter';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import RoundTextPrimary from '@/components/ui-nuggets/RoundTextPrimary';
+import SearchBar from '@/components/SearchBar';
+import type { Category } from '@whats-up-addis/shared';
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; filter?: string; search?: string }>;
+}
+
+function buildCategoryUrl(
+  slug: string,
+  params: { page?: number; filter?: string; search?: string }
+): string {
+  const query = new URLSearchParams();
+  if (params.page && params.page > 1) query.set('page', String(params.page));
+  if (params.filter) query.set('filter', params.filter);
+  if (params.search) query.set('search', params.search);
+  const qs = query.toString();
+  return qs ? `/categories/${slug}?${qs}` : `/categories/${slug}`;
+}
+
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const category = await categoryService.getCategoryBySlug(slug);
+    return {
+      title: `${category.name} Events in Addis Ababa`,
+      description:
+        category.description ??
+        `Browse upcoming ${category.name} events in Addis Ababa, Ethiopia.`,
+    };
+  } catch {
+    return { title: 'Category Not Found' };
+  }
 }
 
 export default async function CategoryPage({
@@ -15,139 +50,246 @@ export default async function CategoryPage({
   searchParams,
 }: CategoryPageProps) {
   const { slug } = await params;
-  const { page: pageParam } = await searchParams;
-  const page = pageParam ? parseInt(pageParam) : 1;
+  const sp = await searchParams;
+  const currentPage = parseInt(sp.page || '1', 10);
+  // Default to upcoming when no filter is explicitly set
+  const filter = sp.filter ?? 'upcoming';
+  const search = sp.search?.trim() || undefined;
 
-  let category: any;
+  let category: Category | null = null;
   let events: any[] = [];
   let pagination: any = null;
+  let allCategories: Category[] = [];
 
   try {
-    const [categoryData, eventsData] = await Promise.all([
+    const now = new Date().toISOString();
+    const queryParams: any = { page: currentPage, limit: 12 };
+
+    if (filter === 'upcoming') {
+      queryParams.startDate = now;
+    } else if (filter === 'past') {
+      queryParams.endDateLt = now;
+    }
+    if (search) queryParams.search = search;
+
+    const [categoryData, categoriesData] = await Promise.all([
       categoryService.getCategoryBySlug(slug),
-      categoryService.getEventsByCategory(slug, page, 12),
+      categoryService.getCategories(),
     ]);
+
     category = categoryData;
-    events = (eventsData as any).data;
-    pagination = (eventsData as any).pagination;
-  } catch (error) {
-    console.error('Error fetching category data:', error);
+    allCategories = categoriesData;
+    queryParams.categoryId = category.id;
+
+    const response = await eventService.getEvents(queryParams);
+    events = response.data;
+    pagination = response.pagination;
+  } catch (err) {
+    console.error('Error fetching category data:', err);
     notFound();
   }
 
-  if (!category) {
-    notFound();
-  }
+  if (!category) notFound();
+
+  // "All" tab has no filter param — on load it will default to upcoming again,
+  // so we use a special href that explicitly removes filter from the URL
+  const tabs = [
+    {
+      label: 'All',
+      href: `/categories/${slug}${search ? `?search=${encodeURIComponent(search)}` : ''}`,
+      active: sp.filter === undefined,
+    },
+    {
+      label: 'Upcoming',
+      href: buildCategoryUrl(slug, { filter: 'upcoming', search }),
+      active: filter === 'upcoming' && sp.filter !== undefined,
+    },
+    {
+      label: 'Past',
+      href: buildCategoryUrl(slug, { filter: 'past', search }),
+      active: filter === 'past',
+    },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8 pb-20 md:pb-8">
-        <div className="mb-6">
-          <Link
-            href="/"
-            className="inline-flex items-center text-primary-600 hover:text-primary-700"
-          >
-            <svg
-              className="w-5 h-5 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      <main className="flex-1 pb-20 md:pb-0">
+        {/* Page header */}
+        <div className="border-b border-border">
+          <div className="mx-auto max-w-7xl px-6 py-12">
+            <Link
+              href="/categories"
+              className="font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Home
-          </Link>
-        </div>
-
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">{category.name}</h1>
-          {category.description && (
-            <p className="text-xl text-gray-600">{category.description}</p>
-          )}
-        </div>
-
-        {events.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event: any) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+              ← Categories
+            </Link>
+            <div className="mt-4">
+              <RoundTextPrimary>{category.name}</RoundTextPrimary>
             </div>
-
-            {pagination && pagination.totalPages > 1 && (
-              <div className="mt-8 flex justify-center gap-2">
-                {pagination.hasPreviousPage && (
-                  <Link
-                    href={`/categories/${slug}?page=${page - 1}`}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                  >
-                    Previous
-                  </Link>
-                )}
-
-                {Array.from(
-                  { length: pagination.totalPages },
-                  (_, i) => i + 1
-                ).map((pageNum) => (
-                  <Link
-                    key={pageNum}
-                    href={`/categories/${slug}?page=${pageNum}`}
-                    className={`px-4 py-2 rounded ${
-                      pageNum === pagination.page
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  >
-                    {pageNum}
-                  </Link>
-                ))}
-
-                {pagination.hasNextPage && (
-                  <Link
-                    href={`/categories/${slug}?page=${page + 1}`}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                  >
-                    Next
-                  </Link>
-                )}
+            <h1 className="mt-2 font-display text-5xl md:text-6xl">
+              {category.name} Events
+            </h1>
+            {category.description && (
+              <p className="mt-3 text-muted-foreground">
+                {category.description}
+              </p>
+            )}
+            <div className="mt-6">
+              <SearchBar
+                defaultValue={search}
+                filter={filter}
+                buttonLabel="Search"
+                action={`/categories/${slug}`}
+              />
+            </div>
+            {search && (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <span className="text-sm text-foreground">
+                  Results for &ldquo;{search}&rdquo;
+                </span>
+                <Link
+                  href={buildCategoryUrl(slug, { filter })}
+                  className="font-mono text-xs uppercase tracking-widest text-muted-foreground underline transition-colors hover:text-foreground"
+                >
+                  Clear search
+                </Link>
               </div>
             )}
-          </>
-        ) : (
-          <div className="text-center py-16">
-            <div className="text-gray-400 mb-4">
-              <svg
-                className="w-16 h-16 mx-auto"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-            </div>
-            <p className="text-gray-600 text-lg mb-4">
-              No events found in this category yet.
-            </p>
-            <Link
-              href="/events"
-              className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-            >
-              Browse All Events
-            </Link>
           </div>
-        )}
+        </div>
+
+        {/* Filter tabs + category switcher */}
+        <div className="border-b border-border">
+          <div className="mx-auto flex max-w-7xl flex-wrap gap-2 overflow-x-auto px-6 py-5">
+            {tabs.map(({ label, href, active }) => (
+              <Link
+                key={label}
+                href={href}
+                className={[
+                  'shrink-0 rounded-full border px-4 py-2 font-mono text-xs uppercase tracking-widest transition-all',
+                  active
+                    ? 'border bg-ember text-foreground'
+                    : 'border-border bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground',
+                ].join(' ')}
+              >
+                {label}
+              </Link>
+            ))}
+            {allCategories.length > 0 && (
+              <CategoryFilter
+                categories={allCategories}
+                currentSlug={slug}
+                getUrl={(newSlug) =>
+                  newSlug
+                    ? buildCategoryUrl(newSlug, { filter, search })
+                    : '/events'
+                }
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="mx-auto max-w-7xl px-6 py-12">
+          {events.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {events.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+
+              {pagination && pagination.totalPages > 1 && (
+                <div className="mt-12 flex justify-center gap-2 items-center">
+                  {currentPage > 1 && (
+                    <Link
+                      href={buildCategoryUrl(slug, {
+                        page: currentPage - 1,
+                        filter,
+                        search,
+                      })}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+                    >
+                      ←
+                    </Link>
+                  )}
+
+                  {Array.from(
+                    { length: pagination.totalPages },
+                    (_, i) => i + 1
+                  )
+                    .filter(
+                      (p) =>
+                        p === 1 ||
+                        p === pagination.totalPages ||
+                        (p >= currentPage - 1 && p <= currentPage + 1)
+                    )
+                    .map((p, idx, arr) => {
+                      const pageUrl = buildCategoryUrl(slug, {
+                        page: p,
+                        filter,
+                        search,
+                      });
+                      const showEllipsisBefore = idx > 0 && p - arr[idx - 1] > 1;
+                      return (
+                        <span key={p} className="flex items-center gap-2">
+                          {showEllipsisBefore && (
+                            <span className="font-mono text-xs text-muted-foreground">
+                              …
+                            </span>
+                          )}
+                          <Link
+                            href={pageUrl}
+                            className={[
+                              'inline-flex h-9 w-9 items-center justify-center rounded-full border font-mono text-sm transition-all',
+                              p === currentPage
+                                ? 'border bg-ember text-foreground'
+                                : 'border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground',
+                            ].join(' ')}
+                          >
+                            {p}
+                          </Link>
+                        </span>
+                      );
+                    })}
+
+                  {currentPage < pagination.totalPages && (
+                    <Link
+                      href={buildCategoryUrl(slug, {
+                        page: currentPage + 1,
+                        filter,
+                        search,
+                      })}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border font-mono text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+                    >
+                      →
+                    </Link>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
+              <p className="font-display text-2xl">Nothing here yet.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                No{' '}
+                {filter === 'upcoming'
+                  ? 'upcoming '
+                  : filter === 'past'
+                    ? 'past '
+                    : ''}
+                events in this category.
+              </p>
+              <Link
+                href="/events"
+                className="mt-6 inline-flex h-10 items-center rounded-full bg-ember px-6 font-mono text-xs uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
+              >
+                Browse All Events
+              </Link>
+            </div>
+          )}
+        </div>
       </main>
 
       <Footer />
