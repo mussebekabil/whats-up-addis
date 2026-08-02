@@ -93,7 +93,6 @@ export class LLMParserService {
       model: this.modelName,
       systemInstruction: this.buildSystemPrompt(),
       generationConfig: {
-
         responseMimeType: 'application/json',
       },
     });

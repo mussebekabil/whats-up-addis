@@ -23,6 +23,8 @@ model User {
   comments     Comment[]
   commentLikes CommentLike[]
   ratings      Rating[]
+  subscriptions        UserCategorySubscription[]
+  notificationSettings UserNotificationSettings?
 
   @@map("users")
 }
@@ -70,8 +72,35 @@ model Category {
 
   events          Event[]
   telegramSources TelegramSource[]
+  subscribers UserCategorySubscription[]
 
   @@map("categories")
+}
+
+model UserCategorySubscription {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  categoryId String   @map("category_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId])
+  @@map("user_category_subscriptions")
+}
+
+model UserNotificationSettings {
+  id                 String          @id @default(uuid())
+  userId             String          @unique @map("user_id")
+  digestFrequency    DigestFrequency @default(EVERY_3_DAYS) @map("digest_frequency")
+  genericEmailOptOut Boolean         @default(false) @map("generic_email_opt_out")
+  lastDigestSentAt   DateTime?       @map("last_digest_sent_at")
+  lastGenericSentAt  DateTime?       @map("last_generic_sent_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_notification_settings")
 }
 
 model EventTag {
@@ -180,4 +209,9 @@ enum EventStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+enum DigestFrequency {
+  EVERY_3_DAYS
+  WEEKLY
 }

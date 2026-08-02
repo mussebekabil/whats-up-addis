@@ -1,0 +1,27 @@
+{
+  "name": "@whats-up-addis/email-scheduler",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "dotenv -e ../../.env -- node dist/index.js",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@whats-up-addis/database": "workspace:*",
+    "@whats-up-addis/shared": "workspace:*",
+    "node-cron": "^3.0.3",
+    "jsonwebtoken": "^9.0.0",
+    "dotenv": "^16.4.7",
+    "dotenv-cli": "^7.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/node-cron": "^3.0.11",
+    "@types/jsonwebtoken": "^9.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

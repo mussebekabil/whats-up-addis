@@ -165,8 +165,7 @@ export class TelegramCrawlerService {
             );
             stats.errors.push({
               type: 'message_processing',
-              message:
-                error instanceof Error ? error.message : 'Unknown error',
+              message: error instanceof Error ? error.message : 'Unknown error',
             });
           }
         }

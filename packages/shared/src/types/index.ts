@@ -128,3 +128,26 @@ export interface EventRatingStats {
   totalRatings: number;
   userRating?: number;
 }
+
+export type DigestFrequency = 'EVERY_3_DAYS' | 'WEEKLY';
+
+export interface UserSubscription {
+  id: string;
+  categoryId: string;
+  category: {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+  };
+  createdAt: Date;
+}
+
+export interface NotificationSettings {
+  id: string;
+  userId: string;
+  digestFrequency: DigestFrequency;
+  genericEmailOptOut: boolean;
+  lastDigestSentAt: Date | null;
+  lastGenericSentAt: Date | null;
+}

@@ -151,3 +151,25 @@ export const contactSchema = z.object({
     .max(2000, 'Message is too long'),
 });
 export type ContactInput = z.infer<typeof contactSchema>;
+
+// Subscription schemas
+export const addSubscriptionSchema = z.object({
+  categoryId: z.string().uuid('Invalid category ID'),
+});
+
+export const updateNotificationSettingsSchema = z
+  .object({
+    digestFrequency: z.enum(['EVERY_3_DAYS', 'WEEKLY']).optional(),
+    genericEmailOptOut: z.boolean().optional(),
+  })
+  .refine(
+    (data) =>
+      data.digestFrequency !== undefined ||
+      data.genericEmailOptOut !== undefined,
+    { message: 'At least one field must be provided' }
+  );
+
+export type AddSubscriptionInput = z.infer<typeof addSubscriptionSchema>;
+export type UpdateNotificationSettingsInput = z.infer<
+  typeof updateNotificationSettingsSchema
+>;
