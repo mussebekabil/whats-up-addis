@@ -139,14 +139,12 @@ export default function Navbar() {
             <ThemeToggle />
             {user ? (
               <>
-                {user.role === Roles.Admin && (
-                  <Link
-                    href="/events/create"
-                    className="inline-flex h-9 items-center rounded-full bg-ember px-4 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
-                  >
-                    Create event
-                  </Link>
-                )}
+                <Link
+                  href="/events/create"
+                  className="inline-flex h-9 items-center rounded-full bg-ember px-4 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
+                >
+                  Create event
+                </Link>
                 <div className="relative" ref={desktopDropdownRef}>
                   <button
                     onClick={() =>
@@ -404,7 +402,7 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {user?.role === Roles.Admin && (
+          {user && (
             <Link
               href="/events/create"
               className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
