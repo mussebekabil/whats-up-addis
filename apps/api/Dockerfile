@@ -32,12 +32,13 @@ RUN echo "DATABASE_URL=postgresql://user:pass@localhost:5432/temp" > /app/.env
 WORKDIR /app/packages/database
 RUN pnpm db:generate
 
-# We don't need to build since we'll use tsx to run TypeScript directly
-# This avoids issues with monorepo package imports
+# Copy and register the entrypoint script
+COPY apps/api/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Expose port (Railway will set PORT env var)
 EXPOSE 3001
 
-# Start the API with tsx (TypeScript executor)
-WORKDIR /app/apps/api
-CMD ["npx", "tsx", "src/index.ts"]
+# Run migrations then start the server
+WORKDIR /app
+CMD ["/app/entrypoint.sh"]
