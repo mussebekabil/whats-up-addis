@@ -143,10 +143,15 @@ function emailShell(
           <!-- Header -->
           <tr>
             <td class="email-header" style="background:${C.header};padding:28px 24px;text-align:center;">
+              <!--[if mso]>
+              <p style="margin:0 0 6px;font-family:'JetBrains Mono','Courier New',monospace;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:${C.ember};">What&#8217;s Up Addis</p>
+              <![endif]-->
+              <!--[if !mso]><!-->
               <div style="margin:0 0 14px;text-align:center;line-height:1;">
                 <span style="display:inline-block;vertical-align:baseline;font-family:${F.display};font-size:24px;font-weight:400;color:#ffffff;line-height:1;margin-right:6px;">What&#8217;s Up</span><!--
                 --><span style="display:inline-block;vertical-align:baseline;background:${C.ember};border-radius:6px;padding:4px 9px;font-family:${F.mono};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#ffffff;">Addis</span>
               </div>
+              <!--<![endif]-->
               <h1 style="color:#ffffff;margin:0 0 8px;font-size:26px;font-weight:400;
                 font-family:'Instrument Serif',Georgia,'Times New Roman',serif;letter-spacing:-0.02em;line-height:1.2;">
                 ${title}
