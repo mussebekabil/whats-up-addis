@@ -1,10 +1,6 @@
 # Email Scheduler Dockerfile for Railway deployment
 FROM node:22-slim AS base
 
-# Set Node to allow self-signed certificates
-ENV NODE_TLS_REJECT_UNAUTHORIZED=0
-ENV npm_config_strict_ssl=false
-
 # Install pnpm
 RUN npm install -g pnpm@10.0.0
 
