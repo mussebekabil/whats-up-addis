@@ -31,6 +31,7 @@ RUN echo "DATABASE_URL=postgresql://user:pass@localhost:5432/temp" > /app/.env
 
 WORKDIR /app/packages/database
 RUN pnpm db:generate
+RUN pnpm db:migrate
 
 # We don't need to build since we'll use tsx to run TypeScript directly
 # This avoids issues with monorepo package imports
