@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { authService } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
@@ -10,7 +10,7 @@ import { ProfileDetails } from './components/ProfileDetails';
 import { NotificationSettings } from './components/NotificationSettings';
 import type { User } from '@whats-up-addis/shared';
 
-export default function ProfilePage() {
+function ProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get('tab') || 'profile';
@@ -91,5 +91,13 @@ export default function ProfilePage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfileContent />
+    </Suspense>
   );
 }
