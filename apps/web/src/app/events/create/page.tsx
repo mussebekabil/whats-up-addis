@@ -53,10 +53,9 @@ function CreateEventForm() {
           authService.getMe(),
           categoryService.getCategories(),
         ]);
-
-        if (userData.role !== Roles.Admin) {
+        if (!userData) {
           setError(
-            'You do not have permission to create events. Admin access required.'
+            'Please register to create events. You can register by clicking the "Register" button in the top-right corner.'
           );
           setIsLoading(false);
           return;

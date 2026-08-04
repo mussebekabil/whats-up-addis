@@ -137,69 +137,67 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
+            <Link
+              href="/events/create"
+              className="inline-flex h-9 items-center rounded-full bg-ember px-4 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
+            >
+              Create event
+            </Link>
             {user ? (
-              <>
-                <Link
-                  href="/events/create"
-                  className="inline-flex h-9 items-center rounded-full bg-ember px-4 font-mono text-[11px] uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
+              <div className="relative" ref={desktopDropdownRef}>
+                <button
+                  onClick={() =>
+                    setIsDesktopDropdownOpen(!isDesktopDropdownOpen)
+                  }
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-ember font-mono text-xs font-bold text-primary-foreground transition-opacity hover:opacity-80"
                 >
-                  Create event
-                </Link>
-                <div className="relative" ref={desktopDropdownRef}>
-                  <button
-                    onClick={() =>
-                      setIsDesktopDropdownOpen(!isDesktopDropdownOpen)
-                    }
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-ember font-mono text-xs font-bold text-primary-foreground transition-opacity hover:opacity-80"
-                  >
-                    {getUserInitials(user.name)}
-                  </button>
+                  {getUserInitials(user.name)}
+                </button>
 
-                  {isDesktopDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-52 rounded-xl border border-border bg-card py-2 shadow-lg">
-                      <div className="border-b border-border px-4 py-2">
-                        <p className="text-sm font-medium text-foreground">
-                          {user.name}
-                        </p>
-                        <p className="truncate font-mono text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
-                      </div>
-                      {user.role === Roles.Admin && (
-                        <Link
-                          href="/admin/events"
-                          onClick={() => setIsDesktopDropdownOpen(false)}
-                          className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                        >
-                          Manage Events
-                        </Link>
-                      )}
-                      {user.role === Roles.Admin && (
-                        <Link
-                          href="/admin/users"
-                          onClick={() => setIsDesktopDropdownOpen(false)}
-                          className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                        >
-                          Manage Users
-                        </Link>
-                      )}
+                {isDesktopDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-52 rounded-xl border border-border bg-card py-2 shadow-lg">
+                    <div className="border-b border-border px-4 py-2">
+                      <p className="text-sm font-medium text-foreground">
+                        {user.name}
+                      </p>
+                      <p className="truncate font-mono text-xs text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
+                    {user.role === Roles.Admin && (
                       <Link
-                        href="/profile"
+                        href="/admin/events"
                         onClick={() => setIsDesktopDropdownOpen(false)}
                         className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                       >
-                        View Profile
+                        Manage Events
                       </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full px-4 py-2 text-left text-sm text-destructive transition-colors hover:bg-muted"
+                    )}
+                    {user.role === Roles.Admin && (
+                      <Link
+                        href="/admin/users"
+                        onClick={() => setIsDesktopDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
                       >
-                        Sign Out
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
+                        Manage Users
+                      </Link>
+                    )}
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsDesktopDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+                    >
+                      View Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-destructive transition-colors hover:bg-muted"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link
@@ -402,35 +400,31 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {user && (
-            <Link
-              href="/events/create"
-              className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
-                isActive('/events/create')
-                  ? 'text-ember'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
+          <Link
+            href="/events/create"
+            className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+              isActive('/events/create')
+                ? 'text-ember'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <div className="w-5 h-5 rounded-full bg-ember flex items-center justify-center text-ember-foreground">
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-              </div>
-              <span className="font-mono text-[9px] uppercase tracking-widest">
-                Create
-              </span>
-            </Link>
-          )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span className="font-mono text-[9px] uppercase tracking-widest">
+              Create
+            </span>
+          </Link>
           {user ? (
             <Link
               href="/profile"
