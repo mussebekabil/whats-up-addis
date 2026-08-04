@@ -222,6 +222,15 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
               <Field label="Venue" value={event.venue ?? 'TBA'} />
               <Field label="Location" value={event.location ?? 'Addis Ababa'} />
               <Field label="Price" value={price} />
+              {event.startDate && (
+                <Field
+                  label="Start Date"
+                  value={format(
+                    new Date(event.startDate),
+                    'MMMM d, yyyy · h:mm a'
+                  )}
+                />
+              )}
               {event.endDate && (
                 <Field
                   label="End Date"
