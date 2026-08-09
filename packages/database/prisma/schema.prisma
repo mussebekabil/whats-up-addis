@@ -19,10 +19,13 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  events       Event[]
-  comments     Comment[]
-  commentLikes CommentLike[]
-  ratings      Rating[]
+  events            Event[]
+  comments          Comment[]
+  commentLikes      CommentLike[]
+  ratings           Rating[]
+  placeRatings      PlaceRating[]
+  placeComments     PlaceComment[]
+  placeCommentLikes PlaceCommentLike[]
   subscriptions        UserCategorySubscription[]
   notificationSettings UserNotificationSettings?
 
@@ -64,13 +67,15 @@ model Event {
 }
 
 model Category {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(100)
-  slug        String   @unique @db.VarChar(100)
-  description String?  @db.Text
-  createdAt   DateTime @default(now()) @map("created_at")
+  id          String         @id @default(uuid())
+  name        String         @db.VarChar(100)
+  slug        String         @unique @db.VarChar(100)
+  description String?        @db.Text
+  applies     CategoryApplies @default(EVENT)
+  createdAt   DateTime       @default(now()) @map("created_at")
 
   events          Event[]
+  places          Place[]
   telegramSources TelegramSource[]
   subscribers UserCategorySubscription[]
 
@@ -197,6 +202,75 @@ model Rating {
   @@map("ratings")
 }
 
+model Place {
+  id         String   @id @default(uuid())
+  slug       String   @unique @db.VarChar(100)
+  name       String   @db.VarChar(255)
+  imageUrl   String?  @map("image_url") @db.VarChar(500)
+  categoryId String   @map("category_id")
+  featured   Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  category Category       @relation(fields: [categoryId], references: [id])
+  ratings  PlaceRating[]
+  comments PlaceComment[]
+
+  @@map("places")
+}
+
+model PlaceRating {
+  id        String   @id @default(uuid())
+  rating    Int      @db.SmallInt // 1-5
+  placeId   String   @map("place_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([placeId, userId])
+  @@index([placeId])
+  @@index([userId])
+  @@map("place_ratings")
+}
+
+model PlaceComment {
+  id              String   @id @default(uuid())
+  content         String   @db.Text
+  placeId         String   @map("place_id")
+  userId          String   @map("user_id")
+  parentCommentId String?  @map("parent_comment_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  place         Place              @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentComment PlaceComment?      @relation("PlaceCommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies       PlaceComment[]     @relation("PlaceCommentReplies")
+  likes         PlaceCommentLike[]
+
+  @@index([placeId])
+  @@index([userId])
+  @@index([parentCommentId])
+  @@map("place_comments")
+}
+
+model PlaceCommentLike {
+  id        String   @id @default(uuid())
+  commentId String   @map("comment_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  comment PlaceComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId])
+  @@index([userId])
+  @@map("place_comment_likes")
+}
+
 enum Role {
   USER
   MODERATOR
@@ -214,4 +288,10 @@ enum EventStatus {
 enum DigestFrequency {
   EVERY_3_DAYS
   WEEKLY
+}
+
+enum CategoryApplies {
+  EVENT
+  PLACE
+  BOTH
 }

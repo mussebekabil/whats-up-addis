@@ -1,12 +1,15 @@
 import Link from 'next/link';
 import { eventService } from '@/lib/events';
 import { categoryService } from '@/lib/categories';
+import { placeService } from '@/lib/places';
 import EventCard from '@/components/EventCard';
 import CategoryCard from '@/components/CategoryCard';
+import PlaceCard from '@/components/PlaceCard';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import FadeIn from '@/components/FadeIn';
 import SearchBar from '@/components/SearchBar';
+import type { Place } from '@whats-up-addis/shared';
 import {
   generateOrganizationSchema,
   generateWebSiteSchema,
@@ -37,17 +40,23 @@ export default async function Home() {
   let upcomingEvents: any[] = [];
   let featuredEvents: any[] = [];
   let categories: any[] = [];
+  let featuredPlaces: Place[] = [];
   let error = null;
 
   try {
     const now = new Date().toISOString();
 
-    const [upcomingResponse, allUpcomingEventsResponse, categoriesResponse] =
-      await Promise.all([
-        eventService.getEvents({ page: 1, limit: 6, startDate: now }),
-        eventService.getEvents({ page: 1, limit: 50, startDate: now }),
-        categoryService.getCategories(),
-      ]);
+    const [
+      upcomingResponse,
+      allUpcomingEventsResponse,
+      categoriesResponse,
+      featuredPlacesResponse,
+    ] = await Promise.all([
+      eventService.getEvents({ page: 1, limit: 6, startDate: now }),
+      eventService.getEvents({ page: 1, limit: 50, startDate: now }),
+      categoryService.getCategories(),
+      placeService.getPlaces({ featured: true, limit: 6 }),
+    ]);
 
     upcomingEvents = upcomingResponse.data;
     allUpcomingEvents = allUpcomingEventsResponse.data;
@@ -73,6 +82,7 @@ export default async function Home() {
     }
 
     categories = categoriesResponse;
+    featuredPlaces = featuredPlacesResponse.data.slice(0, 6);
   } catch (err) {
     error = 'Failed to load data. Please make sure the API server is running.';
     console.error('Error fetching data:', err);
@@ -214,19 +224,52 @@ export default async function Home() {
           </section>
         )}
 
+        {/* Explore Places */}
+        {featuredPlaces.length > 0 && (
+          <section className="mx-auto max-w-7xl px-6 py-12">
+            <div className="mb-8 flex items-end justify-between">
+              <div>
+                <span className="font-mono text-xs uppercase tracking-widest text-ember">
+                  Explore
+                </span>
+                <h2 className="mt-1 font-display text-3xl">Places to Visit</h2>
+              </div>
+              <Link
+                href="/places"
+                className="font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+              >
+                All Places →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredPlaces.map((place) => (
+                <PlaceCard key={place.id} place={place} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Categories */}
         {categories.length > 0 ? (
           <section className="mx-auto max-w-7xl px-6 py-16">
-            <div className="mb-10">
-              <span className="font-mono text-xs uppercase tracking-widest text-ember">
-                By interest
-              </span>
-              <h2 className="mt-2 font-display text-4xl md:text-5xl">
-                Browse by Category
-              </h2>
+            <div className="mb-10 flex items-end justify-between">
+              <div>
+                <span className="font-mono text-xs uppercase tracking-widest text-ember">
+                  By interest
+                </span>
+                <h2 className="mt-2 font-display text-4xl md:text-5xl">
+                  Browse by Category
+                </h2>
+              </div>
+              <Link
+                href="/categories"
+                className="font-mono text-xs uppercase tracking-widest text-muted-foreground transition-colors hover:text-foreground"
+              >
+                View all →
+              </Link>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {categories.map((category, i) => (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {categories.slice(0, 6).map((category, i) => (
                 <FadeIn key={category.id} delay={i * 70}>
                   <CategoryCard category={category} />
                 </FadeIn>

@@ -99,7 +99,17 @@ export default function Navbar() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Discover
+              Events
+            </Link>
+            <Link
+              href="/places"
+              className={`text-xs uppercase transition-colors ${
+                isActive('/places') || pathname?.startsWith('/places/')
+                  ? 'text-ember'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Places
             </Link>
             <Link
               href="/categories"
@@ -349,9 +359,9 @@ export default function Navbar() {
           </Link>
 
           <Link
-            href="/categories"
+            href="/places"
             className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
-              isActive('/categories') || pathname?.startsWith('/categories/')
+              isActive('/places') || pathname?.startsWith('/places/')
                 ? 'text-ember'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
@@ -366,37 +376,17 @@ export default function Navbar() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
               />
-            </svg>
-            <span className="font-mono text-[9px] uppercase tracking-widest">
-              Categories
-            </span>
-          </Link>
-
-          <Link
-            href="/contact"
-            className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
-              isActive('/contact')
-                ? 'text-ember'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
             <span className="font-mono text-[9px] uppercase tracking-widest">
-              Contact
+              Places
             </span>
           </Link>
 
@@ -423,6 +413,32 @@ export default function Navbar() {
             </svg>
             <span className="font-mono text-[9px] uppercase tracking-widest">
               Create
+            </span>
+          </Link>
+
+          <Link
+            href="/contact"
+            className={`flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+              isActive('/contact')
+                ? 'text-ember'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+            <span className="font-mono text-[9px] uppercase tracking-widest">
+              Contact
             </span>
           </Link>
           {user ? (

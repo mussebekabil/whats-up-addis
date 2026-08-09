@@ -32,12 +32,69 @@ export interface Event {
   tags?: EventTag[];
 }
 
+export type CategoryApplies = 'EVENT' | 'PLACE' | 'BOTH';
+
 export interface Category {
   id: string;
   name: string;
   slug: string;
   description?: string | null;
+  applies?: CategoryApplies;
   createdAt: Date;
+}
+
+export interface Place {
+  id: string;
+  slug: string;
+  name: string;
+  imageUrl?: string | null;
+  categoryId: string;
+  featured: boolean;
+  createdAt: Date;
+  category?: Category;
+}
+
+export interface PlaceComment {
+  id: string;
+  content: string;
+  placeId: string;
+  userId: string;
+  parentCommentId?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  user: Pick<User, 'id' | 'name'>;
+  replies?: PlaceComment[];
+  likes?: PlaceCommentLike[];
+  likesCount?: number;
+  isLikedByUser?: boolean;
+}
+
+export interface PlaceCommentLike {
+  id: string;
+  commentId: string;
+  userId: string;
+  createdAt: Date;
+}
+
+export interface PlaceRating {
+  id: string;
+  rating: number;
+  placeId: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user?: Pick<User, 'id' | 'name'>;
+}
+
+export interface PlaceRatingStats {
+  averageRating: number;
+  totalRatings: number;
+  userRating?: number;
+}
+
+export interface PlaceFilters {
+  categoryId?: string;
+  search?: string;
 }
 
 export interface EventTag {

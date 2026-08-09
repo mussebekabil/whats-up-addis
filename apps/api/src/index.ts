@@ -33,6 +33,7 @@ import ratingRoutes from './routes/rating.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import usersRoutes from './routes/users.routes.js';
+import placeRoutes from './routes/place.routes.js';
 
 const app = express();
 const PORT = process.env.API_PORT || 3001;
@@ -62,6 +63,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api', commentRoutes);
 app.use('/api', ratingRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/places', placeRoutes);
 
 // Error handlers
 app.use(notFoundHandler);

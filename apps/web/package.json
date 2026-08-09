@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint .",
@@ -11,19 +11,26 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
+    "@tailwindcss/typography": "^0.5.20",
     "@whats-up-addis/shared": "workspace:*",
+    "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
+    "gray-matter": "^4.0.3",
     "next": "^16.0.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-html": "^16.0.1",
     "tailwind-merge": "^3.6.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.19.1",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.4.20",
@@ -31,6 +38,7 @@
     "eslint-config-next": "^16.0.10",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }
 }

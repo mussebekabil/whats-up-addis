@@ -140,6 +140,17 @@ export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
 export type CreateRatingInput = z.infer<typeof createRatingSchema>;
 export type UpdateRatingInput = z.infer<typeof updateRatingSchema>;
 
+// Place schemas
+export const placeFiltersSchema = z.object({
+  search: z.string().optional(),
+  categoryId: z.string().uuid().optional(),
+  featured: z.coerce.boolean().optional(),
+  page: z.number().int().positive().default(1),
+  limit: z.number().int().positive().max(100).default(20),
+});
+
+export type PlaceFiltersInput = z.input<typeof placeFiltersSchema>;
+
 // Contact schemas
 export const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100),
