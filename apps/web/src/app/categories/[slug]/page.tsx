@@ -64,8 +64,8 @@ export default async function CategoryPage({
   const filter = sp.filter ?? 'upcoming';
   const search = sp.search?.trim() || undefined;
   const tab = sp.tab;
-  const activeTab = tab === 'places' ? 'places' : 'events';
 
+  let activeTab: 'events' | 'places' = 'events';
   let category: Category | null = null;
   let events: any[] = [];
   let places: Place[] = [];
@@ -92,6 +92,16 @@ export default async function CategoryPage({
     category = categoryData;
     allCategories = categoriesData;
     queryParams.categoryId = category.id;
+
+    // Default to places tab when category is PLACE or BOTH, unless user explicitly chose events
+    if (tab) {
+      activeTab = tab === 'places' ? 'places' : 'events';
+    } else {
+      activeTab =
+        category.applies === 'PLACE' || category.applies === 'BOTH'
+          ? 'places'
+          : 'events';
+    }
 
     const response = await eventService.getEvents(queryParams);
     events = response.data;
