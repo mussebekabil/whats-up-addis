@@ -96,7 +96,7 @@ async function main() {
   for (const category of placeCategories) {
     await prisma.category.upsert({
       where: { slug: category.slug },
-      update: {},
+      update: { applies: category.applies },
       create: category,
     });
   }
@@ -456,23 +456,7 @@ async function main() {
         'https://res.cloudinary.com/dlvwfihop/image/upload/v1786271448/whats-up-addis/places/merkato-1786271445779.jpg',
       categoryId: shoppingCategory?.id,
       featured: false,
-    },
-    {
-      slug: 'african-union-handcraft-market',
-      name: 'African Union Handcraft Market',
-      imageUrl:
-        'https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=1200',
-      categoryId: shoppingCategory?.id,
-      featured: false,
-    },
-    {
-      slug: 'shola-market',
-      name: 'Shola Market',
-      imageUrl:
-        'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200',
-      categoryId: shoppingCategory?.id,
-      featured: false,
-    },
+    }
   ];
 
   for (const place of placesData) {
