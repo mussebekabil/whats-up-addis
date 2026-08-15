@@ -1,9 +1,6 @@
 import { Event } from '@whats-up-addis/shared';
+import { PlaceContent } from '@/lib/place-content';
 
-/**
- * Generate JSON-LD structured data for an event
- * This helps search engines understand and display event information
- */
 export function generateEventSchema(event: Event) {
   const schema = {
     '@context': 'https://schema.org',
@@ -28,14 +25,14 @@ export function generateEventSchema(event: Event) {
       ? {
           '@type': 'Offer',
           price: event.price,
-          priceCurrency: 'ETH Birr',
+          priceCurrency: 'ETB',
           availability: 'https://schema.org/InStock',
           url: `https://whatsupaddis.io/events/${event.id}`,
         }
       : {
           '@type': 'Offer',
           price: 0,
-          priceCurrency: 'ETH Birr',
+          priceCurrency: 'ETB',
           availability: 'https://schema.org/InStock',
           url: `https://whatsupaddis.io/events/${event.id}`,
         },
@@ -45,14 +42,9 @@ export function generateEventSchema(event: Event) {
       url: 'https://whatsupaddis.io',
     },
   };
-
-  // Remove undefined values
   return JSON.parse(JSON.stringify(schema));
 }
 
-/**
- * Generate JSON-LD structured data for the website/organization
- */
 export function generateOrganizationSchema() {
   return {
     '@context': 'https://schema.org',
@@ -62,12 +54,7 @@ export function generateOrganizationSchema() {
     logo: 'https://whatsupaddis.io/logo.png',
     description:
       'Your ultimate guide to events in Addis Ababa, Ethiopia. Discover concerts, conferences, workshops, and entertainment.',
-    sameAs: [
-      // Add your social media profiles here
-      // 'https://facebook.com/whatsupaddis',
-      // 'https://twitter.com/whatsupaddis',
-      // 'https://instagram.com/whatsupaddis',
-    ],
+    sameAs: [],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
@@ -76,17 +63,11 @@ export function generateOrganizationSchema() {
     areaServed: {
       '@type': 'City',
       name: 'Addis Ababa',
-      containedIn: {
-        '@type': 'Country',
-        name: 'Ethiopia',
-      },
+      containedIn: { '@type': 'Country', name: 'Ethiopia' },
     },
   };
 }
 
-/**
- * Generate JSON-LD structured data for the website
- */
 export function generateWebSiteSchema() {
   return {
     '@context': 'https://schema.org',
@@ -107,9 +88,6 @@ export function generateWebSiteSchema() {
   };
 }
 
-/**
- * Generate JSON-LD for a list of events
- */
 export function generateEventListSchema(events: Event[]) {
   return {
     '@context': 'https://schema.org',
@@ -118,6 +96,57 @@ export function generateEventListSchema(events: Event[]) {
       '@type': 'ListItem',
       position: index + 1,
       item: generateEventSchema(event),
+    })),
+  };
+}
+
+export function generatePlaceSchema(content: PlaceContent) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristAttraction',
+    name: content.name,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: content.address || undefined,
+      addressLocality: 'Addis Ababa',
+      addressCountry: 'Ethiopia',
+    },
+    telephone: content.contactInfo || undefined,
+    image: content.imageUrls[0] || undefined,
+    url: `https://whatsupaddis.io/places/${content.slug}`,
+  };
+  return JSON.parse(JSON.stringify(schema));
+}
+
+export function generateBreadcrumbSchema(
+  crumbs: { name: string; url: string }[]
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      item: `https://whatsupaddis.io${crumb.url}`,
+    })),
+  };
+}
+
+export function generateGuideSchema(
+  title: string,
+  description: string,
+  places: PlaceContent[]
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: title,
+    description,
+    itemListElement: places.map((place, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: generatePlaceSchema(place),
     })),
   };
 }

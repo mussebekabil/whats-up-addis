@@ -1,17 +1,16 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import Image from 'next/image';
 import { eventService } from '@/lib/events';
-import { authService } from '@/lib/auth';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import EventEngagement from '@/components/EventEngagement';
-import { Event, User, Roles } from '@whats-up-addis/shared';
+import EventAdminActions from './EventAdminActions';
+import { Event } from '@whats-up-addis/shared';
 import RoundTextMuted from '@/components/ui-nuggets/RoundTextMuted';
+import { generateEventSchema, generateBreadcrumbSchema } from '@/lib/seo';
 
 interface EventDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -28,75 +27,49 @@ function Field({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function EventDetailsPage({ params }: EventDetailsPageProps) {
-  const router = useRouter();
-  const [eventId, setEventId] = useState<string>('');
-  const [event, setEvent] = useState<Event | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const resolvedParams = await params;
-        setEventId(resolvedParams.id);
-
-        const eventData = await eventService.getEventById(resolvedParams.id);
-        setEvent(eventData);
-
-        if (authService.isAuthenticated()) {
-          try {
-            const userData = await authService.getMe();
-            setUser(userData);
-          } catch (err) {
-            console.error('Error fetching user:', err);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching event:', error);
-        notFound();
-      } finally {
-        setIsLoading(false);
-      }
+export async function generateMetadata({
+  params,
+}: EventDetailsPageProps): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const event: Event = await eventService.getEventById(id);
+    const description = event.description?.slice(0, 160) ?? '';
+    return {
+      title: event.title,
+      description,
+      alternates: {
+        canonical: `https://whatsupaddis.io/events/${id}`,
+      },
+      openGraph: {
+        title: event.title,
+        description,
+        url: `https://whatsupaddis.io/events/${id}`,
+        type: 'article',
+        images: event.imageUrl
+          ? [{ url: event.imageUrl, width: 1200, height: 630, alt: event.title }]
+          : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: event.title,
+        description,
+        images: event.imageUrl ? [event.imageUrl] : [],
+      },
     };
-
-    fetchData();
-  }, [params]);
-
-  const handleDelete = async () => {
-    if (!eventId) return;
-    setIsDeleting(true);
-    try {
-      await eventService.deleteEvent(eventId);
-      router.push('/events');
-    } catch (error) {
-      console.error('Error deleting event:', error);
-      alert('Failed to delete event. Please try again.');
-      setIsDeleting(false);
-      setShowDeleteModal(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-background text-foreground">
-        <Navbar />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-border border-t-ember" />
-            <p className="mt-4 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              Loading…
-            </p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+  } catch {
+    return {};
   }
+}
 
-  if (!event) {
+export default async function EventDetailsPage({
+  params,
+}: EventDetailsPageProps) {
+  const { id } = await params;
+
+  let event: Event;
+  try {
+    event = await eventService.getEventById(id);
+  } catch {
     notFound();
   }
 
@@ -107,8 +80,27 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
         : `${Number(event.price).toLocaleString()} ETB`
       : 'Free';
 
+  const telegramSourceUrl =
+    event.source === 'telegram' ? (event.sourceUrl ?? null) : null;
+
+  const eventSchema = generateEventSchema(event);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Events', url: '/events' },
+    { name: event.title, url: `/events/${id}` },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
       <Navbar />
 
       <main className="flex-1 pb-20 md:pb-0">
@@ -121,29 +113,11 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
             >
               ← Back to Events
             </Link>
-
-            {user?.role === Roles.Admin && (
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  href={`/events/${eventId}/edit`}
-                  className="inline-flex h-8 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-                >
-                  Edit
-                </Link>
-                <Link
-                  href={`/events/create?duplicate=${eventId}`}
-                  className="inline-flex h-8 items-center rounded-full border border-border px-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-                >
-                  Duplicate
-                </Link>
-                <button
-                  onClick={() => setShowDeleteModal(true)}
-                  className="inline-flex h-8 items-center rounded-full border border-destructive/40 px-3 font-mono text-[10px] uppercase tracking-widest text-destructive transition-colors hover:bg-destructive/10"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
+            <EventAdminActions
+              eventId={id}
+              eventTitle={event.title}
+              telegramSourceUrl={telegramSourceUrl}
+            />
           </div>
 
           {/* Hero media */}
@@ -234,90 +208,31 @@ export default function EventDetailsPage({ params }: EventDetailsPageProps) {
               {event.endDate && (
                 <Field
                   label="End Date"
-                  value={format(
-                    new Date(event.endDate),
-                    'MMMM d, yyyy · h:mm a'
-                  )}
+                  value={format(new Date(event.endDate), 'MMMM d, yyyy · h:mm a')}
                 />
               )}
-
-              {event.sourceUrl &&
-                (event.source !== 'telegram' || user?.role === Roles.Admin) && (
-                  <a
-                    href={event.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full rounded-xl bg-ember px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
-                  >
-                    View Source ↗
-                  </a>
-                )}
+              {/* View Source for non-telegram events (public) */}
+              {event.sourceUrl && event.source !== 'telegram' && (
+                <a
+                  href={event.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full rounded-xl bg-ember px-4 py-3 text-center font-mono text-xs uppercase tracking-widest text-ember-foreground transition-transform hover:-translate-y-0.5"
+                >
+                  View Source ↗
+                </a>
+              )}
             </aside>
           </div>
         </article>
 
         {/* Ratings and Comments */}
         <div className="mx-auto max-w-4xl px-6">
-          <EventEngagement eventId={eventId} />
+          <EventEngagement eventId={id} />
         </div>
       </main>
 
       <Footer />
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-void/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
-            <div className="mb-5 flex items-center gap-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-destructive/10">
-                <svg
-                  className="h-5 w-5 text-destructive"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-display text-xl">Delete Event</h3>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                  This action cannot be undone
-                </p>
-              </div>
-            </div>
-
-            <p className="mb-6 text-sm text-muted-foreground">
-              Are you sure you want to delete{' '}
-              <strong className="text-foreground">{event?.title}</strong>? This
-              will permanently remove the event and all associated data
-              including ratings and comments.
-            </p>
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                disabled={isDeleting}
-                className="inline-flex h-9 items-center rounded-full border border-border px-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="inline-flex h-9 items-center rounded-full bg-destructive px-4 font-mono text-[11px] uppercase tracking-widest text-destructive-foreground transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isDeleting ? 'Deleting…' : 'Delete Event'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

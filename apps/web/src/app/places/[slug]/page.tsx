@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getPlaceContent, getAllPlaceSlugs } from '@/lib/place-content';
 import { placeService } from '@/lib/places';
+import { generatePlaceSchema, generateBreadcrumbSchema } from '@/lib/seo';
 import PlaceImageGallery from '@/components/PlaceImageGallery';
 import PlaceRating from '@/components/PlaceRating';
 import PlaceComments from '@/components/PlaceComments';
@@ -28,9 +29,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const content = await getPlaceContent(slug);
   if (!content) return {};
+
+  const description = `Visit ${content.name} in ${content.address || 'Addis Ababa'}.${
+    content.openingHours ? ` Open: ${content.openingHours}.` : ''
+  }`.slice(0, 160);
+
   return {
-    title: `${content.name} | Whats Up Addis`,
-    description: content.name,
+    title: content.name,
+    description,
+    alternates: {
+      canonical: `https://whatsupaddis.io/places/${slug}`,
+    },
+    openGraph: {
+      title: `${content.name} | What's Up Addis`,
+      description,
+      url: `https://whatsupaddis.io/places/${slug}`,
+      images: content.imageUrls[0]
+        ? [{ url: content.imageUrls[0], width: 1200, height: 630 }]
+        : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.name,
+      description,
+      images: content.imageUrls[0] ? [content.imageUrls[0]] : [],
+    },
   };
 }
 
@@ -47,8 +70,23 @@ export default async function PlaceDetailPage({ params }: Props) {
   // Fetch DB record for ratings/comments (added in Issues 4 & 5)
   const place = await placeService.getPlaceById(slug).catch(() => null);
 
+  const placeSchema = generatePlaceSchema(content);
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: 'Places', url: '/places' },
+    { name: content.name, url: `/places/${slug}` },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(placeSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <Navbar />
 
       <main className="flex-1 pb-20 md:pb-0">

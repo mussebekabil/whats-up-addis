@@ -1,11 +1,12 @@
 import { MetadataRoute } from 'next';
 import { eventService } from '@/lib/events';
 import { categoryService } from '@/lib/categories';
+import { getAllPlaceSlugs } from '@/lib/place-content';
+import { GUIDES } from '@/lib/guides';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://whatsupaddis.io';
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -25,10 +26,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/places`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/guides`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
   ];
 
+  // Place pages — reads markdown files synchronously, no API call needed
+  const placeSlugs = getAllPlaceSlugs();
+  const placePages: MetadataRoute.Sitemap = placeSlugs.map((slug) => ({
+    url: `${baseUrl}/places/${slug}`,
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  }));
+
+  // Guide pages — derived from static config, no API call needed
+  const guidePages: MetadataRoute.Sitemap = GUIDES.map((guide) => ({
+    url: `${baseUrl}/guides/${guide.slug}`,
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
   try {
-    // Fetch all events for sitemap
     const eventsResponse = await eventService.getEvents({
       page: 1,
       limit: 1000,
@@ -42,7 +69,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    // Fetch all categories for sitemap
     const categories = await categoryService.getCategories();
 
     const categoryPages: MetadataRoute.Sitemap = categories.map(
@@ -54,10 +80,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       })
     );
 
-    return [...staticPages, ...eventPages, ...categoryPages];
+    return [
+      ...staticPages,
+      ...eventPages,
+      ...categoryPages,
+      ...placePages,
+      ...guidePages,
+    ];
   } catch (error) {
     console.error('Error generating sitemap:', error);
-    // Return at least the static pages if dynamic content fails
-    return staticPages;
+    return [...staticPages, ...placePages, ...guidePages];
   }
 }

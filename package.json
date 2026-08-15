@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "pnpm -r --parallel dev",
+    "local": "pnpm -r --parallel --filter !@whats-up-addis/telegram-scraper dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
@@ -24,7 +25,8 @@
     "telegram:dev": "pnpm --filter @whats-up-addis/telegram-scraper dev",
     "telegram:scrape": "pnpm --filter @whats-up-addis/telegram-scraper scrape",
     "telegram:generate-session": "pnpm --filter @whats-up-addis/telegram-scraper generate-session",
-    "email-scheduler:start": "pnpm --filter @whats-up-addis/email-scheduler start"
+    "email-scheduler:start": "pnpm --filter @whats-up-addis/email-scheduler start",
+    "upload-place-images": "pnpm --filter @whats-up-addis/web upload-place-images"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

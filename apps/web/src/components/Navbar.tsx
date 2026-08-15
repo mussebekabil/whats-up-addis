@@ -112,14 +112,14 @@ export default function Navbar() {
               Places
             </Link>
             <Link
-              href="/categories"
+              href="/guides"
               className={`text-xs uppercase transition-colors ${
-                isActive('/categories') || pathname?.startsWith('/categories/')
+                isActive('/guides') || pathname?.startsWith('/guides/')
                   ? 'text-ember'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Categories
+              Guides
             </Link>
             <Link
               href="/contact"
