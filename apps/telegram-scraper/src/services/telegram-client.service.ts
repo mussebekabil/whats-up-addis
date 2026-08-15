@@ -14,6 +14,7 @@ export class TelegramClientService {
   private client: TelegramClient;
   private isConnected: boolean = false;
   private sessionFile: string;
+  private connectionWatchdog: NodeJS.Timeout | null = null;
 
   constructor() {
     const apiId = parseInt(process.env.TELEGRAM_API_ID || '');
@@ -31,7 +32,33 @@ export class TelegramClientService {
 
     this.client = new TelegramClient(session, apiId, apiHash, {
       connectionRetries: 5,
+      // Slow reconnects to prevent the library's internal reconnect storm
+      // where multiple _recvLoop instances fire simultaneously at ms intervals.
+      retryDelay: 5000,
     });
+  }
+
+  private startConnectionWatchdog(): void {
+    const WATCHDOG_INTERVAL_MS = 5_000;
+    const MAX_DISCONNECTED_MS = 60_000;
+    let disconnectedSince: number | null = null;
+
+    this.connectionWatchdog = setInterval(() => {
+      if (this.client.connected) {
+        disconnectedSince = null;
+      } else {
+        if (disconnectedSince === null) {
+          disconnectedSince = Date.now();
+          console.warn('Connection lost, monitoring for recovery...');
+        } else if (Date.now() - disconnectedSince > MAX_DISCONNECTED_MS) {
+          console.error(
+            'Telegram connection lost for over 60 seconds — exiting so Railway can restart cleanly'
+          );
+          if (this.connectionWatchdog) clearInterval(this.connectionWatchdog);
+          process.exit(1);
+        }
+      }
+    }, WATCHDOG_INTERVAL_MS);
   }
 
   async connect(): Promise<void> {
@@ -69,6 +96,7 @@ export class TelegramClientService {
       console.log(
         `Connected to Telegram as ${(me as Api.User).firstName || 'User'}`
       );
+      this.startConnectionWatchdog();
     } catch (error) {
       console.error('Failed to connect to Telegram:', error);
       throw error;
@@ -328,6 +356,10 @@ export class TelegramClientService {
   }
 
   async disconnect(): Promise<void> {
+    if (this.connectionWatchdog) {
+      clearInterval(this.connectionWatchdog);
+      this.connectionWatchdog = null;
+    }
     if (this.isConnected) {
       await this.client.disconnect();
       this.isConnected = false;
