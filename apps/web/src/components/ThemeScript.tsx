@@ -3,7 +3,7 @@ export function ThemeScript() {
   return (
     <script
       dangerouslySetInnerHTML={{
-        __html: `(function(){var s=localStorage.getItem('wua-theme');var p=window.matchMedia('(prefers-color-scheme: dark)').matches;if(s?s==='dark':p){document.documentElement.classList.add('dark');}})();`,
+        __html: `(function(){var s=localStorage.getItem('wua-theme');if(s!=='light'){document.documentElement.classList.add('dark');}})();`,
       }}
     />
   );
