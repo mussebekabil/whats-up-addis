@@ -21,6 +21,7 @@ register({
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { prisma } from '@whats-up-addis/database';
 import { errorHandler } from './middleware/error-handler.js';
 import { notFoundHandler } from './middleware/not-found.js';
 import healthRoutes from './routes/health.routes.js';
@@ -69,6 +70,24 @@ app.use('/api/places', placeRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 API server running on http://localhost:${PORT}`);
 });
+
+// Graceful shutdown
+const gracefulShutdown = async (signal: string) => {
+  console.log(`${signal} received, closing connections...`);
+  try {
+    await prisma.$disconnect();
+    console.log('Database connection closed');
+  } catch (error) {
+    console.error('Error disconnecting from database:', error);
+  }
+  server.close(() => {
+    console.log('HTTP server closed');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
