@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
 import { ThemeScript } from '@/components/ThemeScript';
 import './globals.css';
 
@@ -92,16 +93,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const themeCookie = (await cookies()).get('wua-theme')?.value;
+  const isDark = themeCookie !== 'light';
+  const fontClasses = `${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`;
+
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
+      className={isDark ? `${fontClasses} dark` : fontClasses}
     >
       <head>
         <ThemeScript />

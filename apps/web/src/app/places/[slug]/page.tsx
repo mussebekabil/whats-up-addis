@@ -30,9 +30,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const content = await getPlaceContent(slug);
   if (!content) return {};
 
-  const description = `Visit ${content.name} in ${content.address || 'Addis Ababa'}.${
-    content.openingHours ? ` Open: ${content.openingHours}.` : ''
-  }`.slice(0, 160);
+  const description =
+    `Visit ${content.name} in ${content.address || 'Addis Ababa'}.${
+      content.openingHours ? ` Open: ${content.openingHours}.` : ''
+    }`.slice(0, 160);
 
   return {
     title: content.name,

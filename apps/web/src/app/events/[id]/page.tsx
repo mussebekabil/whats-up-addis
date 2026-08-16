@@ -46,7 +46,14 @@ export async function generateMetadata({
         url: `https://whatsupaddis.io/events/${id}`,
         type: 'article',
         images: event.imageUrl
-          ? [{ url: event.imageUrl, width: 1200, height: 630, alt: event.title }]
+          ? [
+              {
+                url: event.imageUrl,
+                width: 1200,
+                height: 630,
+                alt: event.title,
+              },
+            ]
           : [],
       },
       twitter: {
@@ -208,7 +215,10 @@ export default async function EventDetailsPage({
               {event.endDate && (
                 <Field
                   label="End Date"
-                  value={format(new Date(event.endDate), 'MMMM d, yyyy · h:mm a')}
+                  value={format(
+                    new Date(event.endDate),
+                    'MMMM d, yyyy · h:mm a'
+                  )}
                 />
               )}
               {/* View Source for non-telegram events (public) */}

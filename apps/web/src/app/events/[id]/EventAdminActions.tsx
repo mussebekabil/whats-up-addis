@@ -25,7 +25,10 @@ export default function EventAdminActions({
 
   useEffect(() => {
     if (authService.isAuthenticated()) {
-      authService.getMe().then(setUser).catch(() => {});
+      authService
+        .getMe()
+        .then(setUser)
+        .catch(() => {});
     }
   }, []);
 

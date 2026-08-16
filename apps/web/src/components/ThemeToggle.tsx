@@ -13,11 +13,9 @@ export function ThemeToggle() {
     const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle('dark', next);
-    if (next) {
-      localStorage.setItem('wua-theme', 'dark');
-    } else {
-      localStorage.setItem('wua-theme', 'light');
-    }
+    const value = next ? 'dark' : 'light';
+    localStorage.setItem('wua-theme', value);
+    document.cookie = `wua-theme=${value};path=/;max-age=31536000;SameSite=Lax`;
   };
 
   return (

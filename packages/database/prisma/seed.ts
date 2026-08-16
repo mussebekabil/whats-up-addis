@@ -456,7 +456,7 @@ async function main() {
         'https://res.cloudinary.com/dlvwfihop/image/upload/v1786271448/whats-up-addis/places/merkato-1786271445779.jpg',
       categoryId: shoppingCategory?.id,
       featured: false,
-    }
+    },
   ];
 
   for (const place of placesData) {
