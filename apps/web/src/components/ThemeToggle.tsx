@@ -13,7 +13,11 @@ export function ThemeToggle() {
     const next = !dark;
     setDark(next);
     document.documentElement.classList.toggle('dark', next);
-    localStorage.setItem('wua-theme', next ? 'dark' : 'light');
+    if (next) {
+      localStorage.removeItem('wua-theme');
+    } else {
+      localStorage.setItem('wua-theme', 'light');
+    }
   };
 
   return (
