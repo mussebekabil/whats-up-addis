@@ -14,7 +14,7 @@ export function ThemeToggle() {
     setDark(next);
     document.documentElement.classList.toggle('dark', next);
     if (next) {
-      localStorage.removeItem('wua-theme');
+      localStorage.setItem('wua-theme', 'dark');
     } else {
       localStorage.setItem('wua-theme', 'light');
     }
