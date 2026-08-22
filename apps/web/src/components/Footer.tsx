@@ -18,6 +18,17 @@ export default function Footer() {
         <p className="font-mono text-xs text-muted-foreground">
           &copy; {new Date().getFullYear()} &middot; Made in Addis Ababa ✦
         </p>
+        <p className="font-mono text-xs text-muted-foreground">
+          Designed &amp; developed by{' '}
+          <a
+            href="https://qemari.io/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 transition-colors hover:text-foreground"
+          >
+            qemari.io
+          </a>
+        </p>
       </div>
     </footer>
   );
