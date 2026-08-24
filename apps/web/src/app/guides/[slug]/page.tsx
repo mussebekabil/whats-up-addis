@@ -55,6 +55,8 @@ function GuidePlaceCard({ place }: { place: PlaceContent }) {
   );
 }
 
+export const revalidate = 3600;
+
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
 }
@@ -96,18 +98,36 @@ export default async function GuidePage({ params }: Props) {
       c !== null && c.categorySlug === guide.categorySlug
   );
 
-  // Fetch upcoming events matching this guide's keywords; degrade silently on failure
-  let events: Event[] = [];
+  // Fetch upcoming and past events matching this guide's keywords; degrade silently on failure
+  let upcomingEvents: Event[] = [];
+  let pastEvents: Event[] = [];
   try {
     const keyword = guide.eventKeywords[0];
-    const res = await eventService.getEvents({
-      page: 1,
-      limit: 6,
-      search: keyword,
-    });
-    events = res.data ?? [];
+    const now = new Date().toISOString();
+    const [upcomingResult, pastResult] = await Promise.allSettled([
+      eventService.getEvents({
+        page: 1,
+        limit: 6,
+        search: keyword,
+        endDateGte: now,
+      }),
+      eventService.getEvents({
+        page: 1,
+        limit: 6,
+        search: keyword,
+        endDateLt: now,
+      }),
+    ]);
+    upcomingEvents =
+      upcomingResult.status === 'fulfilled'
+        ? (upcomingResult.value.data ?? [])
+        : [];
+    pastEvents =
+      pastResult.status === 'fulfilled'
+        ? (pastResult.value.data ?? [])
+        : [];
   } catch {
-    // events section simply won't render
+    // events sections simply won't render
   }
 
   const guideSchema = generateGuideSchema(
@@ -164,11 +184,22 @@ export default async function GuidePage({ params }: Props) {
             </p>
           )}
 
-          {events.length > 0 && (
+          {upcomingEvents.length > 0 && (
             <section className="mt-16">
               <h2 className="font-display text-2xl">Upcoming Related Events</h2>
               <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {events.map((event) => (
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {pastEvents.length > 0 && (
+            <section className="mt-16">
+              <h2 className="font-display text-2xl">Past Related Events</h2>
+              <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {pastEvents.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
               </div>
