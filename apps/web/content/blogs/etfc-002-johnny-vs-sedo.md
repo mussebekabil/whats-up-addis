@@ -7,6 +7,8 @@ category: "MMA"
 excerpt: "Ethiopia's biggest MMA night delivered. Johnny claimed the ETFC 002 main event at the Adwa 00 Museum, defeating Sedo in a closely-watched clash of styles that signals a new chapter for Ethiopian combat sports."
 coverImage: "https://i.ytimg.com/vi/NUygevvMdJk/sddefault.jpg"
 youtubeUrl: "https://www.youtube.com/watch?v=1lNKrnBvIzQ"
+relatedEventKeywords: "ETFC, MMA, fight, fight night, boxing, muay thai"
+relatedPlaceSlugs: "adwa-victory-memorial"
 ---
 
 ## Adwa Fight Night Delivers

@@ -7,6 +7,15 @@ import remarkHtml from 'remark-html';
 
 const BLOGS_DIR = path.join(process.cwd(), 'content/blogs');
 
+function parseLinks(value: unknown): string[] | undefined {
+  if (!value) return undefined;
+  const links = String(value)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return links.length > 0 ? links : undefined;
+}
+
 export interface BlogFrontmatter {
   title: string;
   slug: string;
@@ -16,6 +25,8 @@ export interface BlogFrontmatter {
   excerpt: string;
   coverImage?: string;
   youtubeUrl?: string;
+  relatedEventKeywords?: string[];
+  relatedPlaceSlugs?: string[];
 }
 
 export interface BlogContent extends BlogFrontmatter {
@@ -60,6 +71,8 @@ export async function getBlogContent(
     excerpt: data.excerpt ?? '',
     coverImage: data.coverImage ?? undefined,
     youtubeUrl: data.youtubeUrl ?? undefined,
+    relatedEventKeywords: parseLinks(data.relatedEventKeywords),
+    relatedPlaceSlugs: parseLinks(data.relatedPlaceSlugs),
     contentHtml,
   };
 }
@@ -97,6 +110,8 @@ export function getAllBlogs(): BlogFrontmatter[] {
         excerpt: data.excerpt ?? '',
         coverImage: data.coverImage ?? undefined,
         youtubeUrl: data.youtubeUrl ?? undefined,
+        relatedEventKeywords: parseLinks(data.relatedEventKeywords),
+        relatedPlaceSlugs: parseLinks(data.relatedPlaceSlugs),
       };
     })
     .sort((a, b) => {
