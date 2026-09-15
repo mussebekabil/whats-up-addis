@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { ThemeScript } from '@/components/ThemeScript';
+import { GTagScript } from '@/components/GTagScript';
 import './globals.css';
 
 const inter = Inter({
@@ -109,14 +110,7 @@ export default async function RootLayout({
       className={isDark ? `${fontClasses} dark` : fontClasses}
     >
       <head>
-          <script async src="https://www.googletagmanager.com/gtag/js?id=G-GL9J0G7KT5"></script>
-          <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-GL9J0G7KT5');
-         </script>
+        <GTagScript />  
         <ThemeScript />
       </head>
       <body className="font-sans">{children}</body>
