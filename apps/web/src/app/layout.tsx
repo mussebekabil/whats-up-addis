@@ -109,8 +109,6 @@ export default async function RootLayout({
       className={isDark ? `${fontClasses} dark` : fontClasses}
     >
       <head>
-          <!-- Move it to its own component -->
-          <!-- Google tag (gtag.js) -->
           <script async src="https://www.googletagmanager.com/gtag/js?id=G-GL9J0G7KT5"></script>
           <script>
             window.dataLayer = window.dataLayer || [];
