@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@whats-up-addis/shared'],
   output: 'standalone',
   images: {
+    loader: 'custom',
+    loaderFile: './src/lib/cloudinary-loader.ts',
     remotePatterns: [
       {
         protocol: 'https',
@@ -27,6 +29,8 @@ const nextConfig: NextConfig = {
   // Environment variables that should be available on the client
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:
+      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   },
 };
 
