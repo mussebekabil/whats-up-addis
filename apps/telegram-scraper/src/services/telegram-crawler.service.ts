@@ -305,6 +305,21 @@ export class TelegramCrawlerService {
         return;
       }
 
+      // Discard past events
+      const now = new Date();
+      let relevantDate: Date | null = null;
+      if (eventData.endDate) {
+        relevantDate = new Date(eventData.endDate);
+      } else if (eventData.startDate) {
+        relevantDate = new Date(eventData.startDate);
+      }
+      if (relevantDate && relevantDate < now) {
+        console.log(
+          `Event "${eventData.title}" is in the past (${relevantDate.toISOString()}), skipping`
+        );
+        return;
+      }
+
       // Upload image if present
       let imageUrl: string | undefined;
       if (message.photo && message.photo.length > 0) {
